@@ -23,5 +23,9 @@
         "./src/dateSelector.tsx",
         "./src/optionsMapper.tsx",
         "./src/reactUtils.tsx"
+    ],
+    "include": [
+        "src",
+        "src/languages/enAU.ts"
     ]
 }

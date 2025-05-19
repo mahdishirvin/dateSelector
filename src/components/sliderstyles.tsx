@@ -7,7 +7,6 @@ export const style = {
 } as const;
 
 export const styleB = {
-  // zIndex: 1,
   marginTop: -16,
   "& .MuiSlider-thumb": {
     marginTop: 0.8,
@@ -84,14 +83,11 @@ export const styleT = {
     opacity: 0.3,
   },
   "& .MuiSlider-markActive": {
-    // top: 19,
     height: 18,
     width: 1.1,
-    // borderRadius: "0%",
     opacity: 0.5,
   },
   "& .MuiSlider-track": {
-    // top: 20,
     height: 10,
     opacity: 0.2,
     borderRadius: "0%",

@@ -211,7 +211,9 @@ export interface dateCardProps {
   current?: any;
   // function to handle the selected value(s)
   handleVal?: (val: any) => void;
+  handleViz?: (val: any) => void;
   handleClick?: () => void;
+  handleStep?: (value: string) => void;
   onFilterChanged?: (val: dateRange) => void;
   setStepValue?: (value: string) => void;
   setStepOpen?: (value: boolean) => void;
@@ -344,5 +346,5 @@ export interface current {
   show: boolean;
   thisPeriod: string;
   thisRange: any;
-  icon: JSX.Element;
+  icon: React.ReactSVGElement;
 }

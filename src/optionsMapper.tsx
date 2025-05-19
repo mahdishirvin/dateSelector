@@ -1,30 +1,10 @@
 import powerbi from "powerbi-visuals-api";
 import { FONT_SIZE, FONT_FAMILY } from "./constants";
-
-import DataView = powerbi.DataView;
-import IViewport = powerbi.IViewport;
-import DataViewCategorical = powerbi.DataViewCategorical;
-import DataViewCategoricalColumn = powerbi.DataViewCategoricalColumn;
-import DataViewCategoryColumn = powerbi.DataViewCategoryColumn;
-import DataViewMetadataColumn = powerbi.DataViewMetadataColumn;
-import PrimitiveValue = powerbi.PrimitiveValue;
-
 import { interactivityFilterService } from "powerbi-visuals-utils-interactivityutils";
-import extractFilterColumnTarget = interactivityFilterService.extractFilterColumnTarget;
-
-import { IAdvancedFilter } from "powerbi-models";
-
-import {
-  valueFormatter as vf,
-  textMeasurementService as tms,
-} from "powerbi-visuals-utils-formattingutils";
-
-import IValueFormatter = vf.IValueFormatter;
-
+import { valueFormatter as vf, textMeasurementService as tms } from "powerbi-visuals-utils-formattingutils";
 import { pixelConverter as PixelConverter } from "powerbi-visuals-utils-typeutils";
-
-import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
-
+import { getInitRange } from "./dateutils";
+import { startOfDay, endOfDay } from "date-fns";
 import {
   VisualState,
   ViewportData,
@@ -32,11 +12,11 @@ import {
   dateCardProps,
   dateRange,
 } from "./interface";
+import { IAdvancedFilter } from "powerbi-models";
 
-import { getInitRange } from "./dateutils";
-import { startOfDay, endOfDay } from "date-fns";
+const { extractFilterColumnTarget } = interactivityFilterService;
 
-export const optionsAreValid = (options: VisualUpdateOptions): boolean => {
+export const optionsAreValid = (options: powerbi.extensibility.visual.VisualUpdateOptions): boolean => {
   try {
     return !(
       !options ||
@@ -52,55 +32,26 @@ export const optionsAreValid = (options: VisualUpdateOptions): boolean => {
 };
 
 export const settingProps = (
-  options: VisualUpdateOptions,
+  options: powerbi.extensibility.visual.VisualUpdateOptions,
   formatSettings: any,
   initialised: boolean
 ): dateCardProps => {
-  const {
-    styleSettings: style,
-    calendarSettings: calendar,
-    layoutSettings: layout,
-    periodSettings: period,
-  } = formatSettings;
-
-  const {
-    periodDay: day,
-    periodWeek: week,
-    periodPay: pay,
-    periodMonth: month,
-    periodQuarter: quarter,
-    periodYear: year,
-  } = period;
-
-  const {layoutCurrent:current ,
-    layoutMove: move,
-    layoutTimeline: timeline ,
-    layoutHelp: help
-  } = layout
+  const { styleSettings: style, calendarSettings: calendar, layoutSettings: layout, periodSettings: period } = formatSettings;
+  const { periodDay: day, periodWeek: week, periodPay: pay, periodMonth: month, periodQuarter: quarter, periodYear: year } = period;
+  const { layoutCurrent: current, layoutMove: move, layoutTimeline: timeline, layoutHelp: help } = layout;
 
   const stepInit: string = calendar.stepInit.value.toString();
   const singleDay: boolean = calendar.singleDay.value;
   const limitToScope: boolean = calendar.limitToScope.value;
   const rangeScope: dateRange = mapDataView(options).category.rangeValues;
-  const weekStartDay: 0 | 1 | 2 | 3 | 4 | 5 | 6 = getDayNum(
-    week.weekStartDay.value.valueOf()
-  );
+  const weekStartDay: 0 | 1 | 2 | 3 | 4 | 5 | 6 = getDayNum(week.weekStartDay.value.valueOf());
   const yearStartMonth: number = getNum(year.yearStartMonth.value.valueOf());
   const startRange: string = calendar.startRange.value.toString();
 
-  const startupFilter = getInitRange(
-    startRange,
-    weekStartDay,
-    yearStartMonth,
-    rangeScope
-  );
+  const startupFilter = getInitRange(startRange, weekStartDay, yearStartMonth, rangeScope);
+  const selectedDates = startRange !== "sync" && !initialised ? startupFilter : restoreRangeFilter(options) || startupFilter;
 
-  const selectedDates =
-    startRange !== "sync" && !initialised
-      ? startupFilter
-      : restoreRangeFilter(options) ? restoreRangeFilter(options): startupFilter;
-
-      return {
+  return {
     landingOff: optionsAreValid(options),
     dates: selectedDates,
     rangeScope: rangeScope,
@@ -136,11 +87,7 @@ export const settingProps = (
     },
     payProps: {
       desc: "Pay-Period",
-      ref: new Date(
-        pay.payRefYear.value,
-        getNum(pay.payRefMonth.value.valueOf()),
-        pay.payRefDay.value
-      ),
+      ref: new Date(pay.payRefYear.value, getNum(pay.payRefMonth.value.valueOf()), pay.payRefDay.value),
       len: pay.payLength.value,
     },
     showHelpIcon: help.showHelpIcon.value,
@@ -162,94 +109,50 @@ export const settingProps = (
 
 const getDayNum = (n: number | string): 0 | 1 | 2 | 3 | 4 | 5 | 6 => {
   const num = typeof n === "number" ? n : parseInt(n, 10);
-  const dayIndex = num % 7;
-  return dayIndex as 0 | 1 | 2 | 3 | 4 | 5 | 6;
+  return (num % 7) as 0 | 1 | 2 | 3 | 4 | 5 | 6;
 };
 
-const getNum = (n: number | string) => {
-  return typeof n === "number" ? n : parseInt(n, 10);
-};
+const getNum = (n: number | string) => (typeof n === "number" ? n : parseInt(n, 10));
 
 const parseDate = (value: any): Date | null => {
-  const typeOfValue: string = typeof value;
-  let date: Date = value;
-  if (typeOfValue === "number") {
-    date = new Date(value, 0);
-  }
-  if (typeOfValue === "string") {
-    date = new Date(value);
-  }
-  if (date && date instanceof Date && date.toString() !== "Invalid Date") {
-    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  }
-  return null;
+  const date = new Date(value);
+  return date instanceof Date && !isNaN(date.getTime()) ? new Date(date.getFullYear(), date.getMonth(), date.getDate()) : null;
 };
 
-export const mapDataView = (
-  options: VisualUpdateOptions
-): Partial<VisualState> => {
-  const dataView: DataView = options.dataViews[0];
-  const categorical: DataViewCategorical | undefined = dataView.categorical;
-
-  const category: DataViewCategoryColumn | undefined =
-    categorical?.categories?.[0];
-
-  const categorySource: DataViewMetadataColumn = (
-    category as DataViewCategoricalColumn
-  ).source;
-
+export const mapDataView = (options: powerbi.extensibility.visual.VisualUpdateOptions): Partial<VisualState> => {
+  const dataView = options.dataViews[0];
+  const categorical = dataView.categorical;
+  const category = categorical?.categories?.[0];
+  const categorySource = category?.source;
   const filterTarget = extractFilterColumnTarget(categorySource);
-
-  const categoriesFormatter: IValueFormatter = vf.create({
-    format: vf.getFormatStringByColumn(categorySource),
-  });
-
-  const rangeScopeValues: string[] | undefined = category?.values.map(
-    (value: PrimitiveValue) => categoriesFormatter.format(value)
-  );
-
+  const categoriesFormatter = vf.create({ format: vf.getFormatStringByColumn(categorySource) });
+  const rangeScopeValues = category?.values.map((value) => categoriesFormatter.format(value));
   const rangeScopeVals: dateRange = {
     start: parseDate(category.values[0]),
     end: parseDate(category.values[category.values.length - 1]),
   };
-
-  const getStringLength = (text: string) =>
-    tms.measureSvgTextWidth({
-      text,
-      fontFamily: FONT_FAMILY,
-      fontSize: PixelConverter.toString(FONT_SIZE),
-    });
-
-  const maxCategoryNameWidth: number | undefined = rangeScopeValues?.reduce(
-    (acc: number, value: string) =>
-      getStringLength(value) > acc ? getStringLength(value) : acc,
+  const maxCategoryNameWidth = rangeScopeValues?.reduce(
+    (acc, value) => Math.max(acc, tms.measureSvgTextWidth({ text: value, fontFamily: FONT_FAMILY, fontSize: PixelConverter.toString(FONT_SIZE) })),
     0
   );
 
-  const categoryData = {
-    displayName: categorySource.displayName,
-    count: category?.values.length,
-    rangeValues: rangeScopeVals,
-    formatter: categoriesFormatter,
-    maxWidth: maxCategoryNameWidth,
-    filterTarget: filterTarget,
-  } as CategoryData;
-
   return {
-    category: categoryData,
+    category: {
+      displayName: categorySource.displayName,
+      count: category?.values.length,
+      rangeValues: rangeScopeVals,
+      formatter: categoriesFormatter,
+      maxWidth: maxCategoryNameWidth,
+      filterTarget: filterTarget,
+    } as CategoryData,
   };
 };
 
-export const restoreRangeFilter = ( options: VisualUpdateOptions ) => {
-  const jsonFilters: powerbi.IFilter[] = options.jsonFilters;
-  const dataView: powerbi.DataView = options.dataViews[0];
+export const restoreRangeFilter = (options: powerbi.extensibility.visual.VisualUpdateOptions) => {
+  const { jsonFilters, dataViews } = options;
+  const dataView = dataViews[0];
 
-  if (
-    jsonFilters &&
-    dataView.metadata &&
-    dataView.metadata.columns &&
-    dataView.metadata.columns[0]
-  ) {
+  if (jsonFilters && dataView.metadata && dataView.metadata.columns && dataView.metadata.columns[0]) {
     const filter = jsonFilters.find((filter): filter is IAdvancedFilter => {
       return (
         (filter as IAdvancedFilter).target !== undefined &&
@@ -260,9 +163,7 @@ export const restoreRangeFilter = ( options: VisualUpdateOptions ) => {
 
     if (filter) {
       const target = filter.target as { table: string; column: string };
-      const source: string[] = String(
-        dataView.metadata.columns[0].queryName
-      ).split(".");
+      const source = String(dataView.metadata.columns[0].queryName).split(".");
       if (
         source &&
         source[0] &&
@@ -271,12 +172,8 @@ export const restoreRangeFilter = ( options: VisualUpdateOptions ) => {
         target.table === source[0] &&
         target.column === source[1]
       ) {
-        const greaterThan = filter.conditions.find(
-          (cond) => cond.operator === "GreaterThanOrEqual"
-        );
-        const lessThan = filter.conditions.find(
-          (cond) => cond.operator === "LessThanOrEqual"
-        );
+        const greaterThan = filter.conditions.find((cond) => cond.operator === "GreaterThanOrEqual");
+        const lessThan = filter.conditions.find((cond) => cond.operator === "LessThanOrEqual");
         if (greaterThan && lessThan) {
           return {
             start: startOfDay(parseDate(greaterThan.value)),
@@ -288,23 +185,18 @@ export const restoreRangeFilter = ( options: VisualUpdateOptions ) => {
   }
 };
 
-export const mapViewport = (viewport: IViewport): ViewportData => ({
+export const mapViewport = (viewport: powerbi.IViewport): ViewportData => ({
   width: viewport.width,
   height: viewport.height,
 });
 
 export const mapOptionsToState = (
-  options: VisualUpdateOptions,
+  options: powerbi.extensibility.visual.VisualUpdateOptions,
   formatSettings: any,
   initialised: boolean
 ): VisualState => {
-
-  const dataViewPartial: Partial<VisualState> = mapDataView(options);
-  const props: dateCardProps = settingProps(
-    options,
-    formatSettings,
-    initialised
-  );
+  const dataViewPartial = mapDataView(options);
+  const props: dateCardProps = settingProps(options, formatSettings, initialised);
   return {
     category: dataViewPartial.category,
     viewport: mapViewport(options.viewport),

@@ -6,8 +6,8 @@ import {
   textMeasurementService as tms,
   interfaces,
 } from "powerbi-visuals-utils-formattingutils";
-import TextProperties = interfaces.TextProperties;
 import { pixelConverter } from "powerbi-visuals-utils-typeutils";
+import TextProperties = interfaces.TextProperties;
 
 interface DateFieldProps {
   id: "start" | "end";
@@ -25,27 +25,15 @@ interface DateFieldProps {
   doUpdate: (id: string, value: string) => void;
 }
 
-export const DateField: React.FC<DateFieldProps> = ({
-  id,
-  value,
-  error,
-  onChange,
-  onBlur,
-  onFocus,
-  doUpdate,
-  underline,
-  max,
-  min,
-  type = "date",
-}) => {
+export const DateField: React.FC<DateFieldProps> = (props) => {
+  const { id, value, doUpdate, underline, max, min = "date" } = props;
+
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
       const inputElement = e.target as HTMLInputElement;
       if (inputElement && inputElement.value) {
-        const dateValue: string = inputElement.value;
-        doUpdate(id, dateValue);
-        // console.log(id, dateValue);
+        doUpdate(id, inputElement.value);
       }
     }
   };
@@ -54,44 +42,37 @@ export const DateField: React.FC<DateFieldProps> = ({
   const textProperties: TextProperties = {
     text: value,
     fontFamily: theme.typography.fontFamily,
-    fontSize: pixelConverter.toString(theme.typography.fontSize)
+    fontSize: pixelConverter.toString(theme.typography.fontSize),
   };
-  // console.log("h: ",tms.measureSvgTextHeight(textProperties),
-  //   "h-estimate: " , tms.estimateSvgTextHeight(textProperties),"w: ",
-  //   tms.measureSvgTextWidth(textProperties),"fontSize",theme.typography.fontSize
-  // );
+
   return (
-    (<TextField
+    <TextField
       id={id}
       sx={{
-        "& input[type='date']::-webkit-calendar-picker-indicator": {
-          filter: theme.palette.primary.main
-            ? hexToCSSFilter(theme.palette.primary.main).filter
-            : "",
-        },
-        //  width: theme.typography.fontSize * 8,
-        paddingTop: "3px",
+      //   "& input[type='date']::-webkit-calendar-picker-indicator": {
+      //     display: "initial !important",
+      //     // filter: theme.palette.primary.main
+      //     //   ? hexToCSSFilter(theme.palette.primary.main).filter
+      //     //   : "",
+      //   },
+      //   paddingTop: "3px",
         width: tms.measureSvgTextWidth(textProperties) + theme.typography.fontSize * 3.25,
       }}
+      type="date"
       variant="standard"
       size="small"
-      type={type}
-      error={error}
-      value={value}
-      onChange={onChange}
-      onBlur={onBlur}
-      onFocus={onFocus}
       placeholder={"yyyy-MM-dd"}
       onKeyDown={handleKeyPress}
       slotProps={{
         input: {
           disableUnderline: underline,
         },
-
         htmlInput: {
           max,
           min,
-        }
-      }} />)
+        },
+      }}
+      {...props}
+    />
   );
 };

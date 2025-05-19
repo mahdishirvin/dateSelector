@@ -4,5 +4,6 @@ export default [
     powerbiVisualsConfigs.configs.recommended,
     {
         ignores: ["node_modules/**", "dist/**", ".vscode/**", ".tmp/**"],
-    },
+        files: ["./src/languages/**/*.{ts,tsx}"]
+    }
 ];

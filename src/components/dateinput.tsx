@@ -1,28 +1,13 @@
 import * as React from "react";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import Zoom from "@mui/material/Zoom";
 import DateMove from "./datemove";
 import DateRange from "./daterange";
 import StepsMenu from "./stepsmenu";
 import StepToggle from "./steptoggle";
+import { dateCardProps } from "../interface";
 
-function DateInput({
-  dates,
-  rangeScope,
-  payProps,
-  handleVal,
-  stepViz,
-  openSlider,
-  stepOpen,
-  stepValue,
-  handleClick,
-  handleStep,
-  handleViz,
-  singleDay,
-  limitToScope,
-  showMove,
-  showExpand,
-}) {
+function DateInput(props: dateCardProps) {
   return (
     <>
       <Grid
@@ -32,30 +17,17 @@ function DateInput({
         }}
       >
         <DateRange
-          dates={dates}
-          rangeScope={rangeScope}
-          handleVal={handleVal}
-          singleDay={singleDay}
-          limitToScope={limitToScope}
+          {...props}
         />
       </Grid>
-      {showMove && (
+      {props.showMove && (
         <Grid container>
-          <Zoom in={showMove}>
+          <Zoom in={props.showMove}>
             <Grid size="auto">
-              <DateMove
-                dates={dates}
-                rangeScope={rangeScope}
-                stepValue={stepValue}
-                payProps={payProps}
-                handleVal={handleVal}
+              <DateMove {...props}
                 bf={"b"}
                 vertical={false}
                 reverse={true}
-                viz={openSlider}
-                singleDay={singleDay}
-                limitToScope={limitToScope}
-                showExpand={showExpand}
               />
             </Grid>
           </Zoom>
@@ -65,41 +37,22 @@ function DateInput({
               paddingRight: 1,
             }}
           >
-            <StepToggle
-              stepViz={stepViz}
-              stepValue={stepValue}
-              payProps={payProps}
-              viz={stepOpen}
-              handleStep={handleStep}
-              onClick={handleClick}
-            />
-          </Grid>
-          <Zoom in={stepOpen}>
+             <StepToggle {...props} onClick={props.handleClick} />
+             </Grid>
+          <Zoom in={props.stepOpen}>
             <Grid size="auto">
-              <StepsMenu
-                stepViz={stepViz}
-                stepValue={stepValue}
-                payProps={payProps}
-                viz={stepOpen}
-                handleStep={handleStep}
-                handleViz={handleViz}
+              <StepsMenu {...props}
+                viz={props.stepOpen}
               />
             </Grid>
           </Zoom>
           {/* <Zoom in={openSlider}> */}
           <Grid size="auto">
-            <DateMove
-              dates={dates}
-              rangeScope={rangeScope}
-              stepValue={stepValue}
-              payProps={payProps}
-              handleVal={handleVal}
+            <DateMove {...props}
               bf={"f"}
               vertical={false}
               reverse={false}
-              viz={openSlider}
-              singleDay={singleDay}
-              showExpand={showExpand}
+              viz={props.openSlider}
             />
           </Grid>
           {/* </Zoom> */}

@@ -75,8 +75,8 @@ type MoveParms = {
   placement: "left" | "right" | "bottom";
   iconLabel: string;
   reduceExpand: string;
-  iconT: JSX.Element;
-  iconB: JSX.Element;
+  iconT: React.ReactElement;
+  iconB: React.ReactElement;
   topRow1: string;
   detailRow1: string;
   topRow2: string;

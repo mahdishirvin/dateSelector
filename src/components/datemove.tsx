@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useMemo, useEffect, useState } from "react";
 import IconButton from "@mui/material/IconButton";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import debounce from "lodash.debounce";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -10,24 +10,13 @@ import { DateMoveProps } from "../interface";
 import RngeTooltip from "./rngetooltip";
 
 export default function DateMove(props: DateMoveProps) {
-  const { dates, stepValue, bf, vertical, reverse, handleVal, showExpand } =
-    props;
-  // viz,
+  const { dates, stepValue, bf, vertical, reverse, handleVal, showExpand } = props;
 
   const [ctrl, setCtrl] = useState(false);
 
-  const mve = React.useMemo(() => {
-    return moveParms(bf, vertical, ctrl, stepValue);
-  }, [bf, vertical, ctrl, stepValue]);
+  const mve = useMemo(() => moveParms(bf, vertical, ctrl, stepValue), [bf, vertical, ctrl, stepValue]);
 
-  const debExt = useMemo(
-    () =>
-      debounce((dt) => handleVal(dt), 500, {
-        leading: false,
-        trailing: true,
-      }),
-    [handleVal]
-  );
+  const debExt = useMemo(() => debounce((dt) => handleVal(dt), 500, { leading: false, trailing: true }), [handleVal]);
 
   useEffect(() => {
     return () => {
@@ -52,54 +41,35 @@ export default function DateMove(props: DateMoveProps) {
   useHotkeys("shift", () => setCtrl(true), { keydown: true }, [ctrl]);
   useHotkeys("shift", () => setCtrl(false), { keyup: true }, [ctrl]);
 
-  // console.log("datemove",showExpand);
-
   return (
-    <>
-      {/* {viz && ( */}
-      <Grid
-        container
-        direction={reverse ? "row-reverse" : vertical ? "column" : "row"}
-      >
-        <Box>
-          <RngeTooltip
-            title={undefined}
-            topRow={mve.topRow1}
-            detailRow={mve.detailRow1}
-            placement={mve.placement}
+    <Grid container direction={reverse ? "row-reverse" : vertical ? "column" : "row"}>
+      <Box>
+        <RngeTooltip title={undefined} topRow={mve.topRow1} detailRow={mve.detailRow1} placement={mve.placement}>
+          <IconButton
+            key={mve.iconLabel + reverse + vertical + stepValue}
+            aria-label={mve.iconLabel + " a " + stepValue}
+            size="small"
+            onClick={() => handleClick(bf)}
           >
+            {mve.iconT}
+          </IconButton>
+        </RngeTooltip>
+      </Box>
+      {showExpand && (
+        <Box>
+          <RngeTooltip title={undefined} topRow={mve.topRow2} detailRow={mve.detailRow2} placement={mve.placement}>
             <IconButton
-              key={mve.iconLabel + reverse + vertical + stepValue}
-              aria-label={mve.iconLabel + " a " + stepValue}
+              key={mve.placement + reverse + vertical + stepValue}
+              id="eb"
+              aria-label={mve.placement + " a " + stepValue}
               size="small"
-              onClick={() => handleClick(bf)}
+              onClick={handleExt}
             >
-              {mve.iconT}
+              {mve.iconB}
             </IconButton>
           </RngeTooltip>
         </Box>
-        {showExpand && (
-          <Box>
-            <RngeTooltip
-              title={undefined}
-              topRow={mve.topRow2}
-              detailRow={mve.detailRow2}
-              placement={mve.placement}
-            >
-              <IconButton
-                key={mve.placement + reverse + vertical + stepValue}
-                id="eb"
-                aria-label={mve.placement + " a " + stepValue}
-                size="small"
-                onClick={handleExt}
-              >
-                {mve.iconB}
-              </IconButton>
-            </RngeTooltip>
-          </Box>
-        )}
-      </Grid>
-      {/* )} */}
-    </>
+      )}
+    </Grid>
   );
 }

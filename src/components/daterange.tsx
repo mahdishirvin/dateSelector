@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import { useTheme } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import Remove from "@mui/icons-material/Remove";
@@ -9,10 +9,10 @@ import { inputParms } from "../dateutils";
 import { DateField } from "./datefield";
 import { useHelpContext } from "./helpprovider";
 import RngeTooltip from "./rngetooltip";
-import { DateRangeProps } from "../interface";
+import { dateCardProps } from "../interface";
 
-export default function DateRange(props: DateRangeProps) {
-  const { dates, rangeScope, handleVal, singleDay, limitToScope } = props;
+export default function DateRange(props: dateCardProps) {
+  const { dates, rangeScope, handleVal, singleDay } = props;
 
   const [underline, setUnderline] = useState(true);
   const [startText, setStartText] = useState<string>(() =>
@@ -56,8 +56,7 @@ export default function DateRange(props: DateRangeProps) {
   const toggleUnderline = () => setUnderline((prev) => !prev);
 
   return (
-    (<div onMouseEnter={toggleUnderline} onMouseLeave={toggleUnderline}>
-      {" "}
+    <div onMouseEnter={toggleUnderline} onMouseLeave={toggleUnderline}>
       <RngeTooltip
         title={undefined}
         topRow={topRow}
@@ -65,10 +64,8 @@ export default function DateRange(props: DateRangeProps) {
         infoRow={dateSpan.info}
         placement="bottom"
       >
-        <Grid container spacing={0.5} sx={{
-          paddingLeft: 0.3
-        }}>
-          <Grid >
+        <Grid container spacing={0.5} sx={{ paddingLeft: 0.3 }}>
+          <Grid size="grow">
             <DateField
               id="start"
               value={startText}
@@ -79,17 +76,15 @@ export default function DateRange(props: DateRangeProps) {
               doUpdate={doUpdate}
               onChange={handleInput}
               onFocus={() => setUnderline(true)}
+              {...props}
             />
           </Grid>
           {!singleDay && (
             <>
               <IconButton size="small">
-                <Remove
-                  style={{ fontSize: useTheme().typography.fontSize }}
-                  color="disabled"
-                />
+                <Remove style={{ fontSize: useTheme().typography.fontSize }} color="disabled" />
               </IconButton>
-              <Grid>
+              <Grid size="grow">
                 <DateField
                   id="end"
                   value={endText}
@@ -100,12 +95,13 @@ export default function DateRange(props: DateRangeProps) {
                   doUpdate={doUpdate}
                   onChange={handleInput}
                   onFocus={() => setUnderline(true)}
+                  {...props}
                 />
               </Grid>
             </>
           )}
         </Grid>
       </RngeTooltip>
-    </div>)
+    </div>
   );
 }
