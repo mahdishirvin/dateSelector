@@ -49,13 +49,13 @@ export const DateField: React.FC<DateFieldProps> = (props) => {
     <TextField
       id={id}
       sx={{
-      //   "& input[type='date']::-webkit-calendar-picker-indicator": {
-      //     display: "initial !important",
-      //     // filter: theme.palette.primary.main
-      //     //   ? hexToCSSFilter(theme.palette.primary.main).filter
-      //     //   : "",
-      //   },
-      //   paddingTop: "3px",
+        "& input[type='date']::-webkit-calendar-picker-indicator": {
+          display: "initial !important",
+          filter: theme.palette.primary.main
+            ? hexToCSSFilter(theme.palette.primary.main).filter
+            : "",
+        },
+        paddingTop: "2px",
         width: tms.measureSvgTextWidth(textProperties) + theme.typography.fontSize * 3.25,
       }}
       type="date"
