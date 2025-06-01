@@ -117,53 +117,9 @@
                 "fontSize": {
                     "displayName": "Font Size",
                     "type": {
-                        "enumeration": [
-                            {
-                                "displayName": "8",
-                                "description": "8",
-                                "value": "8"
-                            },
-                            {
-                                "displayName": "9",
-                                "description": "9",
-                                "value": "9"
-                            },
-                            {
-                                "displayName": "10",
-                                "description": "10",
-                                "value": "10"
-                            },
-                            {
-                                "displayName": "11",
-                                "description": "11",
-                                "value": "11"
-                            },
-                            {
-                                "displayName": "12",
-                                "description": "12",
-                                "value": "12"
-                            },
-                            {
-                                "displayName": "13",
-                                "description": "13",
-                                "value": "13"
-                            },
-                            {
-                                "displayName": "14",
-                                "description": "14",
-                                "value": "14"
-                            },
-                            {
-                                "displayName": "15",
-                                "description": "15",
-                                "value": "15"
-                            },
-                            {
-                                "displayName": "16",
-                                "description": "16",
-                                "value": "16"
-                            }
-                        ]
+                        "formatting": {
+                            "fontSize": true
+                        }
                     }
                 },
                 "fontFamily": {
@@ -483,8 +439,7 @@
                             }
                         ]
                     }
-                }
-            ,
+                },
                 "showWeek": {
                     "type": {
                         "bool": true
@@ -581,8 +536,7 @@
                     "type": {
                         "numeric": true
                     }
-                }
- ,
+                },
                 "paySkip": {
                     "type": {
                         "numeric": true
@@ -694,8 +648,8 @@
                             }
                         ]
                     }
-                }
-,                "showMonth": {
+                },
+                "showMonth": {
                     "type": {
                         "bool": true
                     }
@@ -735,8 +689,8 @@
                             }
                         ]
                     }
-                }
-,                "fmtQuarter": {
+                },
+                "fmtQuarter": {
                     "type": {
                         "enumeration": [
                             {

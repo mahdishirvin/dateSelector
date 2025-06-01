@@ -15,6 +15,7 @@ import { VisualSettingsModel } from "./vsettings";
 
 import IColorPalette = powerbi.extensibility.IColorPalette;
 import IVisualEventService = powerbi.extensibility.IVisualEventService;
+import ILocalizationManager = powerbi.extensibility.ILocalizationManager;
 
 import { ColorHelper } from "powerbi-visuals-utils-colorutils";
 import { IFilterColumnTarget, AdvancedFilter } from "powerbi-models";
@@ -30,13 +31,14 @@ import { mapOptionsToState, optionsAreValid } from "./optionsMapper";
 import tinycolor from "tinycolor2";
 import DateRangeCard from "./components/daterangecard";
 import isEqual from "lodash.isequal";
-import '../assets/visual.less';
+import "../assets/visual.less";
 
 export class DateSelector extends ReactVisual implements IVisual {
   private visualHost: IVisualHost;
   private events: IVisualEventService;
 
   // formatiing panel
+  private localizationManager: ILocalizationManager;
   private formattingSettings: VisualSettingsModel;
   private formattingSettingsService: FormattingSettingsService;
 
@@ -47,6 +49,7 @@ export class DateSelector extends ReactVisual implements IVisual {
   private colorHelper: ColorHelper;
 
   private state: VisualState;
+  private locale: string;
 
   private static filterObjectProperty: {
     objectName: string;
@@ -63,13 +66,17 @@ export class DateSelector extends ReactVisual implements IVisual {
     super(options);
     this.initializeVisualProperties(options);
     this.initializeReact();
-    this.formattingSettingsService = new FormattingSettingsService();
+    this.localizationManager = options.host.createLocalizationManager();
+    this.formattingSettingsService = new FormattingSettingsService(
+      this.localizationManager
+    );
     // const localizationManager = options.host.createLocalizationManager();
     // this.formattingSettingsService = new FormattingSettingsService(localizationManager);
   }
 
   protected initializeVisualProperties(options: VisualConstructorOptions) {
     this.visualHost = options.host;
+    this.locale = options.host.locale;
 
     this.events = options.host.eventService;
     this.colorPalette = this.visualHost.colorPalette;
@@ -101,7 +108,9 @@ export class DateSelector extends ReactVisual implements IVisual {
 
         const existingDataView = this.dataView;
         this.dataView = options.dataViews[0];
-        const getSettings: boolean = !(isEqual(existingDataView, this.dataView) && this.initialised);
+        const getSettings: boolean = !(
+          isEqual(existingDataView, this.dataView) && this.initialised
+        );
 
         if (getSettings) {
           this.formattingSettings =
@@ -109,7 +118,8 @@ export class DateSelector extends ReactVisual implements IVisual {
               VisualSettingsModel,
               options.dataViews[0]
             );
-
+          // const title = this.localizationManager.getDisplayName("style_themeColor_displayName");
+          // console.log(">>>>>>>>>>>>>>>>>>>> dateSelector - title", title)
           this.state = mapOptionsToState(
             options,
             this.formattingSettings,

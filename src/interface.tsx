@@ -35,7 +35,7 @@ export interface Settings {
     themeMode?: any;
     themeFont?: string;
     fontFamily?: string;
-    fontSize?: string;
+    fontSize?: number;
     fontBold?: boolean;
     fontUnderline?: boolean;
     fontItalic?: boolean;
@@ -169,14 +169,26 @@ export interface dateCardProps {
   // boolean value indicating whether to show the current date range
   showCurrent?: boolean;
 
+  // string value representing the font color to use
+  fontColor?: string;
+
+  // string value representing the font color to use
+  fontBold?: boolean;
+
+  // string value representing the font color to use
+  fontUnderline?: boolean;
+
+  // string value representing the font color to use
+  fontItalic?: boolean;
+
   // string value representing the theme color to use
   themeColor?: string;
 
   // value representing the theme font to use
-  themeFont?: any;
+  themeFont?: string;
 
   // value representing the input font size to use
-  fontSize?: string;
+  fontSize?: number;
 
   // value representing the theme font size to use
   themeFontSize?: number;

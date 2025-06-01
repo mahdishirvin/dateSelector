@@ -27,7 +27,7 @@ export default function DateRangeCard(props: dateCardProps) {
     themeMode: props.themeMode,
     themeColor: props.themeColor,
     themeFont: props.themeFont,
-    fontSize: props.fontSize,
+    fontSize: String(props.fontSize),
   });
 
   const [openSlider, setOpenSlider] = React.useState<boolean>(props.showSlider);

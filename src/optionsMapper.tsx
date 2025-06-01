@@ -13,6 +13,7 @@ import {
   dateRange,
 } from "./interface";
 import { IAdvancedFilter } from "powerbi-models";
+import { VisualSettingsModel } from "./vsettings";
 
 const { extractFilterColumnTarget } = interactivityFilterService;
 
@@ -33,7 +34,7 @@ export const optionsAreValid = (options: powerbi.extensibility.visual.VisualUpda
 
 export const settingProps = (
   options: powerbi.extensibility.visual.VisualUpdateOptions,
-  formatSettings: any,
+  formatSettings: VisualSettingsModel,
   initialised: boolean
 ): dateCardProps => {
   const { styleSettings: style, calendarSettings: calendar, layoutSettings: layout, periodSettings: period } = formatSettings;
@@ -103,7 +104,11 @@ export const settingProps = (
     themeColor: style.themeColor.value.value.valueOf(),
     themeFont: style.themeFont.value,
     themeMode: style.themeMode.value,
-    fontSize: style.fontSize.value.toString(),
+    fontSize: style.fontSize.value.valueOf(),
+    fontColor: style.fontColor.value.value.valueOf(),
+    fontBold: style.font.bold.value,
+    // fontUnderline: style.font.underline.value,
+    fontItalic: style.font.italic.value,
   };
 };
 
@@ -192,7 +197,7 @@ export const mapViewport = (viewport: powerbi.IViewport): ViewportData => ({
 
 export const mapOptionsToState = (
   options: powerbi.extensibility.visual.VisualUpdateOptions,
-  formatSettings: any,
+  formatSettings: VisualSettingsModel,
   initialised: boolean
 ): VisualState => {
   const dataViewPartial = mapDataView(options);

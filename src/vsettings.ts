@@ -20,7 +20,7 @@ export class VisualSettingsModel extends FormattingSettingsModel {
   styleSettings = new styleSettings();
   calendarSettings = new calendarSettings();
   layoutSettings = new layoutSettings();
-  periodSettings = new periodSettings();
+  periodSettings = new PeriodSettings();
 
   // Add formatting settings card to cards list in model
   cards: Array<FormattingSettingsCard> = [
@@ -33,47 +33,90 @@ export class VisualSettingsModel extends FormattingSettingsModel {
 
 class styleSettings extends FormattingSettingsCard {
   name: string = "style";
-  description: string = "Visual look and feel";
-  displayName: string = "Style";
+  displayNameKey = "style_displayName";
+  descriptionKey = "style_description";
   analyticsPane: boolean = false;
   uid: string = "styleUid";
 
   // Slices
   themeFont = new formattingSettings.FontPicker({
     name: "themeFont",
-    description: "Font for text on this slicer",
-    displayName: "Theme Font",
-    value: "wf_standard-font, helvetica, arial, sans-serif",
+    descriptionKey: "style_themeFont_description",
+    displayNameKey: "style_themeFont_displayName",
+    value: defaultSettings.styleSettings.themeFont,
+    // value: "wf_standard-font, helvetica, arial, sans-serif",
   });
-  fontSize = new formattingSettings.AutoDropdown({
+  fontFamily = new formattingSettings.FontPicker({
+    name: "fontFamily",
+    descriptionKey: "style_fontFamily_description",
+    displayNameKey: "style_fontFamily_displayName",
+    value: defaultSettings.styleSettings.fontFamily,
+    // value: "wf_standard-font, helvetica, arial, sans-serif",
+  });
+  fontSize = new formattingSettings.NumUpDown({
     name: "fontSize",
-    description: "Font size for text on this slicer",
-    displayName: "Font Size",
+    descriptionKey: "style_fontSize_description",
+    displayNameKey: "style_fontSize_displayName",
     value: defaultSettings.styleSettings.fontSize,
+  });
+  fontItalic = new formattingSettings.ToggleSwitch({
+    name: "fontItalic",
+    descriptionKey: "style_fontItalic_description",
+    displayNameKey: "style_fontItalic_displayName",
+    value: defaultSettings.styleSettings.fontItalic,
+  });
+  fontBold = new formattingSettings.ToggleSwitch({
+    name: "fontBold",
+    descriptionKey: "style_fontBold_description",
+    displayNameKey: "style_fontBold_displayName",
+    value: defaultSettings.styleSettings.fontBold,
+  });
+  fontUnderline = new formattingSettings.ToggleSwitch({
+    name: "fontUnderline",
+    descriptionKey: "style_fontUnderline_description",
+    displayNameKey: "style_fontUnderline_displayName",
+    value: defaultSettings.styleSettings.fontUnderline,
+  });
+  fontColor = new formattingSettings.ColorPicker({
+    name: "fontColor",
+    // displayNameKey: "style_fontColor_displayName",
+    // descriptionKey: "style_fontColor_description",
+    value: { value: defaultSettings.styleSettings.fontColor },
   });
   themeMode = new formattingSettings.AutoDropdown({
     name: "themeMode",
-    description: "Theme mode dark background",
-    displayName: "Mode",
+    descriptionKey: "style_themeMode_description",
+    displayNameKey: "style_themeMode_displayName",
     value: defaultSettings.styleSettings.themeMode,
   });
   themeColor = new formattingSettings.ColorPicker({
     name: "themeColor",
-    displayName: "Theme color",
+    displayNameKey: "style_themeColor_displayName",
+    descriptionKey: "style_themeColor_description",
     value: { value: defaultSettings.styleSettings.themeColor },
   });
 
   // not implemented
   fmtDate = new formattingSettings.AutoDropdown({
     name: "fmtDate",
-    description: "Date format of the input fields",
-    displayName: "Date Input Format",
+    descriptionKey: "style_fmtDate_description",
+    displayNameKey: "style_fmtDate_displayName",
     value: defaultSettings.styleSettings.fmtDate,
   });
 
+  public font: formattingSettings.FontControl = new formattingSettings.FontControl({
+        name: "font",   // must be unique within the same object
+        displayName: "Font",
+        fontFamily: this.themeFont,
+        fontSize: this.fontSize,
+        bold: this.fontBold,           //optional
+        italic: this.fontItalic,       //optional
+        // underline: this.fontUnderline,  //optional
+    });
+
   slices: Array<FormattingSettingsSlice> = [
-    this.themeFont,
-    this.fontSize,
+    this.font,
+    this.fontColor,
     this.themeColor,
     this.themeMode,
   ];
@@ -81,40 +124,36 @@ class styleSettings extends FormattingSettingsCard {
 
 class calendarSettings extends FormattingSettingsCard {
   name: string = "calendar";
-  description: string = "Range startup settings and optional sync override.";
-  displayName: string = "Range options";
+  descriptionKey = "calendar_description";
+  displayNameKey = "calendar_displayName";
   analyticsPane: boolean = false;
   uid: string = "calendarUid";
 
   startRange = new formattingSettings.AutoDropdown({
     name: "startRange",
-    description:
-      "Default date range when the current page is loaded - dominates unless 'Default', which respects Sync & Bookmark settings.",
-    displayName: "Start Range",
+    descriptionKey: "calendar_startRange_description",
+    displayNameKey: "calendar_startRange_displayName",
     value: defaultSettings.calendarSettings.startRange,
   });
   // Slices
   stepInit = new formattingSettings.AutoDropdown({
     name: "stepInit",
-    description:
-      "Timeline and increment step label intervals when the current page is loaded",
-    displayName: "Step Level",
+    descriptionKey: "calendar_stepInit_description",
+    displayNameKey: "calendar_stepInit_displayName",
     value: defaultSettings.calendarSettings.stepInit,
   });
 
   singleDay = new formattingSettings.ToggleSwitch({
     name: "singleDay",
-    description:
-      "Allow only single day selection (or beginning of period where day steps are not selected).",
-    displayName: "Single Day Only",
+    descriptionKey: "calendar_singleDay_description",
+    displayNameKey: "calendar_singleDay_displayName",
     value: defaultSettings.calendarSettings.singleDay,
   });
 
   limitToScope = new formattingSettings.ToggleSwitch({
     name: "limitToScope",
-    description:
-      "Only allow selection within the scope of the date range limits. When false, any date can be selected and the `Current Periods` icons will always show.",
-    displayName: "Limit Dates to Scope",
+    descriptionKey: "calendar_limitToScope_description",
+    displayNameKey: "calendar_limitToScope_displayName",
     value: defaultSettings.calendarSettings.limitToScope,
   });
 
@@ -129,67 +168,65 @@ class calendarSettings extends FormattingSettingsCard {
 class timelineSettings extends FormattingSettingsGroup {
   enableSlider = new formattingSettings.ToggleSwitch({
     name: "enableSlider",
-    description: "Show the button to toggle timeline",
-    displayName: "Enable Timeline",
+    descriptionKey: "timeline_enableSlider_description",
+    displayNameKey: "timeline_enableSlider_displayName",
     value: defaultSettings.layoutSettings.timelineSettings.enableSlider,
   });
 
   showSlider = new formattingSettings.ToggleSwitch({
     name: "showSlider",
-    description: "Show the timeline at startup",
-    displayName: "Show Timeline",
+    descriptionKey: "timeline_showSlider_description",
+    displayNameKey: "timeline_showSlider_displayName",
     value: defaultSettings.layoutSettings.timelineSettings.showSlider,
   });
 
   show2ndSlider = new formattingSettings.ToggleSwitch({
     name: "show2ndSlider",
-    description:
-      "Show 2 scales for contextualising year for months, month for weeks, etc.",
-    displayName: "2nd timeline scale",
+    descriptionKey: "timeline_show2ndSlider_description",
+    displayNameKey: "timeline_show2ndSlider_displayName",
     value: defaultSettings.layoutSettings.timelineSettings.show2ndSlider,
   });
 
   name: string = "timeline";
   description: string = "Timeline controls to show or hide";
-  displayName: string = "Timeline Toggle";
+  displayNameKey = "timeline_displayName";
+  descriptionKey = "timeline_description";
   analyticsPane: boolean = false;
   uid: string = "timelineUid";
-  topLevelSlice: formattingSettings.SimpleSlice = this.enableSlider;
+  // topLevelSlice: formattingSettings.SimpleSlice = this.enableSlider;
 
   slices: Array<FormattingSettingsSlice> = [
+    this.enableSlider,
     this.showSlider,
     this.show2ndSlider,
-    // this.showHelpIcon,
   ];
 }
 class currentSettings extends FormattingSettingsGroup {
   showCurrent = new formattingSettings.ToggleSwitch({
     name: "showCurrent",
-    description:
-      "Show the Current Period Bar selector for Today, this week, this month, this year, etc.",
-    displayName: "Current Periods",
+    descriptionKey: "showCurrent_description",
+    displayNameKey: "showCurrent_displayName",
     value: defaultSettings.layoutSettings.currentSettings.showCurrent,
   });
 
   showIconText = new formattingSettings.ToggleSwitch({
     name: "showIconText",
-    description: "Show the Current Period selector icon text",
+    descriptionKey: "current_showIconText_description",
+    displayNameKey: "current_showIconText_displayName",
     displayName: "Current Icon Text",
     value: defaultSettings.layoutSettings.currentSettings.showIconText,
   });
 
   showMore = new formattingSettings.ToggleSwitch({
     name: "showMore",
-    description:
-      "Show the Extended Period selector for YTD, YT last month, etc.",
-    displayName: "Extended Periods",
+    descriptionKey: "current_showMore_description",
+    displayNameKey: "current_showMore_displayName",
     value: defaultSettings.layoutSettings.currentSettings.showMore,
   });
 
   name: string = "current";
-  description: string =
-    "Show the Current Period Bar selector for Today, this week, this month, this year, etc.";
-  displayName: string = "Current Periods";
+  descriptionKey = "current_description";
+  displayNameKey = "current_displayName";
   analyticsPane: boolean = false;
   uid: string = "currentUid";
   topLevelSlice: formattingSettings.SimpleSlice = this.showCurrent;
@@ -199,23 +236,20 @@ class currentSettings extends FormattingSettingsGroup {
 class moveSettings extends FormattingSettingsGroup {
   showMove = new formattingSettings.ToggleSwitch({
     name: "showMove",
-    description:
-      "Show the arrows and step levels to quickly move, extend or reduce the selected range forwards or backwards by the chosen step granularity.",
-    displayName: "Show move arrows",
+    descriptionKey: "move_showMove_description",
+    displayNameKey: "move_showMove_displayName",
     value: defaultSettings.layoutSettings.moveSettings.showMove,
   });
   showExpand = new formattingSettings.ToggleSwitch({
     name: "showExpand",
-    description:
-      "Show the arrows and step levels to quickly extend/reduce the selected period by the chosen step granularity.",
-    displayName: "Extend  << >>",
+    descriptionKey: "move_showExpand_description",
+    displayNameKey: "move_showExpand_displayName",
     value: defaultSettings.layoutSettings.moveSettings.showExpand,
   });
 
   name: string = "move";
-  description: string = ///"Show move or extend selected range controls";
-    "Show the arrows and step levels to quickly move, extend or reduce the selected range forwards or backwards by the chosen step granularity.";
-  displayName: string = "Move arrows";
+  descriptionKey = "move_description";
+  displayNameKey = "move_displayName";
   analyticsPane: boolean = true;
   uid: string = "moveUid";
   topLevelSlice: formattingSettings.SimpleSlice = this.showMove;
@@ -225,29 +259,31 @@ class moveSettings extends FormattingSettingsGroup {
 class helpSettings extends FormattingSettingsGroup {
   showHelpIcon = new formattingSettings.ToggleSwitch({
     name: "showHelpIcon",
-    description: "Show help button for optional extended tooltips.",
-    displayName: "Detail Toggle",
+    descriptionKey: "assist_showHelpIcon_description",
+    displayNameKey: "assist_showHelpIcon_displayName",
     value: defaultSettings.layoutSettings.helpSettings.showHelpIcon,
   });
   showTooltip = new formattingSettings.ToggleSwitch({
     name: "showTooltip",
-    displayName: "Detail Toggle",
+    displayNameKey: "assist_showToolTip_displayName",
+    descriptionKey: "assist_showToolTip_description",
     value: defaultSettings.layoutSettings.helpSettings.showHelpIcon,
   });
 
   name: string = "tooltip";
-  description: "Show or hide tooltips.";
-  displayName: string = "Tooltip Assist";
+  descriptionKey = "assist_description";
+  displayNameKey = "assist_displayName";
   uid: string = "tooltipUid";
   analyticsPane: boolean = true;
   // visible: boolean = true;
-  topLevelSlice: formattingSettings.SimpleSlice = this.showTooltip;
+  // topLevelSlice: formattingSettings.SimpleSlice = this.showTooltip;
   slices: Array<FormattingSettingsSlice> = [this.showHelpIcon];
 }
 
 class layoutSettings extends FormattingSettingsCompositeCard {
   name: string = "layout";
-  displayName: string = "Layout";
+  displayNameKey = "layout_displayName";
+  descriptionKey = "layout_description";
   // Formatting settings slice
   analyticsPane: boolean = false;
   visible: boolean = true;
@@ -267,29 +303,27 @@ class layoutSettings extends FormattingSettingsCompositeCard {
 class daySettings extends FormattingSettingsGroup {
   showDay = new formattingSettings.ToggleSwitch({
     name: "showDay",
-    displayName: undefined,
+    displayNameKey: undefined,
     value: defaultSettings.period.daySettings.showDay,
   });
 
   fmtDay = new formattingSettings.AutoDropdown({
     name: "fmtDay",
-    displayName: "Day format (Today)",
-    description: "The timeline format for day step level",
+    displayNameKey: "fmtDay_displayName",
+    descriptionKey: "fmtDay_description",
     value: defaultSettings.period.daySettings.fmtDay,
   });
 
   daySkip = new formattingSettings.NumUpDown({
     name: "daySkip",
-    displayName: "Day label intervals",
-    description:
-      "Timeline only shows markers on days skipped by the number - 0 shows today only",
+    displayNameKey: "daySkip_displayName",
+    descriptionKey: "daySkip_description",
     value: defaultSettings.period.daySettings.daySkip,
   });
 
   name: string = "day";
-  description: string =
-    "Show the Today button on the Step Bar & Current Period Bar";
-  displayName: string = "Day";
+  descriptionKey = "day_description";
+  displayNameKey = "day_displayName";
   analyticsPane: boolean = false;
   uid: string = "dayUid";
   topLevelSlice: formattingSettings.SimpleSlice = this.showDay;
@@ -306,30 +340,28 @@ class weekSettings extends FormattingSettingsGroup {
 
   fmtWeek = new formattingSettings.AutoDropdown({
     name: "fmtWeek",
-    displayName: "Week format",
-    description: "The timeline format for week step level",
+    displayNameKey: "fmtWeek_displayName",
+    descriptionKey: "fmtWeek_description",
     value: defaultSettings.period.weekSettings.fmtWeek,
   });
 
   weekSkip = new formattingSettings.NumUpDown({
     name: "weekSkip",
-    displayName: "Week label intervals",
-    description:
-      "Timeline only shows markers on weeks skipped by the number - 0 shows today only",
+    displayNameKey: "weekSkip_displayName",
+    descriptionKey: "weekSkip_description",
     value: defaultSettings.period.weekSettings.weekSkip,
   });
 
   weekStartDay = new formattingSettings.AutoDropdown({
     name: "weekStartDay",
-    description: "The start day for each week step",
-    displayName: "Week Start Day",
+    descriptionKey: "weekStartDay_description",
+    displayNameKey: "weekStartDay_displayName",
     value: defaultSettings.period.weekSettings.weekStartDay,
   });
 
   name: string = "week";
-  description: string =
-    "Show the Week buttons on the Step Bar & Current Period Bar";
-  displayName: string = "Week";
+  descriptionKey = "week_description";
+  displayNameKey = "week_displayName";
   analyticsPane: boolean = false;
   uid: string = "weekUid";
   topLevelSlice: formattingSettings.SimpleSlice = this.showWeek;
@@ -350,47 +382,43 @@ class paySettings extends FormattingSettingsGroup {
 
   fmtPay = new formattingSettings.AutoDropdown({
     name: "fmtPay",
-    displayName: "Pay Period format",
-    description: "The timeline format for pay step level",
+    displayNameKey: "fmtPay_displayName",
+    descriptionKey: "fmtPay_description",
     value: defaultSettings.period.paySettings.fmtPay,
   });
 
   paySkip = new formattingSettings.NumUpDown({
     name: "paySkip",
-    displayName: "Pay label intervals",
-    description:
-      "Timeline only shows markers on pay days skipped by the number - 0 shows today only",
+    descriptionKey: "paySkip_description",
+    displayNameKey: "paySkip_displayName",
     value: defaultSettings.period.paySettings.paySkip,
   });
 
   payLength = new formattingSettings.NumUpDown({
     name: "payLength",
-    displayName: "Pay period length",
-    description: "Pay period length in days",
+    descriptionKey: "payLength_description",
+    displayNameKey: "payLength_displayName",
     value: defaultSettings.period.paySettings.payLength,
   });
 
   payRefDay = new formattingSettings.NumUpDown({
     name: "payRefDay",
-    displayName: "Reference date DAY",
-    description:
-      "Pay period seed reference date from which to start the repeating period",
+    displayNameKey: "payRefDay_displayName",
+    descriptionKey: "payRefDay_description",
     value: defaultSettings.period.paySettings.payRefDay,
   });
 
   payRefMonth = new formattingSettings.AutoDropdown({
     name: "payRefMonth",
-    displayName: "Reference date MONTH",
-    description:
-      "Pay period seed reference date's month from which to start the repeating period",
+    displayNameKey: "payRefMonth_displayName",
+    descriptionKey: "payRefMonth_description",
     value: defaultSettings.period.paySettings.payRefMonth,
   });
 
   payRefYear = new formattingSettings.NumUpDown({
     name: "payRefYear",
-    displayName: "Reference date YEAR",
-    description:
-      "Pay period seed reference date's year from which to start the repeating period",
+    displayNameKey: "payRefYear_displayName",
+    descriptionKey: "payRefYear_description",
     value: defaultSettings.period.paySettings.payRefYear,
   });
 
@@ -398,16 +426,16 @@ class paySettings extends FormattingSettingsGroup {
   payRefDate = new formattingSettings.DatePicker({
     placeholder: "Pay Period Reference Date",
     name: "payRefDate",
-    displayName: "Pay period start",
-    description:
-      "Pay period seed reference date from which to start the repeating period",
+    displayNameKey: "payRefDate_displayName",
+    descriptionKey: "payRefDate_description",
     value: defaultSettings.period.paySettings.payRefDate,
   });
 
   name: string = "pay";
   description: string =
     "Show the Pay buttons on the Step Bar & Current Period Bar";
-  displayName: string = "Pay";
+  displayNameKey = "pay_displayName";
+  descriptionKey = "pay_description";
   analyticsPane: boolean = false;
   uid: string = "payUid";
   topLevelSlice: formattingSettings.SimpleSlice = this.showPay;
@@ -425,29 +453,27 @@ class paySettings extends FormattingSettingsGroup {
 class monthSettings extends FormattingSettingsGroup {
   showMonth = new formattingSettings.ToggleSwitch({
     name: "showMonth",
-    displayName: undefined,
+    displayNameKey: undefined,
     value: defaultSettings.period.monthSettings.showMonth,
   });
 
   fmtMonth = new formattingSettings.AutoDropdown({
     name: "fmtMonth",
-    displayName: "Month Period format",
-    description: "The timeline format for month step level",
+    displayNameKey: "fmtMonth_displayName",
+    descriptionKey: "fmtMonth_description",
     value: defaultSettings.period.monthSettings.fmtMonth,
   });
 
   monthSkip = new formattingSettings.NumUpDown({
     name: "monthSkip",
-    displayName: "Month label intervals",
-    description:
-      "Timeline only shows markers on months skipped by the number - 0 shows today only",
+    displayNameKey: "monthSkip_displayName",
+    descriptionKey: "monthSkip_description",
     value: defaultSettings.period.monthSettings.monthSkip,
   });
 
   name: string = "month";
-  description: string =
-    "Show the Month buttons on the Step Bar & Current Period Bar";
-  displayName: string = "Month";
+  descriptionKey = "month_description";
+  displayNameKey = "month_displayName";
   analyticsPane: boolean = false;
   uid: string = "monthUid";
   topLevelSlice: formattingSettings.SimpleSlice = this.showMonth;
@@ -458,29 +484,27 @@ class monthSettings extends FormattingSettingsGroup {
 class quarterSettings extends FormattingSettingsGroup {
   showQuarter = new formattingSettings.ToggleSwitch({
     name: "showQuarter",
-    displayName: undefined,
+    displayNameKey: undefined,
     value: defaultSettings.period.quarterSettings.showQuarter,
   });
 
   fmtQuarter = new formattingSettings.AutoDropdown({
     name: "fmtQuarter",
-    displayName: "Quarter Period format",
-    description: "The timeline format for quarter step level",
+    displayNameKey: "fmtQuarter_displayName",
+    descriptionKey: "fmtQuarter_description",
     value: defaultSettings.period.quarterSettings.fmtQuarter,
   });
 
   quarterSkip = new formattingSettings.NumUpDown({
     name: "quarterSkip",
-    displayName: "Quarter label intervals",
-    description:
-      "Timeline only shows markers on quarter boundaries skipped by the number - 0 shows today only",
+    displayNameKey: "quarterSkip_displayName",
+    descriptionKey: "quarterSkip_description",
     value: defaultSettings.period.quarterSettings.quarterSkip,
   });
 
   name: string = "quarter";
-  description: string =
-    "Show the Quarter buttons on the Step Bar & Current Period Bar";
-  displayName: string = "Quarter";
+  descriptionKey = "quarter_description";
+  displayNameKey = "quarter_displayName";
   analyticsPane: boolean = false;
   uid: string = "quarterUid";
   topLevelSlice: formattingSettings.SimpleSlice = this.showQuarter;
@@ -491,36 +515,36 @@ class quarterSettings extends FormattingSettingsGroup {
 class yearSettings extends FormattingSettingsGroup {
   showYear = new formattingSettings.ToggleSwitch({
     name: "showYear",
-    displayName: undefined,
+    displayNameKey: undefined,
     value: defaultSettings.period.yearSettings.showYear,
   });
 
   fmtYear = new formattingSettings.AutoDropdown({
     name: "fmtYear",
-    displayName: "Year Period format",
-    description: "The timeline format for year step level",
+    displayNameKey: "fmtYear_displayName",
+    descriptionKey: "fmtYear_description",
     value: defaultSettings.period.yearSettings.fmtYear,
   });
 
   yearSkip = new formattingSettings.NumUpDown({
     name: "yearSkip",
-    displayName: "Year label intervals",
-    description:
-      "Timeline only shows markers on years skipped by the number - 0 shows today only",
+    displayNameKey: "yearSkip_displayName",
+    descriptionKey: "yearSkip_description",
     value: defaultSettings.period.yearSettings.yearSkip,
   });
 
   yearStartMonth = new formattingSettings.AutoDropdown({
     name: "yearStartMonth",
-    description: "Set the start month for the [Fiscal] year",
-    displayName: "Fiscal Year Start",
+    descriptionKey: "yearStartMonth_description",
+    displayNameKey: "yearStartMonth_displayName",
     value: defaultSettings.period.yearSettings.yearStartMonth,
   });
 
   name: string = "year";
   description: string =
     "Show the Year buttons on the Step Bar & Current Period Bar";
-  displayName: string = "Year";
+  displayNameKey = "year_displayName";
+  descriptionKey = "year_description";
   analyticsPane: boolean = false;
   uid: string = "yearUid";
   topLevelSlice: formattingSettings.SimpleSlice = this.showYear;
@@ -532,9 +556,10 @@ class yearSettings extends FormattingSettingsGroup {
   ];
 }
 
-class periodSettings extends FormattingSettingsCompositeCard {
+class PeriodSettings extends FormattingSettingsCompositeCard {
   name: string = "period";
-  displayName: string = "Granularity";
+  displayNameKey = "period_displayName";
+  descriptionKey = "period_description";
   // Formatting settings slice
   analyticsPane: boolean = false;
   visible: boolean = true;

@@ -24,10 +24,14 @@ export function SetTheme({
       primary: {
         main: themeColor,
       },
+      text: {
+        primary: themeMode === "dark" ? "#ccc" : "#000",
+      },
     },
     typography: {
       fontFamily: themeFont,
-      fontSize: sze > 16 ? 16 : sze,
+      // fontSize: sze > 16 ? 16 : sze,
+      fontSize: sze,
       // htmlFontSize: sze,
     },
     components: {

@@ -18,6 +18,12 @@ interface DateFieldProps {
   underline?: boolean;
   type?: string;
   width?: number;
+  fontBold?: boolean;
+  fontFamily?: string;
+  fontColor?: string;
+  fontItalic?: boolean;
+  fontUnderline?: boolean;
+  fontWeight?: string;
   InputFontSize?: number;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur: (e: React.FocusEvent<HTMLInputElement>) => void;
@@ -55,8 +61,17 @@ export const DateField: React.FC<DateFieldProps> = (props) => {
             ? hexToCSSFilter(theme.palette.primary.main).filter
             : "",
         },
+        input: {
+          color: props.fontColor,
+          fontWeight: props.fontBold
+            ? theme.typography.fontWeightBold
+            : theme.typography.fontWeightRegular,
+        fontStyle: props.fontItalic ? "italic" : "normal",
+        },
         paddingTop: "2px",
-        width: tms.measureSvgTextWidth(textProperties) + theme.typography.fontSize * 3.25,
+        width:
+          tms.measureSvgTextWidth(textProperties) +
+          theme.typography.fontSize * 3.25,
       }}
       type="date"
       variant="standard"
