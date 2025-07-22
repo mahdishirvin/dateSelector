@@ -4,20 +4,33 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import RngeTooltip from "./rngetooltip";
 import { TOGGLE_SLIDER_BUTTON } from "../constants";
 
-const { TopRowOpen, TopRowClosed, TopRowEnd, DetailRowOpen, DetailRowClosed } = TOGGLE_SLIDER_BUTTON;
-
-interface ToggleSliderButtonProps {
+const { TopRowOpen, TopRowClosed, TopRowEnd, DetailRowOpen, DetailRowClosed } =
+  TOGGLE_SLIDER_BUTTON;
+  interface ToggleSliderButtonProps {
   openSlider: boolean;
   toggleSlider: () => void;
 }
 
-function ToggleSliderButton({ openSlider, toggleSlider }: ToggleSliderButtonProps) {
-  const topRow = React.useMemo(() => (openSlider ? TopRowOpen : TopRowClosed) + TopRowEnd, [openSlider]);
-  const detailRow = React.useMemo(() => (openSlider ? DetailRowOpen : DetailRowClosed), [openSlider]);
+function ToggleSliderButton({
+  openSlider,
+  toggleSlider,
+}: ToggleSliderButtonProps) {
+  const topRow = (openSlider ? TopRowOpen : TopRowClosed) + TopRowEnd;
+  const detailRow = openSlider ? DetailRowOpen : DetailRowClosed;
 
   return (
-    <IconButton aria-label="Toggle Slider" onClick={toggleSlider} id="menuToggle" size="small">
-      <RngeTooltip shortCut="S" title={undefined} topRow={topRow} detailRow={detailRow} placement="bottom-end">
+    <IconButton
+      aria-label="Toggle Slider"
+      onClick={toggleSlider}
+      id="menuToggle"
+      size="small"
+    >
+      <RngeTooltip
+        title={undefined}
+        topRow={topRow}
+        detailRow={detailRow}
+        placement="bottom"
+      >
         <MoreVertIcon style={{ fontSize: "inherit" }} />
       </RngeTooltip>
     </IconButton>
