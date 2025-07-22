@@ -19,7 +19,6 @@
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^7.1.0",
     "@mui/material": "^7.1.0",
-    "@mui/material-nextjs": "^7.0.0",
     "date-fns": "^4.1.0",
     "hex-to-css-filter": "^6.0.0",
     "lodash.debounce": "^4.0.8",
