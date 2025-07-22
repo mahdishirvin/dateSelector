@@ -1,7 +1,6 @@
 import * as React from "react";
 import Tooltip, { TooltipProps, tooltipClasses } from "@mui/material/Tooltip";
 import { styled } from "@mui/system";
-// import Typography from "@mui/material/Typography";
 import { useHelpContext } from "./helpprovider";
 
 type Props = TooltipProps & {
@@ -18,52 +17,47 @@ const RngeTooltip = styled(({ className, ...props }: Props) => {
     shortCut,
     topRow,
     detailRow,
-    detailFlag = useHelpContext().showHelp ,
+    detailFlag = useHelpContext().showExtendedTooltip,
     infoRow,
     ...rest
   } = props;
 
-  const showKey = useHelpContext().showKey;
-  const [open, setOpen] = React.useState(useHelpContext().showKey);
-  // console.log(shortCut, showKey, open);
+  const { showTooltip } = useHelpContext();
 
-  const handleClose = () => {
-    setOpen(false);
-  };
+  // Tooltip should only be open if explicitly triggered (not on startup)
+  const [open, setOpen] = React.useState(false);
 
-  const handleOpen = () => {
-    setOpen(true);
-  };
+  const handleClose = () => setOpen(false);
+  const handleOpen = () => setOpen(true);
 
   return (
-    (<Tooltip
+    <Tooltip
       {...rest}
       classes={{ popper: className }}
-      arrow={showKey && shortCut ? false : true}
+      arrow={showTooltip && shortCut ? false : true}
       open={open}
       onClose={handleClose}
       onOpen={handleOpen}
       title={
-       useHelpContext().showTooltip && (showKey && shortCut ? (
+        showTooltip && (showTooltip && shortCut ? (
           shortCut
         ) : title !== undefined ? (
           title
         ) : (
           <>
-            <div><b>{detailFlag && detailRow  && (`${topRow}`)}</b></div>
-            <div>{detailFlag && detailRow ? (`${detailRow}`) : `${topRow}`}</div>
-            <div style={{fontStyle: "italic"}}>{ infoRow ? (`${infoRow}`) : ``}</div>
+            <div><b>{detailFlag && detailRow && topRow}</b></div>
+            <div>{detailFlag && detailRow ? detailRow : topRow}</div>
+            <div style={{ fontStyle: "italic" }}>{infoRow ? infoRow : ""}</div>
           </>
         ))
       }
-    />)
+    />
   );
 })(({ theme }) => ({
   [`& .${tooltipClasses.tooltip}`]: {
     backgroundColor: theme.palette.text.primary,
     border: theme.palette.text.primary,
     color: theme.palette.background.paper,
-    // fontWeight: 300,
     maxWidth: 250
   },
   [`& .${tooltipClasses.arrow}`]: {

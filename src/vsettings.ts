@@ -267,7 +267,13 @@ class helpSettings extends FormattingSettingsGroup {
     name: "showTooltip",
     displayNameKey: "assist_showToolTip_displayName",
     descriptionKey: "assist_showToolTip_description",
-    value: defaultSettings.layoutSettings.helpSettings.showHelpIcon,
+    value: defaultSettings.layoutSettings.helpSettings.showTooltip,
+  });
+  showExtendedTooltip = new formattingSettings.ToggleSwitch({
+    name: "showExtendedTooltip",
+    displayNameKey: "assist_showExtendedToolTip_displayName",
+    descriptionKey: "assist_showExtendedToolTip_description",
+    value: defaultSettings.layoutSettings.helpSettings.showExtendedTooltip,
   });
 
   name: string = "tooltip";
@@ -275,9 +281,12 @@ class helpSettings extends FormattingSettingsGroup {
   displayNameKey = "assist_displayName";
   uid: string = "tooltipUid";
   analyticsPane: boolean = true;
-  // visible: boolean = true;
-  // topLevelSlice: formattingSettings.SimpleSlice = this.showTooltip;
-  slices: Array<FormattingSettingsSlice> = [this.showHelpIcon];
+  visible: boolean = true;
+  topLevelSlice: formattingSettings.SimpleSlice = this.showTooltip;
+  slices: Array<FormattingSettingsSlice> = [
+    this.showExtendedTooltip,
+    this.showHelpIcon,
+  ];
 }
 
 class layoutSettings extends FormattingSettingsCompositeCard {

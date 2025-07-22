@@ -6,12 +6,12 @@ export const FONT_FAMILY: string = "helvetica,arial,sans-serif";
 
 export const HELP_PROVIDER = {
   ShortCut: "H",
-  TopRowHelp: "Date Range Selection - shortcut key (H)",
+  TopRowHelp: "Brief tooltips (H)",
   DetailRowHelp:
-    "Click to show descriptions for each aspect of the date range selector.",
-  TopRowInfo: "Information Mode Active",
+    "Click to show extended tooltips.",
+  TopRowInfo: "Extended tooltips (H)",
   DetailRowInfo:
-    "Hover over area of the date selector for descriptions. Escape to cancel."
+    "Click to show brief tooltips."
 };
 
 export const STEP_TOGGLE = {

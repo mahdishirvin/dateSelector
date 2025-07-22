@@ -35,7 +35,7 @@ export default function DateRange(props: dateCardProps) {
   };
 
   const dateSpan = inputParms(dates, rangeScope);
-  const topRow = useHelpContext().showHelp ? "Selected Range" : dateSpan.string;
+  const topRow = useHelpContext().showExtendedTooltip ? "Selected Range" : dateSpan.string;
 
   const doUpdate = (id: "start" | "end", value: string) => {
     const dte: Date = parse(value, "yyyy-MM-dd", new Date());

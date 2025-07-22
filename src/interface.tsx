@@ -67,6 +67,7 @@ export interface Settings {
     helpSettings: {
       showTooltip?: boolean;
       showHelpIcon?: boolean;
+      showExtendedTooltip?: boolean;
     };
   };
   period?: {
@@ -199,6 +200,7 @@ export interface dateCardProps {
   // boolean values to show tooltip datail level
   showHelpIcon?: boolean;
   showTooltip?: boolean;
+  showExtendedTooltip?: boolean;
 
   // boolean value indicating whether to show the icon text
   showIconText?: boolean;

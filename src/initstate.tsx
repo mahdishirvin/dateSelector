@@ -13,7 +13,7 @@ export const defaultSettings: Settings = {
     themeMode: "light",
     themeFont: 'Segoe UI',
     fontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
-    fontSize: 12,
+    fontSize: 10,
     fontBold: false,
     fontUnderline: false,
     fontItalic: false,
@@ -45,6 +45,7 @@ export const defaultSettings: Settings = {
     helpSettings: {
       showHelpIcon: false,
       showTooltip: true,
+      showExtendedTooltip: false,
     },
   },
   period: {

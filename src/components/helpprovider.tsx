@@ -1,48 +1,67 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useMemo, useEffect } from "react";
 import IconButton from "@mui/material/IconButton";
 import { Chat, ChatBubbleOutlineOutlined } from "@mui/icons-material";
-// import Chat from "@mui/icons-material/InfoOutlined";
 import Tooltip from "@mui/material/Tooltip";
-// import Typography from "@mui/material/Typography";
 import { useHotkeys } from "react-hotkeys-hook";
 import { HELP_PROVIDER } from "../constants";
 
 const HelpContext = React.createContext({
-  showKey: false,
-  showHelp: true,
+  showHelpIcon: false,
   showTooltip: true,
-toggleHelp: () => {/* show or hide help messages*/},
+  showExtendedTooltip: false,
+  toggleHelp: () => {},
+  setShowHelpIcon: (_: boolean) => {},
+  setShowTooltip: (_: boolean) => {},
+  setShowExtendedTooltip: (_: boolean) => {},
 });
 
 const { TopRowInfo, DetailRowInfo, TopRowHelp, DetailRowHelp } = HELP_PROVIDER;
 
 export const useHelpContext = () => useContext(HelpContext);
 
-export const HelpProvider = ({ children, showHelpIcon ,showTooltip }) => {
-  // const [showHelp, setShowHelp] = useState(true);
-  // const [showKey, setShowKey] = useState(false);
+export const HelpProvider = ({
+  children,
+  showHelpIcon,
+  showTooltip,
+  showExtendedTooltip,
+}) => {
+  // Always sync state with props
+  const [helpIcon, setHelpIcon] = useState(showHelpIcon ?? false);
+  const [tooltip, setTooltip] = useState(showTooltip ?? true);
+  const [extendedTooltip, setExtendedTooltip] = useState(showExtendedTooltip ?? false);
 
-  // const toggleHelp = (): void => {
-  //   setShowHelp(showHelp);
-  // };
-  const showHelp = showHelpIcon;
-  const showKey = false;
-  const toggleHelp = () => {};
-    const value = { showKey, showHelp, toggleHelp, showTooltip};
+  useEffect(() => {
+    setHelpIcon(showHelpIcon ?? false);
+  }, [showHelpIcon]);
+  useEffect(() => {
+    setTooltip(showTooltip ?? true);
+  }, [showTooltip]);
+  useEffect(() => {
+    setExtendedTooltip(showExtendedTooltip ?? false);
+  }, [showExtendedTooltip]);
 
-  // useHotkeys("escape", () => setShowHelp(false));
-  // useHotkeys(["h"], () => setShowHelp(true));
-  // // useHotkeys(["h"], () => toggleHelp());
-  // useHotkeys("alt", () => setShowKey(true), { keydown: true }, [showKey]);
-  // useHotkeys("alt", () => setShowKey(false), { keyup: true }, [showKey]);
+  const toggleHelp = () => setExtendedTooltip((prev) => !prev);
+
+  useHotkeys("escape", () => setHelpIcon(false));
+  useHotkeys(["h"], () => toggleHelp());
+
+  const value = useMemo(() => ({
+    showHelpIcon: helpIcon,
+    showTooltip: tooltip,
+    showExtendedTooltip: extendedTooltip,
+    toggleHelp,
+    setShowHelpIcon: setHelpIcon,
+    setShowTooltip: setTooltip,
+    setShowExtendedTooltip: setExtendedTooltip,
+  }), [helpIcon, tooltip, extendedTooltip]);
 
   return (
-    (<HelpContext.Provider value={value}>
-      {/* {showHelpIcon && (
+    <HelpContext.Provider value={value}>
+      {helpIcon && tooltip && (
         <Tooltip
           arrow
           title={
-            showHelpIcon ? (
+            extendedTooltip ? (
               <>
                 <div>
                   <b>{TopRowInfo}</b>
@@ -63,7 +82,7 @@ export const HelpProvider = ({ children, showHelpIcon ,showTooltip }) => {
             tooltip: {
               sx: {
                 backgroundColor: (theme) =>
-                  showHelp
+                  extendedTooltip
                     ? theme.palette.secondary.dark
                     : theme.palette.primary.dark,
                 maxWidth: 350,
@@ -76,18 +95,18 @@ export const HelpProvider = ({ children, showHelpIcon ,showTooltip }) => {
           <IconButton
             size="small"
             sx={{ position: "absolute", right: 0, top: 0, margin: 0.2 }}
-            color={showHelp ? "secondary" : "primary"}
+            color={extendedTooltip ? "secondary" : "primary"}
             onClick={toggleHelp}
           >
-            {showHelp ? (
-              <Chat style={{ fontSize: 16 }} />
+            {extendedTooltip ? (
+              <Chat style={{ fontSize: 8 }} />
             ) : (
-              <ChatBubbleOutlineOutlined style={{ fontSize: 16 }} />
+              <ChatBubbleOutlineOutlined style={{ fontSize: 8 }} />
             )}
           </IconButton>
         </Tooltip>
-      )} */}
+      )}
       {children}
-    </HelpContext.Provider>)
+    </HelpContext.Provider>
   );
 };

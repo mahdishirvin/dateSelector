@@ -368,6 +368,11 @@
                         "bool": true
                     }
                 },
+                "showExtendedTooltip": {
+                    "type": {
+                        "bool": true
+                    }
+                },
                 "showCurrent": {
                     "type": {
                         "bool": true

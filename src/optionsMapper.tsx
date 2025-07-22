@@ -93,6 +93,7 @@ export const settingProps = (
     },
     showHelpIcon: help.showHelpIcon.value,
     showTooltip: help.showTooltip.value,
+    showExtendedTooltip: help.showExtendedTooltip.value,
     showMove: move.showMove.value,
     showExpand: move.showExpand.value,
     showCurrent: current.showCurrent.value,

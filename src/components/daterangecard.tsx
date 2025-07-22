@@ -74,6 +74,7 @@ export default function DateRangeCard(props: dateCardProps) {
       <HelpProvider
         showHelpIcon={props.showHelpIcon}
         showTooltip={props.showTooltip}
+        showExtendedTooltip={props.showExtendedTooltip}
       >
         <TopRow
           {...props}
