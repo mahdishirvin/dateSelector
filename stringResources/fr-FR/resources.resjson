@@ -140,5 +140,8 @@
   "yearStartMonth_November": "Novembre",
   "yearStartMonth_December": "Décembre",
   "fmtYear_yyyy": "aaaa - 2017, 2020",
-  "fmtYear_Yy": "aa - 00, 17, ... 20"
+  "fmtYear_Yy": "aa - 00, 17, ... 20",
+  "landingPageTitle": "Sélecteur de plage de dates, ajoutez un champ de date pour l'activer.",
+  "landingPageDescription": "Ce sélecteur vous permet de sélectionner une date ou une plage de dates et de filtrer vos données en conséquence. Vous pouvez choisir parmi divers formats de date, définir la plage de démarrage et personnaliser les options de chronologie et de période actuelle.",
+  "landingPageButton": "Ajouter un champ de date"
 }

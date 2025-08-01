@@ -140,5 +140,10 @@
   "yearStartMonth_November": "November",
   "yearStartMonth_December": "December",
   "fmtYear_yyyy": "yyyy - 2017, 2020",
-  "fmtYear_Yy": "yy - 00, 17, ... 20"
+  "fmtYear_Yy": "yy - 00, 17, ... 20",
+
+  "landingPageTitle":"Date Range Slicer, add a Date field to activate.",
+  "landingPageDescription":"This slicer allows you to select a date or date range and filter your data accordingly. You can choose from various date formats, set the start range, and customize the timeline and current period options.",
+  "landingPageButton":"Add Date Field"
+
 }

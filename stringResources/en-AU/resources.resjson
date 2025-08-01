@@ -12,6 +12,10 @@
   "style_fmtDate_displayName": "Date Input Format",
   "style_fontColor_displayName": "Font colour",
   "style_fontColor_description": "Font colour for text on this slicer",
+  "style_font_displayName": "Font",
+  "style_font_description": "Font for date on this slicer",
+  "style_fontFamily_description": "Font family for text on this slicer",
+  "style_fontFamily_displayName": "Font Family",
   "calendar_description": "Range startup settings and optional sync override.",
   "calendar_displayName": "Range options",
   "calendar_startRange_description": "Default date range when the current page is loaded - domhich respects Sync & Bookmark settings.",
@@ -155,7 +159,7 @@
   "startRange_Yesterday": "Yesterday",
   "startRange_This_Week": "This Week",
   "startRange_Last_Week": "Last Week",
-  "startRange_Last_Week_of_Scope": "Last Full Week of Scope",
+  "startRange_Last_Week_of_Scope": "Last Week of Scope",
   "startRange_First_Week_of_Scope": "First Week of Scope",
   "startRange_This_Month": "This Month",
   "startRange_Last_Month": "Last Month",
@@ -195,6 +199,9 @@
   "fmtPay_Wdmmm": "d-MMM - 1-Jan, ..., 31-Mar",
   "fmtPay_W": "1, 2, ..., 53",
   "fmtPay_Wo": "1st, 2nd, ..., 53th",
-  "fmtPay_Wdm": "d.MMMMM - 1.J, ..., 31.M"
+  "fmtPay_Wdm": "d.MMMMM - 1.J, ..., 31.M",
 
+  "landingPageTitle":"Date Range Slicer",
+  "landingPageDescription":"This slicer lets you to select a date or date range and filter your data accordingly. You can choose from various date formats, set the start range, and customize the timeline and current period options.",
+  "landingPageButton":"Add a Date Field"
 }

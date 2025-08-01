@@ -31,6 +31,7 @@
     ],
     "include": [
         "src",
-        "src/languages/enAU.ts"
+        "src/languages/enAU.ts",
+        "src/types/images.d.ts"
     ]
 }

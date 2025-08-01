@@ -32,6 +32,7 @@ import tinycolor from "tinycolor2";
 import DateRangeCard from "./components/daterangecard";
 import isEqual from "lodash.isequal";
 import "../assets/visual.less";
+import { LocalizationContext } from "./localizationcontext";
 
 export class DateSelector extends ReactVisual implements IVisual {
   private visualHost: IVisualHost;
@@ -93,9 +94,21 @@ export class DateSelector extends ReactVisual implements IVisual {
     }
   }
 
-  protected initializeReact() {
+  // protected initializeReact() {
+  //   this.reactRenderer = this.createReactContainer(
+  //     DateRangeCard,
+  //     this.applyDateFilter
+  //   );
+  //   this.reactMount();
+  // }
+
+    protected initializeReact() {
     this.reactRenderer = this.createReactContainer(
-      DateRangeCard,
+      (props) => (
+        <LocalizationContext.Provider value={this.localizationManager}>
+          <DateRangeCard {...props} />
+        </LocalizationContext.Provider>
+      ),
       this.applyDateFilter
     );
     this.reactMount();

@@ -140,5 +140,8 @@
   "yearStartMonth_November": "November",
   "yearStartMonth_December": "December",
   "fmtYear_yyyy": "jjjj - 2017, 2020",
-  "fmtYear_Yy": "jj - 00, 17, ... 20"
+  "fmtYear_Yy": "jj - 00, 17, ... 20",
+  "landingPageTitle": "Datumreeks Slicer, voeg een datumveld toe om te activeren.",
+  "landingPageDescription": "Deze slicer stelt u in staat om een datum of datumbereik te selecteren en uw gegevens dienovereenkomstig te filteren. U kunt kiezen uit verschillende datumformaten, het startbereik instellen en de tijdlijn- en huidige periodeopties aanpassen.",
+  "landingPageButton": "Datumveld toevoegen"
 }

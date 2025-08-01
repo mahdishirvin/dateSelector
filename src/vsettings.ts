@@ -106,7 +106,7 @@ class styleSettings extends FormattingSettingsCard {
 
   public font: formattingSettings.FontControl = new formattingSettings.FontControl({
         name: "font",   // must be unique within the same object
-        displayName: "Font",
+        displayName: "",
         fontFamily: this.themeFont,
         fontSize: this.fontSize,
         bold: this.fontBold,           //optional
@@ -213,7 +213,7 @@ class currentSettings extends FormattingSettingsGroup {
     name: "showIconText",
     descriptionKey: "current_showIconText_description",
     displayNameKey: "current_showIconText_displayName",
-    displayName: "Current Icon Text",
+    displayName: "current_showIconText_displayName",
     value: defaultSettings.layoutSettings.currentSettings.showIconText,
   });
 
