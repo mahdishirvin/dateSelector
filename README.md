@@ -1,7 +1,7 @@
 # Date Selector Visual
 
 ## A compact rich functionality date range filter for Power BI
-The [**DateSelector** visual](https://github.com/o221/dateSelector/blob/main/dist/dateSel4A1A0033E6F54D1B809B6E51058D54E3.3.2025.02.16.pbiviz) is a date range selector designed to be used with Microsoft Power BI.
+The [**DateSelector** visual](https://github.com/o221/dateSelector/blob/main/dist/dateSel4A1A0033E6F54D1B809B6E51058D54E3.3.2025.07.31.pbiviz) is a date range selector designed to be used with Microsoft Power BI.
 
 ## Features
 - Allows users to select a range of dates with a compact user-friendly interface.
