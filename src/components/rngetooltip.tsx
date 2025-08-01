@@ -38,6 +38,18 @@ const RngeTooltip = styled(({ className, ...props }: Props) => {
       open={open}
       onClose={handleClose}
       onOpen={handleOpen}
+          slotProps={{
+            popper: {
+              modifiers: [
+                {
+                  name: "offset",
+                  options: {
+                    offset: [0, -10],
+                  },
+                },
+              ],
+            },
+          }}
       title={
         showTooltip && (showTooltip && shortCut ? (
           shortCut
