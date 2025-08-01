@@ -62,7 +62,7 @@ Can be synced with last  page viewed
 ## Installation
 To use the DateSelector visual, you can import it into your Power BI report by following these steps:
 
-Download the visual from [dist](https://github.com/o221/dateSelector/blob/main/dist/dateSel4A1A0033E6F54D1B809B6E51058D54E3.3.2025.02.16.pbiviz) and import it into Power BI using the "Import from file" option.
+Download the visual from [dist](https://github.com/o221/dateSelector/blob/main/dist) and import it into Power BI using the "Import from file" option.
 
 1. Open the report in Power BI Desktop.
 2. In the Visualizations pane, select the ellipsis (...).
