@@ -56,6 +56,7 @@ import { isWithinInterval } from "date-fns/isWithinInterval";
 import { step, dateRange, SliderProps } from "./interface";
 import { DATEUTILS } from "./constants";
 import { getDay } from "date-fns/getDay";
+import { MultipleStop, SwapVert } from "@mui/icons-material";
 
 // import compareAsc from 'date-fns/compareAsc'
 
@@ -541,7 +542,7 @@ export const Increment = (
       thisPeriod: periodThis.more, //"more",
       thisRange: null,
       icon: (
-        <MoreHoriz style={{ fontSize: 12, opacity: 0.5 }} color="primary" />
+        <MultipleStop style={{ fontSize: 12, opacity: 0.5 }} color="secondary" />
       ),
     },
     {

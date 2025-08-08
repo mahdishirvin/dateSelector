@@ -1,6 +1,7 @@
 import * as React from "react";
 import IconButton from "@mui/material/IconButton";
 import Badge from "@mui/material/Badge";
+import Typography from "@mui/material/Typography";
 import BlurOn from "@mui/icons-material/BlurOn";
 import { stepProps } from "../interface";
 import { DATEUTILS, STEP_TOGGLE } from "../constants";
@@ -33,7 +34,9 @@ export default function StepToggle(props: stepProps) {
       <IconButton value="on" size="small" onClick={onClick}>
         <Badge
           sx={{ "& .MuiBadge-badge": { right: -2, top: -1 } }}
-          badgeContent={stepValue.charAt(0)}
+          badgeContent={<Typography variant="overline" sx={{ fontSize: ".4rem", textTransform: "none" }}>
+                          {stepValue.charAt(0).toUpperCase()}
+                        </Typography>}
           anchorOrigin={{ vertical: "top", horizontal: "right" }}
         >
           <RngeTooltip

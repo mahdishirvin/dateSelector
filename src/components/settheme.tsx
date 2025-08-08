@@ -1,53 +1,53 @@
-import { createTheme, Theme } from "@mui/material/styles";
+import { createTheme } from "@mui/material/styles";
 
-interface CustomThemeOptions {
+export function SetTheme({ themeMode, themeColor, themeFont, fontSize }: {
   themeMode: "light" | "dark";
   themeColor: string;
   themeFont: string;
   fontSize: string;
-}
-
-const getNum = (n: number | string) => {
-  return typeof n === "number" ? n : parseInt(n, 10);
-};
-
-export function SetTheme({
-  themeMode,
-  themeColor,
-  themeFont,
-  fontSize,
-}: CustomThemeOptions): Theme {
-  const sze = getNum(fontSize);
-  const theme = createTheme({
+}) {
+  return createTheme({
     palette: {
       mode: themeMode,
       primary: {
         main: themeColor,
       },
-      text: {
-        primary: themeMode === "dark" ? "#ccc" : "#000",
-      },
     },
     typography: {
       fontFamily: themeFont,
-      // fontSize: sze > 16 ? 16 : sze,
-      fontSize: sze,
-      // htmlFontSize: sze,
+      fontSize: parseInt(fontSize, 10),
     },
     components: {
-      // Name of the component
+      MuiTooltip: {
+        styleOverrides: {
+          tooltip: ({ theme }) => ({
+            backgroundColor: theme.palette.text.primary,
+            color: theme.palette.background.paper,
+            maxWidth: 250,
+            fontSize: theme.typography.pxToRem(11),
+            padding: theme.spacing(0.75, 1),
+          }),
+          arrow: ({ theme }) => ({
+            color: theme.palette.text.primary,
+          }),
+        },
+        defaultProps: {
+          arrow: true,
+          enterTouchDelay: 0,
+        },
+      },
       MuiBadge: {
         styleOverrides: {
           // Name of the slot
           badge: {
             // Some CSS
-            fontSize: ".5rem",
+            // fontSize: ".5rem",
             textTransform: "uppercase",
           },
         },
       },
+      // Add more component overrides here as needed
     },
   });
-
-  return theme;
 }
+

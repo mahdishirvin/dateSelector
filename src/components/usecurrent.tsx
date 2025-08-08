@@ -7,6 +7,7 @@ import Typography from "@mui/material/Typography";
 import { dateCardProps, dateRange } from "../interface";
 import RngeTooltip from "./rngetooltip";
 import DateIntervalPicker from "./dateintervalpicker";
+import { Badge } from "@mui/material";
 
 export default function UseCurrent(props: dateCardProps) {
   const {
@@ -42,11 +43,11 @@ export default function UseCurrent(props: dateCardProps) {
               .filter((item) => {
                 if (item.thisRange !== null) {
                   const x = ttl ? item.tip !== "" : item.tip === "";
-                  const y = !limitToScope && areIntervalsOverlapping(
-                    item.thisRange,
-                    rangeScope,
-                    { inclusive: true }
-                  );
+                  const y =
+                    !limitToScope &&
+                    areIntervalsOverlapping(item.thisRange, rangeScope, {
+                      inclusive: true,
+                    });
                   return item.show && x && y;
                 } else return showMore;
               })
@@ -71,6 +72,19 @@ export default function UseCurrent(props: dateCardProps) {
                     }
                   >
                     <IconButton
+                      sx={
+                        showIconText
+                          ? {
+                                display: "flex",
+                                flexDirection: "row",
+                                justifyContent: "center",
+                                width: item.thisPeriod.length * 0.2 + "rem",
+                                minWidth: "24px",
+                                alignItems: "center",
+                                padding: "2px",
+                            }
+                          : { minWidth: "24px", padding: "2px" }
+                      }
                       size="small"
                       color="primary"
                       key={`tbn${item.thisRange}${index}`}
@@ -84,16 +98,34 @@ export default function UseCurrent(props: dateCardProps) {
                         }
                       }}
                     >
-                      {item.icon}{" "}
-                      {showIconText && (
-                        <Typography
-                          key={`typ${item.thisRange}${index}`}
-                          variant="caption"
-                          sx={{ color: "text.primary" }}
-                        >
-                          {item.thisPeriod}
-                        </Typography>
-                      )}
+                      <Badge
+                        sx={{
+                          "& .MuiBadge-badge": showIconText
+                            ? {
+                                display: "flex",
+                                flexDirection: "row",
+                                justifyContent: "center",
+                                minWidth: item.thisPeriod.length * 0.21 + "rem",
+                                alignItems: "center",
+                                padding: "2px", top: "-3px", right: "-2px",
+                              }
+                            : { minWidth: "24px", padding: "2px" },
+                        }}
+                        badgeContent={
+                          showIconText && (
+                            <Typography
+                              key={`typ${item.thisRange}${index}`}
+                              variant="caption"
+                              sx={{ color: "text.primary", fontSize: "0.31rem" }}
+                            >
+                              {item.thisPeriod}
+                            </Typography>
+                          )
+                        }
+                        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                      >
+                        {item.icon}
+                      </Badge>
                     </IconButton>
                   </RngeTooltip>
                 </DateIntervalPicker>

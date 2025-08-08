@@ -56,6 +56,17 @@ export default function DateRangeCard(props: dateCardProps) {
 
   React.useEffect(() => setOpenSlider(props.showSlider), [props.showSlider]);
   React.useEffect(() => setStepValue(props.stepInit), [props.stepInit]);
+  React.useEffect(() => {
+    const handleContextMenu = (event: MouseEvent) => {
+      event.preventDefault();
+    };
+
+    document.addEventListener("contextmenu", handleContextMenu);
+
+    return () => {
+      document.removeEventListener("contextmenu", handleContextMenu);
+    };
+  }, []);
 
   const toggleSlider = () => setOpenSlider(!openSlider);
 

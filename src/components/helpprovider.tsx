@@ -4,6 +4,7 @@ import { Chat, ChatBubbleOutlineOutlined } from "@mui/icons-material";
 import Tooltip from "@mui/material/Tooltip";
 import { useHotkeys } from "react-hotkeys-hook";
 import { HELP_PROVIDER } from "../constants";
+import { useTheme } from "@mui/material/styles";
 
 const HelpContext = React.createContext({
   showHelpIcon: false,
@@ -13,6 +14,7 @@ const HelpContext = React.createContext({
   setShowHelpIcon: (_: boolean) => {},
   setShowTooltip: (_: boolean) => {},
   setShowExtendedTooltip: (_: boolean) => {},
+  setTooltipEnabled: (enabled: boolean) => {},
 });
 
 const { TopRowInfo, DetailRowInfo, TopRowHelp, DetailRowHelp } = HELP_PROVIDER;
@@ -25,8 +27,9 @@ export const HelpProvider = ({
   showTooltip,
   showExtendedTooltip,
 }) => {
-  // Always sync state with props
-  const [helpIcon, setHelpIcon] = useState(showHelpIcon ?? false);
+ const theme = useTheme();
+
+ const [helpIcon, setHelpIcon] = useState(showHelpIcon ?? false);
   const [tooltip, setTooltip] = useState(showTooltip ?? true);
   const [extendedTooltip, setExtendedTooltip] = useState(showExtendedTooltip ?? false);
 
@@ -53,7 +56,8 @@ export const HelpProvider = ({
     setShowHelpIcon: setHelpIcon,
     setShowTooltip: setTooltip,
     setShowExtendedTooltip: setExtendedTooltip,
-  }), [helpIcon, tooltip, extendedTooltip]);
+    setTooltipEnabled: (enabled: boolean) => setTooltip(enabled),
+  }), [helpIcon, tooltip, extendedTooltip, toggleHelp]);
 
   return (
     <HelpContext.Provider value={value}>
@@ -81,16 +85,16 @@ export const HelpProvider = ({
           slotProps={{
             tooltip: {
               sx: {
-                backgroundColor: (theme) =>
-                  extendedTooltip
-                    ? theme.palette.secondary.dark
-                    : theme.palette.primary.dark,
+                backgroundColor: extendedTooltip
+                  ? theme.palette.secondary.dark
+                  : theme.palette.primary.dark,
+                color: theme.palette.background.paper,
                 maxWidth: 350,
-                fontWeight: 400,
-                fontSize: 8,
+                fontSize: theme.typography.pxToRem(11),
+                padding: theme.spacing(1),
+                zIndex: theme.zIndex.tooltip + 1,
               },
-            },
-          }}
+            },          }}
         >
           <IconButton
             size="small"

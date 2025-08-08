@@ -1,95 +1,88 @@
 import * as React from "react";
-import Tooltip, { TooltipProps, tooltipClasses } from "@mui/material/Tooltip";
-import { styled } from "@mui/system";
+import Tooltip, { TooltipProps } from "@mui/material/Tooltip";
 import { useHelpContext } from "./helpprovider";
 
-type Props = TooltipProps & {
-  shortCut?: string;
+interface RngeTooltipProps extends Omit<TooltipProps, "title"> {
   topRow?: string;
   detailRow?: string;
+  title?: string;
+  disableTooltip?: boolean;
+  shortCut?: string;
   infoRow?: string;
   detailFlag?: boolean;
-};
+  children: React.ReactElement;
+}
 
-const RngeTooltip = styled(({ className, ...props }: Props) => {
-  const {
-    title,
-    shortCut,
-    topRow,
-    detailRow,
-    detailFlag = useHelpContext().showExtendedTooltip,
-    infoRow,
-    ...rest
-  } = props;
-
+const RngeTooltip: React.FC<RngeTooltipProps> = ({
+  topRow,
+  shortCut,
+  detailRow,
+  title,
+  disableTooltip = false,
+  children,
+  infoRow,
+  detailFlag = useHelpContext().showExtendedTooltip,
+  ...tooltipProps
+}) => {
   const { showTooltip } = useHelpContext();
 
-  // Tooltip should only be open if explicitly triggered (not on startup)
-  const [open, setOpen] = React.useState(false);
+  const shouldShow = showTooltip && !disableTooltip;
+  const content = detailFlag ? (
+    <div>
+      {topRow || title && <div style={{ fontWeight: "bold" }}>{topRow? topRow:title}</div>}
+      {detailRow && <div>{detailRow}</div>}
+      {infoRow && <div style={{ fontStyle: "italic" }}>{infoRow}</div>}
+    </div>
+  ) : (
+    title || topRow
+  );
 
-  const handleClose = () => setOpen(false);
-  const handleOpen = () => setOpen(true);
+  if (!shouldShow || !content) return children;
 
   return (
     <Tooltip
-      {...rest}
-      classes={{ popper: className }}
-      arrow={showTooltip && shortCut ? false : true}
-      open={open}
-      onClose={handleClose}
-      onOpen={handleOpen}
-          slotProps={{
-            popper: {
-              modifiers: [
-                {
-                  name: "offset",
-                  options: {
-                    offset: [0, -10],
-                  },
-                },
-              ],
+      title={content}
+      slotProps={{
+        popper: {
+          modifiers: [
+            {
+              name: "offset",
+              options: { offset: [0, -5] },
             },
-          }}
-      title={
-        showTooltip && (showTooltip && shortCut ? (
-          shortCut
-        ) : title !== undefined ? (
-          title
-        ) : (
-          <>
-            <div><b>{detailFlag && detailRow && topRow}</b></div>
-            <div>{detailFlag && detailRow ? detailRow : topRow}</div>
-            <div style={{ fontStyle: "italic" }}>{infoRow ? infoRow : ""}</div>
-          </>
-        ))
-      }
-    />
+          ],
+        },
+        tooltip: {
+          sx: (theme) => ({
+            backgroundColor: theme.palette.text.primary,
+            color: theme.palette.background.paper,
+            fontSize: theme.typography.pxToRem(11),
+            padding: theme.spacing(1),
+            maxWidth: 250,
+          }),
+        },
+        arrow: {
+          sx: (theme) => ({
+            color: theme.palette.text.primary,
+          }),
+        },
+      }}
+      {...tooltipProps}
+    >
+      {children}
+    </Tooltip>
   );
-})(({ theme }) => ({
-  [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: theme.palette.text.primary,
-    border: theme.palette.text.primary,
-    color: theme.palette.background.paper,
-    maxWidth: 250
-  },
-  [`& .${tooltipClasses.arrow}`]: {
-    color: theme.palette.text.primary,
-    border: theme.palette.text.primary
-  }
-}));
+};
 
 export default RngeTooltip;
-
 interface valueProps {
   children: React.ReactElement;
-  value: number;
   index: number;
 }
 export function ValueLabel(props: valueProps) {
-  const { children, value, index } = props;
+  const { children,  index } = props;
   const loc = index === 0 ? "top-end" : "bottom-start";
   return (
-    <RngeTooltip enterTouchDelay={0} placement={loc} title={value} arrow>
+    <RngeTooltip enterTouchDelay={0} placement={loc}  arrow>
       {children}
     </RngeTooltip>
   );

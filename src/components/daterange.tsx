@@ -9,7 +9,8 @@ import { inputParms } from "../dateutils";
 import { DateField } from "./datefield";
 import { useHelpContext } from "./helpprovider";
 import RngeTooltip from "./rngetooltip";
-import { dateCardProps } from "../interface";
+import { dateCardProps, dateRange } from "../interface";
+import DateIntervalPicker from "./dateintervalpicker";
 
 export default function DateRange(props: dateCardProps) {
   const { dates, rangeScope, handleVal, singleDay } = props;
@@ -33,9 +34,14 @@ export default function DateRange(props: dateCardProps) {
       setStartText(dateValue);
     } else setEndText(dateValue);
   };
+  const handleDate = (val: dateRange) => {
+    handleVal([val.start, singleDay ? val.start : val.end]);
+  };
 
   const dateSpan = inputParms(dates, rangeScope);
-  const topRow = useHelpContext().showExtendedTooltip ? "Selected Range" : dateSpan.string;
+  const topRow = useHelpContext().showExtendedTooltip
+    ? "Selected Range"
+    : dateSpan.string;
 
   const doUpdate = (id: "start" | "end", value: string) => {
     const dte: Date = parse(value, "yyyy-MM-dd", new Date());
@@ -57,15 +63,15 @@ export default function DateRange(props: dateCardProps) {
 
   return (
     <div onMouseEnter={toggleUnderline} onMouseLeave={toggleUnderline}>
-      <RngeTooltip
-        title={undefined}
-        topRow={topRow}
-        detailRow={dateSpan.string}
-        infoRow={dateSpan.info}
-        placement="bottom"
-      >
-        <Grid container spacing={0.5} sx={{ paddingLeft: 0.3 }}>
-          <Grid size="grow">
+      <Grid container spacing={0.5} sx={{ paddingLeft: 0.3 }}>
+        <Grid size="grow">
+          <RngeTooltip
+            title={undefined}
+            topRow={topRow}
+            detailRow={dateSpan.string}
+            infoRow={dateSpan.info}
+            placement="bottom-start"
+          >
             <DateField
               id="start"
               value={startText}
@@ -78,13 +84,39 @@ export default function DateRange(props: dateCardProps) {
               onFocus={() => setUnderline(true)}
               {...props}
             />
-          </Grid>
-          {!singleDay && (
-            <>
-              <IconButton size="small">
-                <Remove style={{ fontSize: useTheme().typography.fontSize }} color="disabled" />
-              </IconButton>
-              <Grid size="grow">
+          </RngeTooltip>
+        </Grid>
+        {!singleDay && (
+          <>
+            <DateIntervalPicker
+              baseDate={dates.start}
+              stepValue={props.stepValue}
+              handleVal={handleDate}
+              clickType="left"
+            >
+              <RngeTooltip
+                title={undefined}
+                topRow={"Range Extension"}
+                detailRow={"Click to extend the date range"}
+                infoRow={dateSpan.info}
+                placement="right-start"
+              >
+                <IconButton size="small">
+                  <Remove
+                    style={{ fontSize: useTheme().typography.fontSize }}
+                    color="disabled"
+                  />
+                </IconButton>
+              </RngeTooltip>
+            </DateIntervalPicker>
+            <Grid size="grow">
+              <RngeTooltip
+                title={undefined}
+                topRow={topRow}
+                detailRow={dateSpan.string}
+                infoRow={dateSpan.info}
+                placement="bottom-start"
+              >
                 <DateField
                   id="end"
                   value={endText}
@@ -97,11 +129,11 @@ export default function DateRange(props: dateCardProps) {
                   onFocus={() => setUnderline(true)}
                   {...props}
                 />
-              </Grid>
-            </>
-          )}
-        </Grid>
-      </RngeTooltip>
+              </RngeTooltip>
+            </Grid>
+          </>
+        )}
+      </Grid>
     </div>
   );
 }

@@ -1,173 +1,223 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Popover,
   TextField,
   ClickAwayListener,
-  Paper,
+  Grid,
+  IconButton,
 } from "@mui/material";
-import { Interval, subDays } from "date-fns";
-import { getIntervalFunction } from "../dateutils";
-import IconButton from "@mui/material/IconButton";
-import RefreshIcon from "@mui/icons-material/Refresh";
 import CheckIcon from "@mui/icons-material/Check";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+// import RefreshIcon from "@mui/icons-material/Refresh";
 import RngeTooltip from "./rngetooltip";
-// import TopRow from "./toprow";
+import { getIntervalFunction } from "../dateutils";
+import { Interval, subDays } from "date-fns";
 
 interface IntervalParmsProps {
-  setIntervalValue: (value: number) => void;
-  handleClose: () => void;
-  handleInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   intervalValue: number;
   stepValue: string;
+  setIntervalValue: React.Dispatch<React.SetStateAction<number>>;
+  handleClose: () => void;
 }
 
 const IntervalParms: React.FC<IntervalParmsProps> = ({
-  setIntervalValue,
-  handleClose,
-  handleInputChange,
   intervalValue,
   stepValue,
+  setIntervalValue,
+  handleClose,
 }) => {
-  return (<>
-    <RngeTooltip
-      title={undefined}
-      topRow={`Extend ${stepValue}s from today`}
-      detailRow={`Set the date range by extending ${stepValue}s forward (+) or backward (-) from today. Click away to save & close.`}
-      placement="left"
-    >
-      <TextField
-        variant="standard"
-        label={`Today -/+ ${stepValue}s`}
-        type="number"
-        onChange={handleInputChange}
-        sx={{ width: 76 }}
-        value={intervalValue}
-        size="small"
-        onKeyDown={(ev) => {
-          if (ev.key === "Enter") {
-            handleClose();
-            ev.preventDefault();
-          }
-        }}
-        slotProps={{
-          htmlInput: {
-            style: { fontSize: 14, display: "flex", flexWrap: "wrap" },
-          }
-        }}
-      />
-    </RngeTooltip>
-    <RngeTooltip title="Save & Close" placement="top">
-      <IconButton size="small" onClick={handleClose}>
-        <CheckIcon style={{ fontSize: 14 }} color="primary" />
-      </IconButton>
-    </RngeTooltip>
-    <RngeTooltip title="Reset to 0" placement="top">
-      <IconButton size="small" onClick={() => setIntervalValue(0)}>
-        <RefreshIcon style={{ fontSize: 14 }} color="primary" />
-      </IconButton>
-    </RngeTooltip>
-  </>);
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(event.target.value, 10);
+    setIntervalValue(isNaN(value) ? 0 : value);
+  };
+
+  return (
+    <Grid container spacing={1} alignItems="center" direction="row" p={0.5}>
+      <Grid>
+        <IconButton
+          size="small"
+          onClick={() => setIntervalValue((prev) => (prev || 0) - 1)}
+        >
+          <RemoveIcon style={{ fontSize: "0.6rem" }} color="primary" />
+        </IconButton>
+      </Grid>
+      <Grid>
+        <RngeTooltip
+          placement="left-start"
+          detailRow={`Extend ${stepValue}s from today`}
+          infoRow={`Add future (+) or past (-) ${stepValue}s.`}
+        >
+          <TextField
+            helperText={`+/- ${stepValue}s`}
+            slotProps={{
+              formHelperText: {
+                sx: {
+                  margin: "1px",
+                  fontSize: "0.4rem",
+                  lineHeight: 1.0,
+                  padding: "0px 2px",
+                  color: "text.secondary",
+                  alignItems: "center",
+                  display: "flex",
+                },
+              },
+            }}
+            variant="standard"
+            size="small"
+            sx={{
+              fontSize: "0.5rem",
+              width: "2.5rem",
+            }}
+            type="number"
+            onChange={handleInputChange}
+            value={intervalValue}
+            onKeyDown={(ev) => {
+              if (ev.key === "Enter") {
+                handleClose();
+                ev.preventDefault();
+              }
+            }}
+          />
+        </RngeTooltip>
+      </Grid>
+      <Grid>
+        <IconButton
+          size="small"
+          onClick={() => setIntervalValue((prev) => (prev || 0) + 1)}
+        >
+          <AddIcon style={{ fontSize: "0.6rem" }} color="primary" />
+        </IconButton>
+      </Grid>
+      <Grid>
+        <RngeTooltip title="Save & Close" placement="right">
+          <IconButton size="small" onClick={handleClose}>
+            <CheckIcon fontSize="small" color="primary" />
+          </IconButton>
+        </RngeTooltip>
+      </Grid>
+    </Grid>
+  );
 };
+
+type ClickType = "left" | "right";
 
 interface DateIntervalPickerProps {
   children: React.ReactNode;
   baseDate?: Date;
   stepValue: string;
   handleVal?: (interval: Interval) => void;
+  clickType?: ClickType;
 }
 
 const DateIntervalPicker: React.FC<DateIntervalPickerProps> = ({
   children,
-  baseDate = new Date(),
+  baseDate,
   stepValue,
   handleVal,
+  clickType = "right",
 }) => {
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  // FIX: Use useState to ensure baseDate is stable and only created once
+  const [currentBaseDate] = useState(baseDate || new Date());
   const [intervalValue, setIntervalValue] = useState<number>(0);
   const [interval, setInterval] = useState<Interval>({
-    start: null,
+    start: currentBaseDate,
     end: null,
   });
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
 
-  const handleContextMenu = (event: React.MouseEvent<HTMLElement>) => {
-    event.preventDefault();
-    if (!isOpen) {
-      const target = event.target as HTMLElement;
-      setAnchorEl(target);
-      setIsOpen(true);
-    } else {
-      setIsOpen(false);
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    const isCorrectClick =
+      (clickType === "right" && event.button === 2) ||
+      (clickType === "left" && event.button === 0);
+
+    if (!isCorrectClick) return;
+    if (clickType === "right") event.preventDefault();
+
+    console.log("DateIntervalPicker rendered with baseDate:", currentBaseDate);
+    if (!baseDate) {
+      console.warn("baseDate is not provided, using current date.");
     }
+
+    setAnchorEl(event.currentTarget);
+    setIsEditing(true);
   };
 
-  const handleClose = () => {
-    setAnchorEl(null);
-    setIsOpen(false);
-    if (intervalValue !== 0) {
-      handleVal(interval);
-    }
-  };
-
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    const numValue = parseInt(value, 10);
-    if (isNaN(numValue)) {
-      return;
-    }
-    if (value === "" || numValue === 0) {
-      setIntervalValue(0);
+  useEffect(() => {
+    if (!isEditing || intervalValue === 0) {
+      setInterval({ start: null, end: null });
       return;
     }
     const intervalFn = getIntervalFunction(stepValue);
     const newDate = subDays(
-      intervalFn(baseDate, numValue),
-      stepValue === "day" ? 0 : numValue < 0 ? -1 : 1
+      intervalFn(currentBaseDate, intervalValue),
+      stepValue === "day" ? 0 : intervalValue < 0 ? -1 : 1
+    );
+    console.log(
+      "Setting interval with newDate:",
+      newDate,
+      "and stepValue:",
+      stepValue
     );
     setInterval({
-      start: numValue >= 0 ? baseDate : newDate,
-      end: numValue < 0 ? baseDate : newDate,
+      start: intervalValue >= 0 ? currentBaseDate : newDate,
+      end: intervalValue < 0 ? currentBaseDate : newDate,
     });
-    setIntervalValue(numValue);
-    setIsOpen(true);
+  }, [intervalValue, stepValue, isEditing, currentBaseDate]);
+
+  const handleClose = () => {
+    setIsEditing(false);
+    setAnchorEl(null);
+
+    // The state "leak" is fixed here. intervalValue is reset on close.
+    // Also, added the check to prevent an infinite loop in the parent.
+    if (intervalValue === 0) {
+      setIntervalValue(0); // Resetting the value to 0
+      return;
+    }
+
+    if (handleVal) {
+      console.log("Interval set to:", interval);
+      handleVal(interval);
+    }
+
+    // Reset value after passing to parent to avoid state "leak"
+    setIntervalValue(0);
   };
 
   return (
     <>
-      <div onContextMenu={handleContextMenu}>
-        <Popover
-          open={isOpen}
-          sx={{ zIndex: 1000 }}
-          anchorEl={anchorEl}
-          anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "right",
-          }}
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "left",
-          }}
-        >
-          <ClickAwayListener onClickAway={handleClose}>
-            <Paper
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                padding: "6px",
-              }}
-            >
-              <IntervalParms
-                setIntervalValue={() => setIntervalValue(0)}
-                handleClose={handleClose}
-                handleInputChange={handleInputChange}
-                intervalValue={intervalValue}
-                stepValue={stepValue}
-              />
-            </Paper>
-          </ClickAwayListener>
-        </Popover>
-          {children}
+      <Popover
+        open={isEditing}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "top", horizontal: "left" }}
+        transformOrigin={{ vertical: "bottom", horizontal: "center" }}
+        sx={{ zIndex: 1000 }}
+        slotProps={{
+          paper: {
+            sx: { p: 0.1, display: "flex", alignItems: "center" },
+          },
+          ...{
+            name: "offset",
+            options: { offset: [0, -30] },
+          },
+        }}
+      >
+        <ClickAwayListener onClickAway={handleClose}>
+          <div>
+            <IntervalParms
+              intervalValue={intervalValue}
+              stepValue={stepValue}
+              setIntervalValue={setIntervalValue}
+              handleClose={handleClose}
+            />
+          </div>
+        </ClickAwayListener>
+      </Popover>
+      <div onClick={handleClick} onContextMenu={handleClick}>
+        {children}
       </div>
     </>
   );

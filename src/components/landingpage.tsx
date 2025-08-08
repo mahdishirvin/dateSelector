@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import Tooltip, { TooltipProps, tooltipClasses } from "@mui/material/Tooltip";
 import Icon from "@mui/material/Icon";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import { useLocalization } from "../localizationcontext";
+import { useLocalization } from "../localeutils";
 // This component serves as a landing page for the Date Range Slicer visual in Power BI.
 // It provides a brief description and a visual representation of the slicer when no date field is selected.
 

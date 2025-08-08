@@ -32,7 +32,7 @@ import tinycolor from "tinycolor2";
 import DateRangeCard from "./components/daterangecard";
 import isEqual from "lodash.isequal";
 import "../assets/visual.less";
-import { LocalizationContext } from "./localizationcontext";
+import { LocalizationContext, DateFnsLocaleProvider } from "./localeutils";
 
 export class DateSelector extends ReactVisual implements IVisual {
   private visualHost: IVisualHost;
@@ -78,6 +78,7 @@ export class DateSelector extends ReactVisual implements IVisual {
   protected initializeVisualProperties(options: VisualConstructorOptions) {
     this.visualHost = options.host;
     this.locale = options.host.locale;
+    console.log("[DateSelector] locale: ", this.locale);
 
     this.events = options.host.eventService;
     this.colorPalette = this.visualHost.colorPalette;
@@ -106,7 +107,8 @@ export class DateSelector extends ReactVisual implements IVisual {
     this.reactRenderer = this.createReactContainer(
       (props) => (
         <LocalizationContext.Provider value={this.localizationManager}>
-          <DateRangeCard {...props} />
+          <DateFnsLocaleProvider languageCode={this.locale}>
+          <DateRangeCard {...props} /></DateFnsLocaleProvider>
         </LocalizationContext.Provider>
       ),
       this.applyDateFilter
