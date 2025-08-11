@@ -1,7 +1,7 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-import Zoom from "@mui/material/Zoom";
+import Grow from "@mui/material/Grow";
 import DateInput from "./dateinput";
 import UseCurrent from "./usecurrent";
 import ToggleSliderButton from "./togglesliderbutton";
@@ -36,14 +36,17 @@ const TopRow: React.FC<dateCardProps> = (props) => {
         />
       <Grid size="auto">
         {!props.stepOpen && (
-          <Zoom in={!props.stepOpen}>
+          <Grow in={!props.stepOpen}
+            style={{ transformOrigin: "0 0 0" }}
+            {...(props.stepOpen ? { timeout: 1000 } : {})}
+          >
             <Box>
               <UseCurrent {...props}
                 handleStep={props.setStepValue}
                 />
             </Box>
-          </Zoom>
-        )}
+          </Grow>
+         )}
       </Grid>
       <Grid size="grow">
         <Box></Box>

@@ -9,12 +9,13 @@ import SwitchLeft from "@mui/icons-material/SwitchLeft";
 import PlayArrow from "@mui/icons-material/PlayArrow";
 import SkipPrevious from "@mui/icons-material/SkipPrevious";
 import SkipNext from "@mui/icons-material/SkipNext";
-import MoreHoriz from "@mui/icons-material/MoreHoriz";
+// import MoreHoriz from "@mui/icons-material/MoreHoriz";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardDoubleArrowLeft from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardDoubleArrowRight from "@mui/icons-material/KeyboardDoubleArrowRight";
 import SettingsEthernetIcon from "@mui/icons-material/SettingsEthernet";
+import { MultipleStop } from "@mui/icons-material";
 // import Collapse from "@material-ui/core/Collapse";
 
 import type { Interval } from "date-fns";
@@ -56,7 +57,6 @@ import { isWithinInterval } from "date-fns/isWithinInterval";
 import { step, dateRange, SliderProps } from "./interface";
 import { DATEUTILS } from "./constants";
 import { getDay } from "date-fns/getDay";
-import { MultipleStop, SwapVert } from "@mui/icons-material";
 
 // import compareAsc from 'date-fns/compareAsc'
 
@@ -766,9 +766,9 @@ export const inputParms = (dates: dateRange, rangeScope: dateRange) => {
           ? formatDistance(_start, _end)
               .toLowerCase()
               .replace(/\b\w/g, (s) => s.toUpperCase()) +
-            " from " +
+            ": " +
             _startDate +
-            " to "
+            " - "
           : " ") +
         _endDate , info:
         (_startInRange && _endInRange ? `` : ' ['+ _startStory +' - '+ _endStory +' exceeds scope].' ),

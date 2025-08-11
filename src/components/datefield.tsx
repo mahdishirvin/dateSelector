@@ -26,8 +26,8 @@ interface DateFieldProps {
   fontWeight?: string;
   InputFontSize?: number;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onBlur: (e: React.FocusEvent<HTMLInputElement>) => void;
-  onFocus: () => void;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
+  onFocus?: () => void;
   doUpdate: (id: string, value: string) => void;
 }
 

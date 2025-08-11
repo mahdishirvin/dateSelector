@@ -39,7 +39,7 @@ export const styleB = {
     height: 13,
     width: 1.1,
     borderRadius: "0%",
-    opacity: 1,
+    opacity: 0.2,
   },
   "& .MuiSlider-track": {
     top: 27,
@@ -85,7 +85,7 @@ export const styleT = {
   "& .MuiSlider-markActive": {
     height: 18,
     width: 1.1,
-    opacity: 0.5,
+    opacity: 0.2,
   },
   "& .MuiSlider-track": {
     height: 10,

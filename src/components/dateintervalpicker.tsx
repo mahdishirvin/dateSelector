@@ -7,16 +7,17 @@ import {
   IconButton,
 } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
+import AddIcon from "@mui/icons-material/AddCircle";
+import RemoveIcon from "@mui/icons-material/RemoveCircle";
 // import RefreshIcon from "@mui/icons-material/Refresh";
 import RngeTooltip from "./rngetooltip";
 import { getIntervalFunction } from "../dateutils";
-import { Interval, subDays } from "date-fns";
+import { Interval, subDays, format } from "date-fns";
 
 interface IntervalParmsProps {
   intervalValue: number;
   stepValue: string;
+  interval: Interval;
   setIntervalValue: React.Dispatch<React.SetStateAction<number>>;
   handleClose: () => void;
 }
@@ -26,6 +27,7 @@ const IntervalParms: React.FC<IntervalParmsProps> = ({
   stepValue,
   setIntervalValue,
   handleClose,
+  interval,
 }) => {
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(event.target.value, 10);
@@ -45,11 +47,19 @@ const IntervalParms: React.FC<IntervalParmsProps> = ({
       <Grid>
         <RngeTooltip
           placement="left-start"
-          detailRow={`Extend ${stepValue}s from today`}
+          title="Extend from start date"
+          detailRow={`Add ${stepValue}s from today`}
           infoRow={`Add future (+) or past (-) ${stepValue}s.`}
         >
           <TextField
-            helperText={`+/- ${stepValue}s`}
+            helperText={
+              interval.end
+                ? `${format(interval.start, "yyyy-MM-dd")} ${format(
+                    interval.end,
+                    "yyyy-MM-dd"
+                  )}`
+                : `Today +/- ${stepValue}s`
+            }
             slotProps={{
               formHelperText: {
                 sx: {
@@ -58,16 +68,34 @@ const IntervalParms: React.FC<IntervalParmsProps> = ({
                   lineHeight: 1.0,
                   padding: "0px 2px",
                   color: "text.secondary",
-                  alignItems: "center",
                   display: "flex",
+                  justifyContent: "center",
                 },
               },
             }}
             variant="standard"
             size="small"
             sx={{
+              // Target the internal input element to remove the spinner arrows.
+              // This uses a CSS selector within the sx prop.
+              "& input[type=number]": {
+                "-moz-appearance": "textfield",
+                textAlign: "center",
+              },
+              "& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button":
+                {
+                  "-webkit-appearance": "none",
+                  margin: 0,
+                },
               fontSize: "0.5rem",
-              width: "2.5rem",
+              width: "3.1rem",
+              justifyContent: "center",
+              display: "flex",
+              alignItems: "center",
+              "& .MuiInputBase-input": {
+                textAlign: "center",
+                padding: "2px 2px",
+              },
             }}
             type="number"
             onChange={handleInputChange}
@@ -135,11 +163,6 @@ const DateIntervalPicker: React.FC<DateIntervalPickerProps> = ({
     if (!isCorrectClick) return;
     if (clickType === "right") event.preventDefault();
 
-    console.log("DateIntervalPicker rendered with baseDate:", currentBaseDate);
-    if (!baseDate) {
-      console.warn("baseDate is not provided, using current date.");
-    }
-
     setAnchorEl(event.currentTarget);
     setIsEditing(true);
   };
@@ -154,12 +177,7 @@ const DateIntervalPicker: React.FC<DateIntervalPickerProps> = ({
       intervalFn(currentBaseDate, intervalValue),
       stepValue === "day" ? 0 : intervalValue < 0 ? -1 : 1
     );
-    console.log(
-      "Setting interval with newDate:",
-      newDate,
-      "and stepValue:",
-      stepValue
-    );
+
     setInterval({
       start: intervalValue >= 0 ? currentBaseDate : newDate,
       end: intervalValue < 0 ? currentBaseDate : newDate,
@@ -178,7 +196,6 @@ const DateIntervalPicker: React.FC<DateIntervalPickerProps> = ({
     }
 
     if (handleVal) {
-      console.log("Interval set to:", interval);
       handleVal(interval);
     }
 
@@ -197,7 +214,13 @@ const DateIntervalPicker: React.FC<DateIntervalPickerProps> = ({
         sx={{ zIndex: 1000 }}
         slotProps={{
           paper: {
-            sx: { p: 0.1, display: "flex", alignItems: "center" },
+            sx: {
+              p: 0.1,
+              display: "flex",
+              alignItems: "center",
+              overflowY: "hidden",
+              maxHeight: "100px",
+            },
           },
           ...{
             name: "offset",
@@ -212,6 +235,7 @@ const DateIntervalPicker: React.FC<DateIntervalPickerProps> = ({
               stepValue={stepValue}
               setIntervalValue={setIntervalValue}
               handleClose={handleClose}
+              interval={interval}
             />
           </div>
         </ClickAwayListener>

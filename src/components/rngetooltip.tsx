@@ -29,7 +29,10 @@ const RngeTooltip: React.FC<RngeTooltipProps> = ({
   const shouldShow = showTooltip && !disableTooltip;
   const content = detailFlag ? (
     <div>
-      {topRow || title && <div style={{ fontWeight: "bold" }}>{topRow? topRow:title}</div>}
+      {topRow ||
+        (title && (
+          <div style={{ fontWeight: "bold" }}>{topRow ? topRow : title}</div>
+        ))}
       {detailRow && <div>{detailRow}</div>}
       {infoRow && <div style={{ fontStyle: "italic" }}>{infoRow}</div>}
     </div>
@@ -41,6 +44,7 @@ const RngeTooltip: React.FC<RngeTooltipProps> = ({
 
   return (
     <Tooltip
+      enterDelay={500}
       title={content}
       slotProps={{
         popper: {
@@ -79,10 +83,10 @@ interface valueProps {
   index: number;
 }
 export function ValueLabel(props: valueProps) {
-  const { children,  index } = props;
+  const { children, index } = props;
   const loc = index === 0 ? "top-end" : "bottom-start";
   return (
-    <RngeTooltip enterTouchDelay={0} placement={loc}  arrow>
+    <RngeTooltip enterTouchDelay={0} placement={loc} arrow>
       {children}
     </RngeTooltip>
   );

@@ -62,6 +62,7 @@ export const settingProps = (
     stepInit: stepInit,
     singleDay: singleDay,
     limitToScope: limitToScope,
+    startupFilter: startupFilter,
     stepSkip: {
       day: day.daySkip.value,
       week: week.weekSkip.value,

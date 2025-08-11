@@ -107,7 +107,7 @@ export default function UseCurrent(props: dateCardProps) {
                                 justifyContent: "center",
                                 minWidth: item.thisPeriod.length * 0.21 + "rem",
                                 alignItems: "center",
-                                padding: "2px", top: "-3px", right: "-2px",
+                                padding: "2px", top: "-2px", right: "-2px",
                               }
                             : { minWidth: "24px", padding: "2px" },
                         }}

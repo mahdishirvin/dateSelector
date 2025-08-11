@@ -188,87 +188,87 @@
                             {
                                 "value": "sync",
                                 "displayName": "Default",
-                                "displayNameKey": "startRange_Sync"
+                                "displayNameKey": "startRange_sync"
                             },
                             {
                                 "value": "rangeScope",
                                 "displayName": "All in Scope",
-                                "displayNameKey": "startRange_All"
+                                "displayNameKey": "startRange_rangeScope"
                             },
                             {
                                 "value": "today",
                                 "displayName": "Today",
-                                "displayNameKey": "startRange_Today"
+                                "displayNameKey": "startRange_today"
                             },
                             {
                                 "value": "yesterday",
                                 "displayName": "Yesterday",
-                                "displayNameKey": "startRange_Yesterday"
+                                "displayNameKey": "startRange_yesterday"
                             },
                             {
                                 "value": "thisWeek",
                                 "displayName": "This Week",
-                                "displayNameKey": "startRange_This_Week"
+                                "displayNameKey": "startRange_thisWeek"
                             },
                             {
                                 "value": "lastWeek",
                                 "displayName": "Last Week",
-                                "displayNameKey": "startRange_Last_Week"
+                                "displayNameKey": "startRange_lastWeek"
                             },
                             {
                                 "value": "lastWeekOfScope",
                                 "displayName": "Last Full Week of Scope",
-                                "displayNameKey": "startRange_Last_Week_of_Scope"
+                                "displayNameKey": "startRange_lastWeekOfScope"
                             },
                             {
                                 "value": "firstWeekOfScope",
                                 "displayName": "First Week of Scope",
-                                "displayNameKey": "startRange_First_Week_of_Scope"
+                                "displayNameKey": "startRange_firstWeekOfScope"
                             },
                             {
                                 "value": "thisMonth",
                                 "displayName": "This Month",
-                                "displayNameKey": "startRange_This_Month"
+                                "displayNameKey": "startRange_thisMonth"
                             },
                             {
                                 "value": "lastMonth",
                                 "displayName": "Last Month",
-                                "displayNameKey": "startRange_Last_Month"
+                                "displayNameKey": "startRange_lastMonth"
                             },
                             {
                                 "value": "lastMonthOfScope",
                                 "displayName": "Last Cal. Month of Scope",
-                                "displayNameKey": "startRange_Last_Month_of_Scope"
+                                "displayNameKey": "startRange_lastMonthOfScope"
                             },
                             {
                                 "value": "days30FromScopeEnd",
                                 "displayName": "Last 30 days of Scope",
-                                "displayNameKey": "startRange_Last_30days_of_Scope"
+                                "displayNameKey": "startRange_days30FromScopeEnd"
                             },
                             {
                                 "value": "firstMonthOfScope",
                                 "displayName": "First Month of Scope",
-                                "displayNameKey": "startRange_First_Month_of_Scope"
+                                "displayNameKey": "startRange_firstMonthOfScope"
                             },
                             {
                                 "value": "thisQuarter",
                                 "displayName": "This Quarter",
-                                "displayNameKey": "startRange_This_Quarter"
+                                "displayNameKey": "startRange_thisQuarter"
                             },
                             {
                                 "value": "lastQuarter",
                                 "displayName": "Last Quarter",
-                                "displayNameKey": "startRange_Last_Quarter"
+                                "displayNameKey": "startRange_lastQuarter"
                             },
                             {
                                 "value": "thisYear",
                                 "displayName": "This Year",
-                                "displayNameKey": "startRange_This_Year"
+                                "displayNameKey": "startRange_thisYear"
                             },
                             {
                                 "value": "lastYear",
                                 "displayName": "Last Year",
-                                "displayNameKey": "startRange_Last_Year"
+                                "displayNameKey": "startRange_lastYear"
                             },
                             {
                                 "value": "ytToday",
@@ -293,12 +293,12 @@
                             {
                                 "value": "yearToLastMonth",
                                 "displayName": "Year to end last month",
-                                "displayNameKey": "startRange_YearToLastMonth"
+                                "displayNameKey": "startRange_yearToLastMonth"
                             },
                             {
                                 "value": "yearToThisMonth",
                                 "displayName": "Year to end this month",
-                                "displayNameKey": "startRange_YearToThisMonth"
+                                "displayNameKey": "startRange_yearToThisMonth"
                             }
                         ]
                     }

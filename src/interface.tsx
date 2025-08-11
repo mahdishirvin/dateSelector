@@ -28,6 +28,7 @@ export interface Settings {
     rangeScope?: dateRange; // date range object representing the scope of available dates to choose from
     landingOff?: boolean; // boolean value indicating whether to display landing page
     filter?: any;
+    startupFilter?: dateRange; // date range object representing the initial filter state
   };
   styleSettings?: {
     fmtDate?: string;
@@ -131,6 +132,8 @@ export interface dateCardProps {
   landingOff?: boolean;
 
   startRange?: string;
+
+  startupFilter?: dateRange;
   // boolean value indicating whether to display step controls for selecting dates
   stepViz?: step<boolean>;
 

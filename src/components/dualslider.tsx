@@ -1,10 +1,23 @@
 import * as React from "react";
 // import Box from "@mui/material/Box";
-import Slider from "@mui/material/Slider";
+import Slider, {SliderValueLabelProps } from "@mui/material/Slider";
+import Tooltip from "@mui/material/Tooltip";
 import Zoom from "@mui/material/Zoom";
-import { ValueLabel } from "./rngetooltip";
+// import { ValueLabel } from "./rngetooltip";
 import { style, styleB, styleT } from "./sliderstyles";
 import Grid from "@mui/material/Grid";
+
+function ValueLabelComponent(props: SliderValueLabelProps) {
+  const { children, value ,index} = props;
+  const loc = index === 0 ? "top-end" : "bottom-start";
+
+  return (
+    <Tooltip enterTouchDelay={10} placement={loc} title={value}  enterDelay={500} arrow  color="primary">
+      {children}
+    </Tooltip>
+  );
+}
+
 
 interface DualSliderProps {
   value: number[];
@@ -41,7 +54,7 @@ function DualSlider(props: DualSliderProps): React.ReactElement {
           onChangeCommitted={handleTopCommit}
           marks={mainMarks}
           valueLabelDisplay="auto"
-          slots={{ valueLabel: ValueLabel }}
+          slots={{ valueLabel: ValueLabelComponent }}
           min={0}
           sx={{ ...style, ...styleT }}
           {...props}
@@ -53,11 +66,11 @@ function DualSlider(props: DualSliderProps): React.ReactElement {
             name="bottom"
             key="slider2"
             size="small"
-            color="primary"
+            color="secondary"
             onChangeCommitted={handleBottomCommit}
             step={null}
             marks={superMarks}
-            slots={{ valueLabel: ValueLabel }}
+            slots={{ valueLabel: ValueLabelComponent }}
             valueLabelDisplay="auto"
             aria-labelledby="range-slider2"
             getAriaValueText={valueLabelFormat}

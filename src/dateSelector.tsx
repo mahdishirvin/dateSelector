@@ -78,7 +78,7 @@ export class DateSelector extends ReactVisual implements IVisual {
   protected initializeVisualProperties(options: VisualConstructorOptions) {
     this.visualHost = options.host;
     this.locale = options.host.locale;
-    console.log("[DateSelector] locale: ", this.locale);
+    // console.log("[DateSelector] locale: ", this.locale);
 
     this.events = options.host.eventService;
     this.colorPalette = this.visualHost.colorPalette;
