@@ -33,6 +33,7 @@ import DateRangeCard from "./components/daterangecard";
 import isEqual from "lodash.isequal";
 import "../assets/visual.less";
 import { LocalizationContext, DateFnsLocaleProvider } from "./localeutils";
+import { font } from "powerbi-visuals-utils-formattingutils";
 
 export class DateSelector extends ReactVisual implements IVisual {
   private visualHost: IVisualHost;
@@ -84,16 +85,6 @@ export class DateSelector extends ReactVisual implements IVisual {
     this.events = options.host.eventService;
     this.colorPalette = this.visualHost.colorPalette;
     this.colorHelper = new ColorHelper(this.colorPalette);
-    // support high contrast
-    if (this.colorHelper.isHighContrast) {
-      const foregroundColor = this.colorPalette.getColor("foreground").value;
-      const backgroundColor = this.colorPalette.getColor("background").value;
-      const theme = tinycolor(backgroundColor).isDark() ? "dark" : "light";
-      this.updateReactContainers({
-        themeColor: foregroundColor,
-        themeMode: theme,
-      });
-    }
   }
 
   // protected initializeReact() {
@@ -104,12 +95,13 @@ export class DateSelector extends ReactVisual implements IVisual {
   //   this.reactMount();
   // }
 
-    protected initializeReact() {
+  protected initializeReact() {
     this.reactRenderer = this.createReactContainer(
       (props) => (
         <LocalizationContext.Provider value={this.localizationManager}>
           <DateFnsLocaleProvider languageCode={this.locale}>
-          <DateRangeCard {...props} /></DateFnsLocaleProvider>
+            <DateRangeCard {...props} />
+          </DateFnsLocaleProvider>
         </LocalizationContext.Provider>
       ),
       this.applyDateFilter
@@ -141,8 +133,19 @@ export class DateSelector extends ReactVisual implements IVisual {
             this.formattingSettings,
             this.initialised
           );
+            // Support high contrast mode
+            if (this.colorHelper.isHighContrast) {
+            const foregroundColor = this.colorHelper.getHighContrastColor("foreground");
+            const backgroundColor = this.colorHelper.getHighContrastColor("background");
+            const themeMode = tinycolor(backgroundColor).isDark() ? "dark" : "light";
+            Object.assign(this.state.settings, {
+              fontColor: foregroundColor,
+              themeColor: foregroundColor,
+              themeMode,
+            });
+            }
           const { settings } = this.state;
-          // console.log(">>>>>>>>>>>>>>>>>>>> dateSelector - font", settings.themeFont )
+
           const refresh: boolean = !(
             isEqual(settings, this.lastSettings) && this.initialised
           );
@@ -150,6 +153,7 @@ export class DateSelector extends ReactVisual implements IVisual {
           if (refresh) {
             this.applyDateFilter(settings.dates);
             this.updateReactContainers(settings);
+
             this.initialised = true;
           }
 
