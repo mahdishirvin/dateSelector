@@ -106,12 +106,14 @@ class styleSettings extends FormattingSettingsCard {
 
   public font: formattingSettings.FontControl = new formattingSettings.FontControl({
         name: "font",   // must be unique within the same object
-        displayName: "",
+        displayNameKey: "style_font_displayName",
+        descriptionKey: "style_font_description",
         fontFamily: this.themeFont,
         fontSize: this.fontSize,
         bold: this.fontBold,           //optional
         italic: this.fontItalic,       //optional
         // underline: this.fontUnderline,  //optional
+
     });
 
   slices: Array<FormattingSettingsSlice> = [
@@ -383,6 +385,7 @@ class weekSettings extends FormattingSettingsGroup {
 }
 
 class paySettings extends FormattingSettingsGroup {
+
   showPay = new formattingSettings.ToggleSwitch({
     name: "showPay",
     displayName: undefined,
@@ -437,8 +440,17 @@ class paySettings extends FormattingSettingsGroup {
     name: "payRefDate",
     displayNameKey: "payRefDate_displayName",
     descriptionKey: "payRefDate_description",
-    value: defaultSettings.period.paySettings.payRefDate,
+    value: new Date(),
   });
+
+   payCustomLabel = new formattingSettings.TextInput({
+    name: "payCustomLabel",
+    displayNameKey: "payCustomLabel_displayName",
+    descriptionKey: "payCustomLabel_description",
+    placeholder: "Enter custom pay label",
+    value: defaultSettings.period.paySettings.payCustomLabel,
+  });
+
 
   name: string = "pay";
   description: string =
@@ -450,12 +462,14 @@ class paySettings extends FormattingSettingsGroup {
   topLevelSlice: formattingSettings.SimpleSlice = this.showPay;
 
   slices: Array<FormattingSettingsSlice> = [
+    this.payCustomLabel, // ← Added text input here
     this.paySkip,
     this.fmtPay,
     this.payLength,
-    this.payRefYear,
-    this.payRefMonth,
-    this.payRefDay,
+    this.payRefDate,
+    // this.payRefYear,
+    // this.payRefMonth,
+    // this.payRefDay,
   ];
 }
 

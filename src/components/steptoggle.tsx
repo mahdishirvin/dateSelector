@@ -4,14 +4,24 @@ import Badge from "@mui/material/Badge";
 import Typography from "@mui/material/Typography";
 import BlurOn from "@mui/icons-material/BlurOn";
 import { stepProps } from "../interface";
-import { DATEUTILS, STEP_TOGGLE } from "../constants";
 import { useHotkeys } from "react-hotkeys-hook";
 import RngeTooltip from "./rngetooltip";
-
-const { TopRow, DetailRow } = STEP_TOGGLE;
+import { useLocalization } from "../localeutils";
 
 export default function StepToggle(props: stepProps) {
   const { stepViz, stepValue, viz, handleStep, onClick } = props;
+
+    const localisation = useLocalization();
+    const TopRow = localisation.getDisplayName("stepToggleTopRow");
+    const DetailRow = localisation.getDisplayName("stepToggleDetailRow");
+    const periodTitle = {
+      day: localisation.getDisplayName("Step_Day"),
+      week: localisation.getDisplayName("Step_Week"),
+      pay: localisation.getDisplayName("Step_Pay"),
+      month: localisation.getDisplayName("Step_Month"),
+      quarter: localisation.getDisplayName("Step_Quarter"),
+      year: localisation.getDisplayName("Step_Year"),
+    };
 
   const keyHandler = (period) => {
     if (handleStep && stepViz[period]) {
@@ -41,7 +51,7 @@ export default function StepToggle(props: stepProps) {
         >
           <RngeTooltip
             title={undefined}
-            topRow={`${TopRow}${DATEUTILS.periodTip[stepValue]} (${ShortCut})`}
+            topRow={`${TopRow}${periodTitle[stepValue]} (${ShortCut})`}
             detailRow={DetailRow}
             placement="bottom"
           >

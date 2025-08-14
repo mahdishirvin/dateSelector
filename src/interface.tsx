@@ -84,6 +84,8 @@ export interface Settings {
       fmtWeek?: string;
     };
     paySettings?: {
+      payCustomLabel?: string;
+      payDesc?: string;
       showPay?: boolean;
       paySkip?: number;
       payLength?: number;
@@ -91,7 +93,7 @@ export interface Settings {
       payRefDay?: number;
       payRefYear?: number;
       payRefMonth?: number;
-      payRefDate?: Date;
+      payRefDate?: string;
     };
     monthSettings?: {
       showMonth?: boolean;

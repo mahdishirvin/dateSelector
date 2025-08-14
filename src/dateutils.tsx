@@ -9,14 +9,12 @@ import SwitchLeft from "@mui/icons-material/SwitchLeft";
 import PlayArrow from "@mui/icons-material/PlayArrow";
 import SkipPrevious from "@mui/icons-material/SkipPrevious";
 import SkipNext from "@mui/icons-material/SkipNext";
-// import MoreHoriz from "@mui/icons-material/MoreHoriz";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardDoubleArrowLeft from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardDoubleArrowRight from "@mui/icons-material/KeyboardDoubleArrowRight";
 import SettingsEthernetIcon from "@mui/icons-material/SettingsEthernet";
 import { MultipleStop } from "@mui/icons-material";
-// import Collapse from "@material-ui/core/Collapse";
 
 import type { Interval } from "date-fns";
 import { startOfDay } from "date-fns/startOfDay";
@@ -57,10 +55,11 @@ import { isWithinInterval } from "date-fns/isWithinInterval";
 import { step, dateRange, SliderProps } from "./interface";
 import { DATEUTILS } from "./constants";
 import { getDay } from "date-fns/getDay";
+import { useDateFnsLocale, useLocalization } from "./localeutils";
 
 // import compareAsc from 'date-fns/compareAsc'
 
-const { periodTip, periodThis, periodGranularity } = DATEUTILS;
+const { periodThis, periodGranularity } = DATEUTILS;
 
 /** Date Movement functions **/
 
@@ -221,7 +220,11 @@ export const week = (
   //  if (full) {
   //    console.log(full, getDay(subDays(startBaseDate,1)),"w:", weekStartDay, startBaseDate);
   //  }
-  const j = full ? (weekStartDay === getDay(addDays(startBaseDate,1)) ? i : i + 1) : i;
+  const j = full
+    ? weekStartDay === getDay(addDays(startBaseDate, 1))
+      ? i
+      : i + 1
+    : i;
   return {
     start: startOfWeek(subWeeks(startBaseDate, j), {
       weekStartsOn: weekStartDay,
@@ -492,93 +495,150 @@ export const Increment = (
   showMore?: boolean,
   scope?: Interval
 ) => {
-  const _rnge = getInitRange("today", weekStartDay, yearStartMonth, { start: null, end: null }, "matrix" );
+  const localization = useLocalization();
+
+  const _rnge = getInitRange(
+    "today",
+    weekStartDay,
+    yearStartMonth,
+    { start: null, end: null },
+    "matrix"
+  );
   return [
     {
-      tip: periodTip.day, step: periodGranularity.day,
+      menu: periodThis.day,
+      tip: localization.getDisplayName("startRange_today"),
+      step: periodGranularity.day,
       show: stepViz.day,
-      thisPeriod: periodThis.day,
+      thisPeriod: localization.getDisplayName("buttonText_today"),
       thisRange: _rnge["today"],
       icon: <TodayIcon style={{ fontSize: "inherit" }} color="primary" />,
     },
     {
-      tip: periodTip.week, step: periodGranularity.week,
+      menu: periodThis.week,
+      tip: localization.getDisplayName("startRange_thisWeek"),
+      step: periodGranularity.week,
       show: stepViz.week,
-      thisPeriod: periodThis.week,
+      thisPeriod: localization.getDisplayName("buttonText_thisWeek"),
       thisRange: _rnge["thisWeek"],
       icon: <DateRangeIcon style={{ fontSize: "inherit" }} color="primary" />,
     },
     {
-      tip: periodTip.pay, step: periodGranularity.pay,
+      menu: periodThis.pay,
+      tip: payProps.desc,
+      step: periodGranularity.pay,
       show: stepViz.pay,
-      thisPeriod: periodThis.pay + payProps.desc,
+      thisPeriod: payProps.desc,
       thisRange: getPayPeriod(payProps.ref, startOfToday(), payProps.len),
       icon: <PaymentIcon style={{ fontSize: "inherit" }} color="primary" />,
     },
     {
-      tip: periodTip.month, step: periodGranularity.month,
+      menu: periodThis.month,
+      tip: localization.getDisplayName("startRange_thisMonth"),
+      step: periodGranularity.month,
       show: stepViz.month,
-      thisPeriod: periodThis.month,
+      thisPeriod: localization.getDisplayName("buttonText_thisMonth"),
       thisRange: _rnge["thisMonth"],
       icon: <EventNoteIcon style={{ fontSize: "inherit" }} color="primary" />,
     },
     {
-      tip: periodTip.quarter, step: periodGranularity.quarter,
+      menu: periodThis.quarter,
+      tip: localization.getDisplayName("startRange_thisQuarter"),
+      step: periodGranularity.quarter,
       show: stepViz.quarter,
-      thisPeriod: periodThis.quarter,
+      thisPeriod: localization.getDisplayName("buttonText_thisQuarter"),
       thisRange: _rnge["thisQuarter"],
       icon: <DynamicFeedIcon style={{ fontSize: "inherit" }} color="primary" />,
     },
     {
-      tip: periodTip.year, step: periodGranularity.year,
+      menu: periodThis.year,
+      tip: localization.getDisplayName("startRange_thisYear"),
+      step: periodGranularity.year,
       show: stepViz.year,
-      thisPeriod: periodThis.year,
+      thisPeriod: localization.getDisplayName("buttonText_thisYear"),
       thisRange: _rnge["thisYear"],
       icon: <LineStyleIcon style={{ fontSize: "inherit" }} color="primary" />,
     },
     {
-      tip: "", step: null,
+      menu: periodThis.more,
+      tip: localization.getDisplayName("dateUtilsMore"),
+      step: null,
       show: (stepViz.day || stepViz.year) && showMore,
-      thisPeriod: periodThis.more, //"more",
+      thisPeriod: localization.getDisplayName("dateUtilsMore"),
       thisRange: null,
       icon: (
-        <MultipleStop style={{ fontSize: 12, opacity: 0.5 }} color="secondary" />
+        <MultipleStop
+          style={{ fontSize: 12, opacity: 0.5 }}
+          color="secondary"
+        />
       ),
     },
     {
-      tip: "", step: periodGranularity.range,
+      menu: periodThis.range,
+      tip: localization.getDisplayName("startRange_rangeScope"),
+      step: periodGranularity.range,
       show: true,
-      thisPeriod: periodThis.range,
+      thisPeriod: localization.getDisplayName("buttonText_rangeScope"),
       thisRange: scope,
-      icon: <SettingsEthernetIcon style={{ fontSize: "inherit" }} color="primary" />,
+      icon: (
+        <SettingsEthernetIcon style={{ fontSize: "inherit" }} color="primary" />
+      ),
     },
     {
-      tip: "", step: periodGranularity.ytd,
+      menu: periodThis.ytd,
+      tip: localization.getDisplayName("startRange_ytdToday"),
+      step: periodGranularity.ytd,
       show: stepViz.day || stepViz.year,
-      thisPeriod: periodThis.ytd, //YTD
+      thisPeriod: localization.getDisplayName("buttonText_ytdToday"),
       thisRange: _rnge["ytdToday"],
-      icon: <PlayArrow style={{ fontSize: "inherit", opacity: 0.7 }} color="primary" />,
+      icon: (
+        <PlayArrow
+          style={{ fontSize: "inherit", opacity: 0.7 }}
+          color="primary"
+        />
+      ),
     },
     {
-      tip: "", step: periodGranularity.yearPast,
+      menu: periodThis.yearPast,
+      tip: localization.getDisplayName("startRange_ytToday"),
+      step: periodGranularity.yearPast,
       show: stepViz.day || stepViz.year,
-      thisPeriod: periodThis.yearPast, //"Year Past"
+      thisPeriod: localization.getDisplayName("buttonText_ytToday"),
       thisRange: _rnge["ytToday"],
-      icon: <SwitchLeft style={{ fontSize: "inherit", opacity: 0.7 }} color="primary" />,
+      icon: (
+        <SwitchLeft
+          style={{ fontSize: "inherit", opacity: 0.7 }}
+          color="primary"
+        />
+      ),
     },
     {
-      tip: "", step: periodGranularity.ytdLastMonth,
+      menu: periodThis.ytdLastMonth,
+      tip: localization.getDisplayName("startRange_ytdLastMonth"),
+      step: periodGranularity.ytdLastMonth,
       show: stepViz.month || stepViz.year,
-      thisPeriod: periodThis.ytdLastMonth, //"YTD Last Month",
+      thisPeriod: localization.getDisplayName("buttonText_ytdLastMonth"),
       thisRange: _rnge["ytdLastMonth"],
-      icon: <SkipPrevious style={{ fontSize: "inherit", opacity: 0.7 }} color="primary" />,
+      icon: (
+        <SkipPrevious
+          style={{ fontSize: "inherit", opacity: 0.7 }}
+          color="primary"
+        />
+      ),
     },
     {
-      tip: "", step: periodGranularity.ytdThisMonth,
+      menu: periodThis.ytdThisMonth,
+      tip: localization.getDisplayName("startRange_ytdThisMonth"),
+      step: periodGranularity.ytdThisMonth,
       show: stepViz.month || stepViz.year,
-      thisPeriod: periodThis.ytdThisMonth, //"YTD This Month",
+      thisPeriod: localization.getDisplayName("buttonText_ytdThisMonth"),
       thisRange: _rnge["ytdThisMonth"],
-      icon: <SkipNext style={{ fontSize: "inherit", opacity: 0.7 }} color="primary" />,
+      icon: (
+        <SkipNext
+          style={{ fontSize: "inherit", opacity: 0.7 }}
+          color="primary"
+        />
+      ),
     },
   ];
 };
@@ -592,8 +652,12 @@ export const sliderMarkNumber = (val: Date, min: Date) =>
 
 export const sliderMarkDate = (val: number, min: Date) => addDays(min, val);
 
-export const sliderMarkText = (num: number, min: Date, fmt = "d-MMM-yy") =>
-  format(addDays(min, num), fmt);
+export const useSliderMarkText = () => {
+  const locale = useDateFnsLocale();
+
+  return (num: number, min: Date, fmt = "d-MMM-yy") =>
+    format(addDays(min, num), fmt, { locale });
+};
 
 type Step = "day" | "week" | "pay" | "month" | "quarter" | "year";
 
@@ -680,14 +744,15 @@ export const doMarks = (
   _skip: number,
   _offset: number
 ) => {
+  const sliderMarkText = useSliderMarkText();
   return _val.map((x: Date, i: number) => {
-    const v: number = sliderMarkNumber(_skip === 0 ? startOfToday(): x, _min);
+    const v: number = sliderMarkNumber(_skip === 0 ? startOfToday() : x, _min);
     const dateValue =
       _offset === 0
         ? _min
         : addYears(_min, sliderMarkDate(v, _min).getMonth() <= _offset ? 1 : 0);
     const l =
-       (i + 1) % _skip === 0 || i === 0 || i === _val.length - 1
+      (i + 1) % _skip === 0 || i === 0 || i === _val.length - 1
         ? sliderMarkText(v, dateValue, _fmt)
         : "";
     return { value: v, label: l };
@@ -733,59 +798,83 @@ export const uniqueDate = (_array: Date[]) => {
 
 /** Date field input parameters and checks */
 
-export const inputParms = (dates: dateRange, rangeScope: dateRange) => {
-  const _start =
-    dates.start >= rangeScope.start
-      ? startOfDay(dates.start)
-      : startOfDay(rangeScope.start);
-  const _end =
-    dates.end <= rangeScope.end
-      ? endOfDay(dates.end)
-      : endOfDay(rangeScope.end);
-  const _startInRange: boolean = isWithinInterval(
-    endOfDay(dates.start),
-    rangeScope
-  );
-  const _endInRange: boolean = isWithinInterval(
-    startOfDay(dates.end),
-    rangeScope
-  );
-  try {
-    const noDays = differenceInDays(_end, _start);
-    const _startDate = format(_start, "EEE, d MMM yy");
-    const _endDate = format(_end, "EEE, d MMM yy");
-    const _startStory =
-      (_startInRange
+// import { startOfDay, endOfDay, isWithinInterval, differenceInDays, format, formatDistance } from "date-fns";
+// import { useDateFnsLocale } from "../contexts/DateFnsLocaleContext";
+// import { useLocalization } from "../contexts/LocalizationContext";
+
+interface DateRange {
+  start: Date;
+  end: Date;
+}
+
+export const useInputParms = () => {
+  const locale = useDateFnsLocale();
+  const localization = useLocalization();
+
+  return (dates: DateRange, rangeScope: DateRange) => {
+    const _start =
+      dates.start >= rangeScope.start
+        ? startOfDay(dates.start)
+        : startOfDay(rangeScope.start);
+    const _end =
+      dates.end <= rangeScope.end
+        ? endOfDay(dates.end)
+        : endOfDay(rangeScope.end);
+
+    const _startInRange: boolean = isWithinInterval(
+      endOfDay(dates.start),
+      rangeScope
+    );
+    const _endInRange: boolean = isWithinInterval(
+      startOfDay(dates.end),
+      rangeScope
+    );
+
+    try {
+      const noDays = differenceInDays(_end, _start);
+
+      const _startDate = format(_start, "EEE, d MMM yy", { locale });
+      const _endDate = format(_end, "EEE, d MMM yy", { locale });
+
+      const _startStory = _startInRange
         ? _startDate
-        :  format(dates.start, "EEE, d MMM yy") ); // + _startDate;
-    const _endStory =
-      (_endInRange ? _endDate :  format(dates.end, "EEE, d MMM yy") ); // + _endDate;
-    return {
-      string:
-        (noDays > 0
-          ? formatDistance(_start, _end)
-              .toLowerCase()
-              .replace(/\b\w/g, (s) => s.toUpperCase()) +
-            ": " +
-            _startDate +
-            " - "
-          : " ") +
-        _endDate , info:
-        (_startInRange && _endInRange ? `` : ' ['+ _startStory +' - '+ _endStory +' exceeds scope].' ),
-      duration: formatDistance(_start, _end),
-      fmDoW: format(dates.start, "EEEE"),
-      toDoW: format(dates.end, "EEE"),
-      fmValid: _startInRange,
-      toValid: _endInRange,
-    };
-  } catch {
-    return {
-      string: "Date entry is invalid",
-      duration: formatDistance(_start, _end),
-      fmDoW: format(dates.start, "EEEE"),
-      toDoW: format(dates.end, "EEE"),
-      fmValid: _startInRange,
-      toValid: _endInRange,
-    };
-  }
+        : format(dates.start, "EEE, d MMM yy", { locale });
+
+      const _endStory = _endInRange
+        ? _endDate
+        : format(dates.end, "EEE, d MMM yy", { locale });
+
+      return {
+        string:
+          (noDays > 0
+            ? formatDistance(_start, _end, { locale })
+                .toLowerCase()
+                .replace(/\b\w/g, (s) => s.toUpperCase()) +
+              ": " +
+              _startDate +
+              " - "
+            : " ") + _endDate,
+        info:
+          _startInRange && _endInRange
+            ? ""
+            : ` [${_startStory} - ${_endStory} ${localization.getDisplayName(
+                "dateUtilsExceedsScope"
+              )}]`,
+        duration: formatDistance(_start, _end, { locale }),
+        fmDoW: format(dates.start, "EEEE", { locale }),
+        toDoW: format(dates.end, "EEE", { locale }),
+        fmValid: _startInRange,
+        toValid: _endInRange,
+      };
+    } catch {
+      return {
+        string: localization.getDisplayName("dateUtilsInvalid"),
+        duration: formatDistance(_start, _end, { locale }),
+        fmDoW: format(dates.start, "EEEE", { locale }),
+        toDoW: format(dates.end, "EEE", { locale }),
+        fmValid: _startInRange,
+        toValid: _endInRange,
+      };
+    }
+  };
 };

@@ -1,6 +1,6 @@
 import { Settings, dateCardProps } from "./interface";
 //import { defaultSettings } from "./vinitsettings";
-import { startOfToday } from "date-fns";
+import { startOfToday , format} from "date-fns";
 //,startOfYear, endOfYear
 
 export const defaultSettings: Settings = {
@@ -61,6 +61,7 @@ export const defaultSettings: Settings = {
       fmtWeek: "w",
     },
     paySettings: {
+      payCustomLabel:"Pay Period", // ← Added text input here: "Pay Period",
       showPay: false,
       paySkip: 4,
       payLength: 14,
@@ -68,7 +69,7 @@ export const defaultSettings: Settings = {
       payRefDay: new Date().getDate(),
       payRefYear: new Date().getFullYear(),
       payRefMonth: new Date().getMonth(),
-      payRefDate: startOfToday(),
+      payRefDate: format(startOfToday(),"yyyy-MM-dd"),
     },
     monthSettings: {
       showMonth: true,
@@ -137,7 +138,7 @@ export const initialState: dateCardProps = {
     year: yearSettings.fmtYear,
   },
   payProps: {
-    desc: "Pay-Period",
+    desc: paySettings.payCustomLabel,
     ref: new Date(
       paySettings.payRefYear,
       paySettings.payRefMonth,

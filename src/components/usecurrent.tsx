@@ -42,7 +42,7 @@ export default function UseCurrent(props: dateCardProps) {
             {current
               .filter((item) => {
                 if (item.thisRange !== null) {
-                  const x = ttl ? item.tip !== "" : item.tip === "";
+                  const x = ttl ? item.menu !== "2" : item.menu === "2";
                   const y =
                     !limitToScope &&
                     areIntervalsOverlapping(item.thisRange, rangeScope, {
@@ -61,14 +61,14 @@ export default function UseCurrent(props: dateCardProps) {
                     title={undefined}
                     key={`rtt${item.thisRange}${index}`}
                     detailRow={
-                      item.tip !== ""
+                      item.menu !== "2"
                         ? `Set the date range to ${item.thisPeriod.toLowerCase()}. Right click for ${item.tip.toLowerCase()}s from today.`
                         : ``
                     }
                     placement="bottom"
                     topRow={
-                      item.thisPeriod +
-                      (item.tip.toLowerCase() === stepValue ? " (T)" : "")
+                      item.tip +
+                      (item.step === stepValue && item.menu !== "2" ? " (T)" : "")
                     }
                   >
                     <IconButton
@@ -81,7 +81,7 @@ export default function UseCurrent(props: dateCardProps) {
                                 width: item.thisPeriod.length * 0.2 + "rem",
                                 minWidth: "24px",
                                 alignItems: "center",
-                                padding: "2px",
+                                padding: "2px",top:"3px"
                             }
                           : { minWidth: "24px", padding: "2px" }
                       }
@@ -98,25 +98,25 @@ export default function UseCurrent(props: dateCardProps) {
                         }
                       }}
                     >
+
                       <Badge
                         sx={{
                           "& .MuiBadge-badge": showIconText
                             ? {
                                 display: "flex",
                                 flexDirection: "row",
-                                justifyContent: "center",
                                 minWidth: item.thisPeriod.length * 0.21 + "rem",
-                                alignItems: "center",
-                                padding: "2px", top: "-2px", right: "-2px",
+                                padding: "2px", right: "-2px", top: "-2px",
+                                textTransform: 'none',
                               }
-                            : { minWidth: "24px", padding: "2px" },
+                            : { minWidth: "24px", padding: "2px" , top: "-3px"},
                         }}
                         badgeContent={
                           showIconText && (
                             <Typography
                               key={`typ${item.thisRange}${index}`}
                               variant="caption"
-                              sx={{ color: "text.primary", fontSize: "0.31rem" }}
+                              sx={{ color: "text.primary", fontSize: "0.35rem" }}
                             >
                               {item.thisPeriod}
                             </Typography>

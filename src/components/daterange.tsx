@@ -5,19 +5,22 @@ import { useTheme } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import Remove from "@mui/icons-material/Remove";
 import { format, parse, isValid } from "date-fns";
-import { inputParms } from "../dateutils";
+import { useInputParms } from "../dateutils";
 import { DateField } from "./datefield";
 import { useHelpContext } from "./helpprovider";
 import RngeTooltip from "./rngetooltip";
 import { dateCardProps, dateRange } from "../interface";
-import DateIntervalPicker from "./dateintervalpicker";
-import { useLocalization } from "../localeutils";
-
+// import DateIntervalPicker from "./dateintervalpicker";
+import { useDateFnsLocale, useLocalization } from "../localeutils";
 
 export default function DateRange(props: dateCardProps) {
   const { dates, rangeScope, handleVal, singleDay, startupFilter } = props;
 
-  const tipDescription = useLocalization().getDisplayName(`startRange_${props.startRange}`);
+  const locale = useDateFnsLocale();
+
+  const tipDescription = useLocalization().getDisplayName(
+    `startRange_${props.startRange}`
+  );
   // const [underline, setUnderline] = useState(true);
   const [startText, setStartText] = useState<string>(() =>
     format(dates.start, "yyyy-MM-dd")
@@ -27,8 +30,8 @@ export default function DateRange(props: dateCardProps) {
   );
 
   useEffect(() => {
-    setStartText(format(dates.start, "yyyy-MM-dd"));
-    setEndText(format(dates.end, "yyyy-MM-dd"));
+    setStartText(format(dates.start, "yyyy-MM-dd", { locale }));
+    setEndText(format(dates.end, "yyyy-MM-dd", { locale }));
   }, [dates]);
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,7 +44,9 @@ export default function DateRange(props: dateCardProps) {
     handleVal([val.start, singleDay ? val.start : val.end]);
   };
 
-  const dateSpan = inputParms(dates, rangeScope);
+  const input = useInputParms();
+  const dateSpan = input(dates, rangeScope);
+
   const topRow = useHelpContext().showExtendedTooltip
     ? "Selected Range"
     : dateSpan.string;
@@ -53,8 +58,8 @@ export default function DateRange(props: dateCardProps) {
         handleVal([dte, dates.end]);
       } else handleVal([dates.start, dte]);
     } else {
-      setStartText(format(dates.start, "yyyy-MM-dd"));
-      setEndText(format(dates.end, "yyyy-MM-dd"));
+      setStartText(format(dates.start, "yyyy-MM-dd", { locale }));
+      setEndText(format(dates.end, "yyyy-MM-dd", { locale }));
     }
   };
 
@@ -66,77 +71,84 @@ export default function DateRange(props: dateCardProps) {
 
   return (
     // <div onMouseEnter={toggleUnderline} onMouseLeave={toggleUnderline}>
-      <Grid container spacing={0.5} sx={{ paddingLeft: 0.3 }}>
-        <Grid size="grow">
-          <RngeTooltip
-            title={undefined}
-            topRow={topRow}
-            detailRow={dateSpan.string}
-            infoRow={dateSpan.info}
-            placement="bottom-start"
-          >
-            <DateField
-              id="start"
-              value={startText}
-              max={singleDay ? "" : endText}
-              // underline={underline}
-              error={!dateSpan.toValid}
-              onBlur={handleBlur}
-              doUpdate={doUpdate}
-              onChange={handleInput}
-              // onFocus={() => setUnderline(true)}
-              {...props}
-            />
-          </RngeTooltip>
-        </Grid>
-        {!singleDay && (
-          <>
-            {/* <DateIntervalPicker
+    <Grid container spacing={0.5} sx={{ paddingLeft: 0.3 }}>
+      <Grid size="grow">
+        <RngeTooltip
+          title={undefined}
+          topRow={topRow}
+          detailRow={dateSpan.string}
+          infoRow={dateSpan.info}
+          placement="bottom-start"
+        >
+          <DateField
+            id="start"
+            value={startText}
+            max={singleDay ? "" : endText}
+            // underline={underline}
+            error={!dateSpan.toValid}
+            onBlur={handleBlur}
+            doUpdate={doUpdate}
+            onChange={handleInput}
+            // onFocus={() => setUnderline(true)}
+            {...props}
+          />
+        </RngeTooltip>
+      </Grid>
+      {!singleDay && (
+        <>
+          {/* <DateIntervalPicker
               baseDate={dates.start}
               stepValue={props.stepValue}
               handleVal={handleDate}
               clickType="right"
             > */}
-              <RngeTooltip
-                title={undefined}
-                topRow={`Reset to ${tipDescription}`}
-                // detailRow={"Right-click to extend from start date."}
-                infoRow={dateSpan.info}
-                placement="right-start"
-              >
-                <IconButton size="small" onClick={(event) => (startupFilter && event.button === 0) ? handleDate(startupFilter):""}>
-                  <Remove
-                    style={{ fontSize: useTheme().typography.fontSize }}
-                    color="disabled"
-                  />
-                </IconButton>
-              </RngeTooltip>
-            {/* </DateIntervalPicker> */}
-            <Grid size="grow">
-              <RngeTooltip
-                title={undefined}
-                topRow={topRow}
-                detailRow={dateSpan.string}
-                infoRow={dateSpan.info}
-                placement="bottom-start"
-              >
-                <DateField
-                  id="end"
-                  value={endText}
-                  min={startText}
-                  error={!dateSpan.toValid}
-                  // underline={underline}
-                  onBlur={handleBlur}
-                  doUpdate={doUpdate}
-                  onChange={handleInput}
-                  // onFocus={() => setUnderline(true)}
-                  {...props}
-                />
-              </RngeTooltip>
-            </Grid>
-          </>
-        )}
-      </Grid>
+            <RngeTooltip
+            title={undefined}
+            topRow={useLocalization().getDisplayName("dateRangeResetTo") + " " + tipDescription}
+            // detailRow={"Right-click to extend from start date."}
+            infoRow={dateSpan.info}
+            placement="right-start"
+            >
+            <IconButton
+              size="small"
+              onClick={(event) =>
+              startupFilter && event.button === 0
+                ? handleDate(startupFilter)
+                : ""
+              }
+            >
+              <Remove
+              style={{ fontSize: useTheme().typography.fontSize }}
+              color="disabled"
+              />
+            </IconButton>
+            </RngeTooltip>
+          {/* </DateIntervalPicker> */}
+          <Grid size="grow">
+            <RngeTooltip
+              title={undefined}
+              topRow={topRow}
+              detailRow={dateSpan.string}
+              infoRow={dateSpan.info}
+              placement="bottom-start"
+            >
+              <DateField
+                id="end"
+                value={endText}
+                min={startText}
+                error={!dateSpan.toValid}
+                // underline={underline}
+                onBlur={handleBlur}
+                doUpdate={doUpdate}
+                onChange={handleInput}
+                // onFocus={() => setUnderline(true)}
+                {...props}
+              />
+            </RngeTooltip>
+          </Grid>
+        </>
+      )}
+    </Grid>
     // </div>
   );
 }

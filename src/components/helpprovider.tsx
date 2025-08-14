@@ -3,7 +3,7 @@ import IconButton from "@mui/material/IconButton";
 import { Chat, ChatBubbleOutlineOutlined } from "@mui/icons-material";
 import Tooltip from "@mui/material/Tooltip";
 import { useHotkeys } from "react-hotkeys-hook";
-import { HELP_PROVIDER } from "../constants";
+import { useLocalization } from "../localeutils";
 import { useTheme } from "@mui/material/styles";
 
 const HelpContext = React.createContext({
@@ -17,8 +17,6 @@ const HelpContext = React.createContext({
   setTooltipEnabled: (enabled: boolean) => {},
 });
 
-const { TopRowInfo, DetailRowInfo, TopRowHelp, DetailRowHelp } = HELP_PROVIDER;
-
 export const useHelpContext = () => useContext(HelpContext);
 
 export const HelpProvider = ({
@@ -28,6 +26,12 @@ export const HelpProvider = ({
   showExtendedTooltip,
 }) => {
  const theme = useTheme();
+
+   const localisation = useLocalization();
+   const TopRowInfo = localisation.getDisplayName("helpProviderTopRowInfo");
+   const DetailRowInfo = localisation.getDisplayName("helpProviderDetailRowInfo");
+   const TopRowHelp = localisation.getDisplayName("helpProviderTopRowHelp");
+   const DetailRowHelp = localisation.getDisplayName("helpProviderDetailRowHelp");
 
  const [helpIcon, setHelpIcon] = useState(showHelpIcon ?? false);
   const [tooltip, setTooltip] = useState(showTooltip ?? true);

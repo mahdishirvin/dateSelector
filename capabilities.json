@@ -628,6 +628,11 @@
                         "text": true
                     }
                 },
+                "payCustomLabel": {
+                    "type": {
+                        "text": true
+                    }
+                },
                 "fmtPay": {
                     "type": {
                         "enumeration": [

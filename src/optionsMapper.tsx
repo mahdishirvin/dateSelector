@@ -14,6 +14,7 @@ import {
 } from "./interface";
 import { IAdvancedFilter } from "powerbi-models";
 import { VisualSettingsModel } from "./vsettings";
+import { parse } from "path";
 
 const { extractFilterColumnTarget } = interactivityFilterService;
 
@@ -88,8 +89,8 @@ export const settingProps = (
       year: year.fmtYear.value.toString(),
     },
     payProps: {
-      desc: "Pay-Period",
-      ref: new Date(pay.payRefYear.value, getNum(pay.payRefMonth.value.valueOf()), pay.payRefDay.value),
+      desc: pay.payCustomLabel.value.toString(),
+      ref: pay.payRefDate.value ,
       len: pay.payLength.value,
     },
     showHelpIcon: help.showHelpIcon.value,
