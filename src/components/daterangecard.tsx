@@ -21,6 +21,7 @@ import LandingPage from "./landingpage";
 import { compareAsc } from "date-fns";
 
 export default function DateRangeCard(props: dateCardProps) {
+// console.log("[DateRangeCard] props: ", props.dates);
   if (!props.landingOff) return <LandingPage />;
 
   const theme = SetTheme({

@@ -1,7 +1,10 @@
 import powerbi from "powerbi-visuals-api";
 import { FONT_SIZE, FONT_FAMILY } from "./constants";
 import { interactivityFilterService } from "powerbi-visuals-utils-interactivityutils";
-import { valueFormatter as vf, textMeasurementService as tms } from "powerbi-visuals-utils-formattingutils";
+import {
+  valueFormatter as vf,
+  textMeasurementService as tms,
+} from "powerbi-visuals-utils-formattingutils";
 import { pixelConverter as PixelConverter } from "powerbi-visuals-utils-typeutils";
 import { getInitRange } from "./dateutils";
 import { startOfDay, endOfDay } from "date-fns";
@@ -14,56 +17,90 @@ import {
 } from "./interface";
 import { IAdvancedFilter } from "powerbi-models";
 import { VisualSettingsModel } from "./vsettings";
-import { parse } from "path";
 
 const { extractFilterColumnTarget } = interactivityFilterService;
 
-export const optionsAreValid = (options: powerbi.extensibility.visual.VisualUpdateOptions): boolean => {
+/**
+ * Quick structural validation of update options.
+ */
+export const optionsAreValid = (
+  options: powerbi.extensibility.visual.VisualUpdateOptions
+): boolean => {
   try {
-    return !(
-      !options ||
-      !options.dataViews ||
-      !options.dataViews[0] ||
-      !options.viewport ||
-      !options.dataViews[0]?.metadata?.columns?.length ||
-      !options.dataViews[0].categorical.categories[0].source.type.dateTime
+    const dataView = options?.dataViews?.[0];
+    return !!(
+      dataView?.metadata?.columns?.length &&
+      options.viewport &&
+      dataView.categorical?.categories?.[0]?.source?.type?.dateTime
     );
   } catch {
     return false;
   }
 };
 
+/**
+ * Extracts settings properties into strongly-typed dateCardProps.
+ */
 export const settingProps = (
   options: powerbi.extensibility.visual.VisualUpdateOptions,
   formatSettings: VisualSettingsModel,
   initialised: boolean
 ): dateCardProps => {
-  const { styleSettings: style, calendarSettings: calendar, layoutSettings: layout, periodSettings: period } = formatSettings;
-  const { periodDay: day, periodWeek: week, periodPay: pay, periodMonth: month, periodQuarter: quarter, periodYear: year } = period;
-  const { layoutCurrent: current, layoutMove: move, layoutTimeline: timeline, layoutHelp: help } = layout;
+  const {
+    styleSettings: style,
+    calendarSettings: calendar,
+    layoutSettings: layout,
+    periodSettings: period,
+  } = formatSettings;
 
-  const stepInit: string = calendar.stepInit.value.toString();
-  const singleDay: boolean = calendar.singleDay.value;
-  const limitToScope: boolean = calendar.limitToScope.value;
-  const rangeScope: dateRange = mapDataView(options).category.rangeValues;
-  const weekStartDay: 0 | 1 | 2 | 3 | 4 | 5 | 6 = getDayNum(week.weekStartDay.value.valueOf());
-  const yearStartMonth: number = getNum(year.yearStartMonth.value.valueOf());
-  const startRange: string = calendar.startRange.value.toString();
+  const {
+    periodDay: day,
+    periodWeek: week,
+    periodPay: pay,
+    periodMonth: month,
+    periodQuarter: quarter,
+    periodYear: year,
+  } = period;
 
-  const startupFilter = getInitRange(startRange, weekStartDay, yearStartMonth, rangeScope);
-  const selectedDates = startRange !== "sync" && !initialised ? startupFilter : restoreRangeFilter(options) || startupFilter;
+  const {
+    layoutCurrent: current,
+    layoutMove: move,
+    layoutTimeline: timeline,
+    layoutHelp: help,
+  } = layout;
+
+  const stepInit = String(calendar.stepInit.value);
+  const singleDay = calendar.singleDay.value;
+  const limitToScope = calendar.limitToScope.value;
+
+  const rangeScope = mapDataView(options).category.rangeValues;
+  const weekStartDay = getDayNum(week.weekStartDay.value);
+  const yearStartMonth = getNum(year.yearStartMonth.value);
+  const startRange = String(calendar.startRange.value);
+
+  const startupFilter = getInitRange(
+    startRange,
+    weekStartDay,
+    yearStartMonth,
+    rangeScope
+  );
+
+  const selectedDates =
+    startRange !== "sync" && !initialised
+      ? startupFilter
+      : restoreRangeFilter(options) || startupFilter;
 
   return {
     landingOff: optionsAreValid(options),
     dates: selectedDates,
-    rangeScope: rangeScope,
-    startRange: startRange,
-    weekStartDay: weekStartDay,
-    yearStartMonth: yearStartMonth,
-    stepInit: stepInit,
-    singleDay: singleDay,
-    limitToScope: limitToScope,
-    startupFilter: startupFilter,
+    rangeScope,
+    startRange,
+    weekStartDay,
+    yearStartMonth,
+    stepInit,
+    singleDay,
+    limitToScope,
+    startupFilter,
     stepSkip: {
       day: day.daySkip.value,
       week: week.weekSkip.value,
@@ -81,16 +118,16 @@ export const settingProps = (
       year: year.showYear.value,
     },
     stepFmt: {
-      day: day.fmtDay.value.toString(),
-      week: week.fmtWeek.value.toString(),
-      pay: pay.fmtPay.value.toString(),
-      month: month.fmtMonth.value.toString(),
-      quarter: quarter.fmtQuarter.value.toString(),
-      year: year.fmtYear.value.toString(),
+      day: String(day.fmtDay.value),
+      week: String(week.fmtWeek.value),
+      pay: String(pay.fmtPay.value),
+      month: String(month.fmtMonth.value),
+      quarter: String(quarter.fmtQuarter.value),
+      year: String(year.fmtYear.value),
     },
     payProps: {
-      desc: pay.payCustomLabel.value.toString(),
-      ref: pay.payRefDate.value ,
+      desc: String(pay.payCustomLabel.value),
+      ref: pay.payRefDate.value,
       len: pay.payLength.value,
     },
     showHelpIcon: help.showHelpIcon.value,
@@ -104,91 +141,119 @@ export const settingProps = (
     enableSlider: timeline.enableSlider.value,
     showSlider: timeline.showSlider.value,
     show2ndSlider: timeline.show2ndSlider.value,
-    themeColor: style.themeColor.value.value.valueOf(),
     themeFont: style.themeFont.value,
+    themeColor: style.themeColor.value.value.valueOf(),
     themeMode: style.themeMode.value,
-    fontSize: style.fontSize.value.valueOf(),
     fontColor: style.fontColor.value.value.valueOf(),
+    fontSize: style.fontSize.value.valueOf(),
     fontBold: style.font.bold.value,
-    // fontUnderline: style.font.underline.value,
     fontItalic: style.font.italic.value,
   };
 };
 
-const getDayNum = (n: number | string): 0 | 1 | 2 | 3 | 4 | 5 | 6 => {
-  const num = typeof n === "number" ? n : parseInt(n, 10);
-  return (num % 7) as 0 | 1 | 2 | 3 | 4 | 5 | 6;
-};
+const getDayNum = (n: number | string): 0 | 1 | 2 | 3 | 4 | 5 | 6 =>
+  (getNum(n) % 7) as 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
-const getNum = (n: number | string) => (typeof n === "number" ? n : parseInt(n, 10));
+const getNum = (n: number | string): number =>
+  typeof n === "number" ? n : parseInt(n, 10);
 
 const parseDate = (value: any): Date | null => {
   const date = new Date(value);
-  return date instanceof Date && !isNaN(date.getTime()) ? new Date(date.getFullYear(), date.getMonth(), date.getDate()) : null;
+  return isNaN(date.getTime())
+    ? null
+    : new Date(date.getFullYear(), date.getMonth(), date.getDate());
 };
 
-export const mapDataView = (options: powerbi.extensibility.visual.VisualUpdateOptions): Partial<VisualState> => {
+/**
+ * Extract categorical data from the DataView and measure labels.
+ */
+export const mapDataView = (
+  options: powerbi.extensibility.visual.VisualUpdateOptions
+): Partial<VisualState> => {
   const dataView = options.dataViews[0];
-  const categorical = dataView.categorical;
-  const category = categorical?.categories?.[0];
+  const category = dataView.categorical?.categories?.[0];
   const categorySource = category?.source;
+
+  if (!category || !categorySource) {
+    return {};
+  }
+
   const filterTarget = extractFilterColumnTarget(categorySource);
-  const categoriesFormatter = vf.create({ format: vf.getFormatStringByColumn(categorySource) });
-  const rangeScopeValues = category?.values.map((value) => categoriesFormatter.format(value));
+  const categoriesFormatter = vf.create({
+    format: vf.getFormatStringByColumn(categorySource),
+  });
+
+  const values = category.values;
+  const formattedValues = values.map((v) => categoriesFormatter.format(v));
+
   const rangeScopeVals: dateRange = {
-    start: parseDate(category.values[0]),
-    end: parseDate(category.values[category.values.length - 1]),
+    start: parseDate(values[0]),
+    end: parseDate(values[values.length - 1]),
   };
-  const maxCategoryNameWidth = rangeScopeValues?.reduce(
-    (acc, value) => Math.max(acc, tms.measureSvgTextWidth({ text: value, fontFamily: FONT_FAMILY, fontSize: PixelConverter.toString(FONT_SIZE) })),
+
+  const maxCategoryNameWidth = formattedValues.reduce(
+    (acc, val) =>
+      Math.max(
+        acc,
+        tms.measureSvgTextWidth({
+          text: val,
+          fontFamily: FONT_FAMILY,
+          fontSize: PixelConverter.toString(FONT_SIZE),
+        })
+      ),
     0
   );
 
   return {
     category: {
       displayName: categorySource.displayName,
-      count: category?.values.length,
+      count: values.length,
       rangeValues: rangeScopeVals,
       formatter: categoriesFormatter,
       maxWidth: maxCategoryNameWidth,
-      filterTarget: filterTarget,
+      filterTarget,
     } as CategoryData,
   };
 };
 
-export const restoreRangeFilter = (options: powerbi.extensibility.visual.VisualUpdateOptions) => {
+/**
+ * Restore filter state from jsonFilters if present.
+ */
+export const restoreRangeFilter = (
+  options: powerbi.extensibility.visual.VisualUpdateOptions
+): dateRange | undefined => {
   const { jsonFilters, dataViews } = options;
   const dataView = dataViews[0];
+  const column = dataView?.metadata?.columns?.[0];
+  if (!jsonFilters || !column) return;
 
-  if (jsonFilters && dataView.metadata && dataView.metadata.columns && dataView.metadata.columns[0]) {
-    const filter = jsonFilters.find((filter): filter is IAdvancedFilter => {
-      return (
-        (filter as IAdvancedFilter).target !== undefined &&
-        (filter as IAdvancedFilter).logicalOperator !== undefined &&
-        (filter as IAdvancedFilter).conditions !== undefined
-      );
-    });
+  const filter = jsonFilters.find(
+    (f): f is IAdvancedFilter =>
+      !!(f as IAdvancedFilter).target &&
+      !!(f as IAdvancedFilter).logicalOperator &&
+      !!(f as IAdvancedFilter).conditions
+  );
+  if (!filter) return;
 
-    if (filter) {
-      const target = filter.target as { table: string; column: string };
-      const source = String(dataView.metadata.columns[0].queryName).split(".");
-      if (
-        source &&
-        source[0] &&
-        source[1] &&
-        filter.logicalOperator === "And" &&
-        target.table === source[0] &&
-        target.column === source[1]
-      ) {
-        const greaterThan = filter.conditions.find((cond) => cond.operator === "GreaterThanOrEqual");
-        const lessThan = filter.conditions.find((cond) => cond.operator === "LessThanOrEqual");
-        if (greaterThan && lessThan) {
-          return {
-            start: startOfDay(parseDate(greaterThan.value)),
-            end: endOfDay(parseDate(lessThan.value)),
-          };
-        }
-      }
+  const [table, col] = String(column.queryName).split(".");
+  const target = filter.target as { table: string; column: string };
+  if (
+    filter.logicalOperator === "And" &&
+    target.table === table &&
+    target.column === col
+  ) {
+    const greaterThan = filter.conditions.find(
+      (c) => c.operator === "GreaterThanOrEqual"
+    );
+    const lessThan = filter.conditions.find(
+      (c) => c.operator === "LessThanOrEqual"
+    );
+
+    if (greaterThan && lessThan) {
+      return {
+        start: startOfDay(parseDate(greaterThan.value)),
+        end: endOfDay(parseDate(lessThan.value)),
+      };
     }
   }
 };
@@ -202,14 +267,10 @@ export const mapOptionsToState = (
   options: powerbi.extensibility.visual.VisualUpdateOptions,
   formatSettings: VisualSettingsModel,
   initialised: boolean
-): VisualState => {
-  const dataViewPartial = mapDataView(options);
-  const props: dateCardProps = settingProps(options, formatSettings, initialised);
-  return {
-    category: dataViewPartial.category,
-    viewport: mapViewport(options.viewport),
-    settings: props,
-  };
-};
+): VisualState => ({
+  category: mapDataView(options).category,
+  viewport: mapViewport(options.viewport),
+  settings: settingProps(options, formatSettings, initialised),
+});
 
 export default mapOptionsToState;

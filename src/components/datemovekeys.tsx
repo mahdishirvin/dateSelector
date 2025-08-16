@@ -13,7 +13,6 @@ export function dateMoveKeys(
   const updateResult = (x: string) => {
     const dteRange = getRange(x, stepValue, dates);
     fn(dteRange);
-    // console.log("moveKeys: ", dteRange.toString());
   };
 
   const debouncedResult = debounce(updateResult, debounceTime, {
@@ -31,7 +30,7 @@ export function dateMoveKeys(
     "t",
     () => {
       const thisRange = current
-        .filter((item) => item.tip.toLowerCase() === stepValue)
+        .filter((item) => item.step === stepValue)
         .map((item) => item.thisRange)[0];
       fn([thisRange.start, thisRange.end]);
     },

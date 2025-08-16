@@ -1,47 +1,75 @@
 import * as React from "react";
 import { createRoot, Root } from "react-dom/client";
 import powerbi from "powerbi-visuals-api";
-import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
 import VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructorOptions;
+import { Interval } from "date-fns";
 
-interface ContainerProps {
+/**
+ * A wrapper component to bridge the Power BI visual and the React component.
+ * It passes all props directly to the main visual component.
+ */
+interface ReactContainerProps {
   component: React.ComponentType<any>;
-  data: Partial<VisualUpdateOptions>;
-  onFilterChanged?: (data: any) => void;
+  data: any;
+  onFilterChanged?: (data: Interval) => void;
 }
 
-const ReactContainer: React.FC<ContainerProps> = ({ component: Component, data, onFilterChanged, ...rest }) => (
-  <Component {...data} {...rest} onFilterChanged={onFilterChanged} />
-);
+const ReactContainer: React.FC<ReactContainerProps> = ({ component: Component, data, onFilterChanged }) => {
+  return <Component {...data} onFilterChanged={onFilterChanged} />;
+};
 
-export default ReactContainer;
-
+/**
+ * An abstract class to provide common functionality for Power BI visuals
+ * that use React.
+ */
 export abstract class ReactVisual {
   protected reactTarget: HTMLElement;
-  protected reactRenderer: React.ComponentType<any>;
   protected root: Root | null = null;
+  private mainComponent: React.ComponentType<any>;
+  private filterCallback: (data: Interval) => void;
 
   constructor(options: VisualConstructorOptions) {
     this.reactTarget = options.element;
   }
 
-  protected reactMount(): void {
+  /**
+   * Initializes the React component tree by creating the root and
+   * performing the initial render.
+   * @param component The main React component to render.
+   * @param onFilterChanged The callback function for filter changes.
+   */
+  protected initializeReact(
+    component: React.ComponentType<any>,
+    onFilterChanged: (data: Interval) => void
+  ): void {
     if (!this.root) {
       this.root = createRoot(this.reactTarget);
     }
-    this.root.render(React.createElement(this.reactRenderer));
+    this.mainComponent = component;
+    this.filterCallback = onFilterChanged;
+    this.updateReactContainers({});
   }
 
+  /**
+   * Updates the component with new data. This method is called
+   * in the visual's `update` method.
+   * @param data The props to pass to the main component.
+   */
   protected updateReactContainers = (data: any): void => {
-    if (this.root) {
-      this.root.render(React.createElement(this.reactRenderer, { data }));
+    if (this.root && this.mainComponent) {
+      this.root.render(
+        React.createElement(ReactContainer, {
+          component: this.mainComponent,
+          data,
+          onFilterChanged: this.filterCallback,
+        })
+      );
     }
   };
 
-  protected createReactContainer = (component: React.ComponentType<any>, onFilterChanged: (dates: any) => void) => (
-    props: any
-  ) => React.createElement(ReactContainer, { component, ...props, onFilterChanged });
-
+  /**
+   * Unmounts the component tree, used when the visual is destroyed.
+   */
   protected reactUnmount(): void {
     if (this.root) {
       this.root.unmount();
