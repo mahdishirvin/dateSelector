@@ -210,6 +210,12 @@
   "Step_Month": "Month",
   "Step_Quarter": "Quarter",
   "Step_Year": "Year",
+  "Step_Days": "Days",
+  "Step_Weeks": "Weeks",
+  "Step_Pays": "Pays",
+  "Step_Months": "Months",
+  "Step_Quarters": "Quarters",
+  "Step_Years": "Years",
   "fmtDay": "Day format",
   "Visual_Day_Sunday": "Sunday",
   "Visual_Day_Monday": "Monday",
@@ -240,5 +246,14 @@
   "dateUtilsExceedsScope": " exceeds scope",
   "dateUtilsMore": "More...",
   "dateUtilsInvalid": "Date entry is invalid",
-  "dateRangeResetTo": "Reset to "
+  "dateRangeResetTo": "Reset to ",
+  "dateUtilsMoveBack": " Back ",
+  "dateUtilsMoveForward": " Forward ",
+  "dateUtilsMoveReduceBy": "Reduce by",
+  "dateUtilsMoveExtend": "Extend",
+  "dateUtilsMoveTheSelectedRange": "Move the selected range ",
+  "dateUtilsMoveByTheStepLevel": " by the step level.",
+  "useCurrentRightClick": "Right click to extend periods from the current date.",
+  "dateIntervalExtend": "Extend future (+) or past (-) steps from today",
+  "dateIntervalToday": "Today +/- "
 }

@@ -2,11 +2,12 @@ import { getRange } from "../dateutils";
 import { useHotkeys } from "react-hotkeys-hook";
 import debounce from "lodash.debounce";
 import type { Interval } from "date-fns";
+import type { dateRange } from "../interface";
 
 export function dateMoveKeys(
   fn: (result: Date[]) => void,
   stepValue: string,
-  dates: Interval,
+  dates: dateRange,
   current: any,
   debounceTime = 500
 ) {

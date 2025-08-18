@@ -240,5 +240,20 @@
   "dateUtilsExceedsScope": " exceeds scope",
   "dateUtilsMore": "More...",
   "dateUtilsInvalid": "Date entry is invalid",
-  "dateRangeResetTo": "Reset to "
+  "dateRangeResetTo": "Reset to ",
+  "dateUtilsMoveBack": " Back ",
+  "dateUtilsMoveForward": " Forward ",
+  "dateUtilsMoveReduceBy": "Reduce by",
+  "dateUtilsMoveExtend": "Extend",
+  "dateUtilsMoveTheSelectedRange": "Move the selected range ",
+  "dateUtilsMoveByTheStepLevel": " by the step level.",
+  "useCurrentRightClick": "Right click to extend periods from today.",
+  "Step_Days": "Days",
+  "Step_Weeks": "Weeks",
+  "Step_Pays": "units",
+  "Step_Months": "Months",
+  "Step_Quarters": "Quarters",
+  "Step_Years": "Years",
+  "dateIntervalExtend": "Extend future (+) or past (-) steps from today",
+  "dateIntervalToday": "Today +/- "
 }

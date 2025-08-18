@@ -12,11 +12,12 @@ import RemoveIcon from "@mui/icons-material/RemoveCircle";
 // import RefreshIcon from "@mui/icons-material/Refresh";
 import RngeTooltip from "./rngetooltip";
 import { getIntervalFunction } from "../dateutils";
-import { Interval, subDays, format } from "date-fns";
+import { Interval, subDays, format, startOfDay, endOfDay } from "date-fns";
+import { useLocalization } from "../localeutils";
 
 interface IntervalParmsProps {
   intervalValue: number;
-  stepValue: string;
+  item: any;
   interval: Interval;
   setIntervalValue: React.Dispatch<React.SetStateAction<number>>;
   handleClose: () => void;
@@ -24,7 +25,7 @@ interface IntervalParmsProps {
 
 const IntervalParms: React.FC<IntervalParmsProps> = ({
   intervalValue,
-  stepValue,
+  item,
   setIntervalValue,
   handleClose,
   interval,
@@ -47,18 +48,18 @@ const IntervalParms: React.FC<IntervalParmsProps> = ({
       <Grid>
         <RngeTooltip
           placement="left-start"
-          title="Extend from start date"
-          detailRow={`Add ${stepValue}s from today`}
-          infoRow={`Add future (+) or past (-) ${stepValue}s.`}
+          detailRow={useLocalization().getDisplayName("dateIntervalExtend")}
+          // title={`Add ${stepValue}s from today`}
+          infoRow={`${useLocalization().getDisplayName("dateIntervalToday")} ${item.plural}.`}
         >
           <TextField
             helperText={
               interval.end
-                ? `${format(interval.start, "yyyy-MM-dd")} ${format(
+                ? `${format(interval.start, "yy-MM-dd")} | ${format(
                     interval.end,
-                    "yyyy-MM-dd"
+                    "yy-MM-dd"
                   )}`
-                : `Today +/- ${stepValue}s`
+                : `${useLocalization().getDisplayName("dateIntervalToday")} ${item.plural}.`
             }
             slotProps={{
               formHelperText: {
@@ -66,7 +67,7 @@ const IntervalParms: React.FC<IntervalParmsProps> = ({
                   margin: "1px",
                   fontSize: "0.4rem",
                   lineHeight: 1.0,
-                  padding: "0px 2px",
+                  padding: "0px 0px",
                   color: "text.secondary",
                   display: "flex",
                   justifyContent: "center",
@@ -87,8 +88,8 @@ const IntervalParms: React.FC<IntervalParmsProps> = ({
                   "-webkit-appearance": "none",
                   margin: 0,
                 },
-              fontSize: "0.5rem",
-              width: "3.1rem",
+              fontSize: "0.4rem",
+              width: "3.8rem",
               justifyContent: "center",
               display: "flex",
               alignItems: "center",
@@ -133,7 +134,7 @@ type ClickType = "left" | "right";
 interface DateIntervalPickerProps {
   children: React.ReactNode;
   baseDate?: Date;
-  stepValue: string;
+  item: any;
   handleVal?: (interval: Interval) => void;
   clickType?: ClickType;
 }
@@ -141,7 +142,7 @@ interface DateIntervalPickerProps {
 const DateIntervalPicker: React.FC<DateIntervalPickerProps> = ({
   children,
   baseDate,
-  stepValue,
+  item,
   handleVal,
   clickType = "right",
 }) => {
@@ -172,17 +173,17 @@ const DateIntervalPicker: React.FC<DateIntervalPickerProps> = ({
       setInterval({ start: null, end: null });
       return;
     }
-    const intervalFn = getIntervalFunction(stepValue);
+    const intervalFn = getIntervalFunction(item.step);
     const newDate = subDays(
       intervalFn(currentBaseDate, intervalValue),
-      stepValue === "day" ? 0 : intervalValue < 0 ? -1 : 1
+      item.step === "day" ? 0 : intervalValue < 0 ? -1 : 1
     );
 
     setInterval({
-      start: intervalValue >= 0 ? currentBaseDate : newDate,
-      end: intervalValue < 0 ? currentBaseDate : newDate,
+      start: startOfDay(intervalValue >= 0 ? currentBaseDate : newDate),
+      end: endOfDay(intervalValue < 0 ? currentBaseDate : newDate),
     });
-  }, [intervalValue, stepValue, isEditing, currentBaseDate]);
+  }, [intervalValue, item.step, isEditing, currentBaseDate]);
 
   const handleClose = () => {
     setIsEditing(false);
@@ -232,7 +233,7 @@ const DateIntervalPicker: React.FC<DateIntervalPickerProps> = ({
           <div>
             <IntervalParms
               intervalValue={intervalValue}
-              stepValue={stepValue}
+              item={item}
               setIntervalValue={setIntervalValue}
               handleClose={handleClose}
               interval={interval}
