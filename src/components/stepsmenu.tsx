@@ -48,7 +48,7 @@ export default function StepsMenu(props: stepProps) {
                     <Badge
                       sx={{ "& .MuiBadge-badge": { right: -2, top: -1 } }}
                       badgeContent={
-                        <Typography variant="overline" sx={{ fontSize: ".5rem", textTransform: "none" }}>
+                        <Typography variant="overline" sx={{ fontSize: ".35rem", textTransform: "none" }}>
                           {action.step.charAt(0).toUpperCase()}
                         </Typography>
                       }

@@ -1,45 +1,50 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid";
-import { useTheme } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import Remove from "@mui/icons-material/Remove";
+import { useTheme } from "@mui/material/styles";
 import { format, parse, isValid } from "date-fns";
+
 import { useInputParms } from "../dateutils";
 import { DateField } from "./datefield";
 import { useHelpContext } from "./helpprovider";
 import RngeTooltip from "./rngetooltip";
 import { dateCardProps, dateRange } from "../interface";
-// import DateIntervalPicker from "./dateintervalpicker";
 import { useDateFnsLocale, useLocalization } from "../localeutils";
 
 export default function DateRange(props: dateCardProps) {
-  const { dates, rangeScope, handleVal, singleDay, startupFilter } = props;
+  const { dates, rangeScope, handleVal, singleDay, startupFilter, startRange } = props;
 
   const locale = useDateFnsLocale();
+  const localization = useLocalization();
+  const theme = useTheme();
+  const { showExtendedTooltip } = useHelpContext();
 
-  const tipDescription = useLocalization().getDisplayName(
-    `startRange_${props.startRange}`
+  const tipDesc = `startRange_${startRange ?? ""}`;
+  const tipDescription =
+    localization.getDisplayName(tipDesc) && localization.getDisplayName(tipDesc) !== tipDesc
+      ? localization.getDisplayName(tipDesc)
+      : "Start Range";
+
+  const [startText, setStartText] = useState(() =>
+    format(dates.start, "yyyy-MM-dd", { locale })
   );
-  // const [underline, setUnderline] = useState(true);
-  const [startText, setStartText] = useState<string>(() =>
-    format(dates.start, "yyyy-MM-dd")
-  );
-  const [endText, setEndText] = useState<string>(() =>
-    format(dates.end, "yyyy-MM-dd")
+  const [endText, setEndText] = useState(() =>
+    format(dates.end, "yyyy-MM-dd", { locale })
   );
 
   useEffect(() => {
     setStartText(format(dates.start, "yyyy-MM-dd", { locale }));
     setEndText(format(dates.end, "yyyy-MM-dd", { locale }));
-  }, [dates]);
+  }, [dates, locale]);
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const dateValue: string = e.target.value;
-    if (e.target.id === "start") {
-      setStartText(dateValue);
-    } else setEndText(dateValue);
+    const { id, value } = e.target;
+    if (id === "start") setStartText(value);
+    else setEndText(value);
   };
+
   const handleDate = (val: dateRange) => {
     handleVal([val.start, singleDay ? val.start : val.end]);
   };
@@ -47,16 +52,15 @@ export default function DateRange(props: dateCardProps) {
   const input = useInputParms();
   const dateSpan = input(dates, rangeScope);
 
-  const topRow = useHelpContext().showExtendedTooltip
-    ? "Selected Range"
+  const topRow = showExtendedTooltip
+    ? localization.getDisplayName("dateRangeTopRow")
     : dateSpan.string;
 
   const doUpdate = (id: "start" | "end", value: string) => {
-    const dte: Date = parse(value, "yyyy-MM-dd", new Date());
+    const dte = parse(value, "yyyy-MM-dd", new Date());
     if (isValid(dte)) {
-      if (id === "start") {
-        handleVal([dte, dates.end]);
-      } else handleVal([dates.start, dte]);
+      if (id === "start") handleVal([dte, dates.end]);
+      else handleVal([dates.start, dte]);
     } else {
       setStartText(format(dates.start, "yyyy-MM-dd", { locale }));
       setEndText(format(dates.end, "yyyy-MM-dd", { locale }));
@@ -67,14 +71,10 @@ export default function DateRange(props: dateCardProps) {
     doUpdate(e.target.id as "start" | "end", e.target.value);
   };
 
-  // const toggleUnderline = () => setUnderline((prev) => !prev);
-
   return (
-    // <div onMouseEnter={toggleUnderline} onMouseLeave={toggleUnderline}>
     <Grid container spacing={0.5} sx={{ paddingLeft: 0.3 }}>
       <Grid size="grow">
         <RngeTooltip
-          title={undefined}
           topRow={topRow}
           detailRow={dateSpan.string}
           infoRow={dateSpan.info}
@@ -84,49 +84,34 @@ export default function DateRange(props: dateCardProps) {
             id="start"
             value={startText}
             max={singleDay ? "" : endText}
-            // underline={underline}
             error={!dateSpan.toValid}
             onBlur={handleBlur}
             doUpdate={doUpdate}
             onChange={handleInput}
-            // onFocus={() => setUnderline(true)}
             {...props}
           />
         </RngeTooltip>
       </Grid>
+
       {!singleDay && (
         <>
-          {/* <DateIntervalPicker
-              baseDate={dates.start}
-              stepValue={props.stepValue}
-              handleVal={handleDate}
-              clickType="right"
-            > */}
-            <RngeTooltip
-            title={undefined}
-            topRow={useLocalization().getDisplayName("dateRangeResetTo") + " " + tipDescription}
-            // detailRow={"Right-click to extend from start date."}
-            infoRow={dateSpan.info}
-            placement="right-start"
-            >
+          <RngeTooltip
+            topRow={(startRange === "sync") ? topRow : `${localization.getDisplayName("dateRangeResetTo")} ${tipDescription}`}
+            detailRow={(startRange === "sync") ? dateSpan.string: ""}
+            placement="bottom-start"
+          >
             <IconButton
               size="small"
               onClick={(event) =>
-              startupFilter && event.button === 0
-                ? handleDate(startupFilter)
-                : ""
+             (startRange != "sync") && startupFilter && event.button === 0 ? handleDate(startupFilter) : undefined
               }
             >
-              <Remove
-              style={{ fontSize: useTheme().typography.fontSize }}
-              color="disabled"
-              />
+              <Remove style={{ fontSize: theme.typography.fontSize }} color="disabled" />
             </IconButton>
-            </RngeTooltip>
-          {/* </DateIntervalPicker> */}
+          </RngeTooltip>
+
           <Grid size="grow">
             <RngeTooltip
-              title={undefined}
               topRow={topRow}
               detailRow={dateSpan.string}
               infoRow={dateSpan.info}
@@ -137,11 +122,9 @@ export default function DateRange(props: dateCardProps) {
                 value={endText}
                 min={startText}
                 error={!dateSpan.toValid}
-                // underline={underline}
                 onBlur={handleBlur}
                 doUpdate={doUpdate}
                 onChange={handleInput}
-                // onFocus={() => setUnderline(true)}
                 {...props}
               />
             </RngeTooltip>
@@ -149,6 +132,5 @@ export default function DateRange(props: dateCardProps) {
         </>
       )}
     </Grid>
-    // </div>
   );
 }

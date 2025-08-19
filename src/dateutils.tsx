@@ -58,8 +58,7 @@ import {
 import { step, dateRange, SliderProps } from "./interface";
 import { DATEUTILS } from "./constants";
 import { useDateFnsLocale, useLocalization } from "./localeutils";
-import { pl } from "date-fns/locale";
-
+//
 const { periodThis, periodGranularity } = DATEUTILS;
 
 // Arrow icons mapping
@@ -91,6 +90,16 @@ export const moveParms = (
 ): MoveParms => {
     const localization = useLocalization();
 
+     const periodTitle = {
+      day: localization.getDisplayName("Step_Day"),
+      week: localization.getDisplayName("Step_Week"),
+      pay: localization.getDisplayName("Step_Pay"),
+      month: localization.getDisplayName("Step_Month"),
+      quarter: localization.getDisplayName("Step_Quarter"),
+      year: localization.getDisplayName("Step_Year"),
+    };
+
+
   const isBack = bf === "b";
   const iconLabel = isBack ? localization.getDisplayName("dateUtilsMoveBack") : localization.getDisplayName("dateUtilsMoveForward");
   const iconT = isBack ? arrowIcons.arrowLeft : arrowIcons.arrowRight;
@@ -102,14 +111,14 @@ export const moveParms = (
     ? arrowIcons.arrowDoubleLeft
     : arrowIcons.arrowDoubleRight;
   const reduceExpand = ctrl ? localization.getDisplayName("dateUtilsMoveReduceBy") : localization.getDisplayName("dateUtilsMoveExtend");
-  const topRow1 = iconLabel + " a " + stepValue + (isBack ? " (L)" : " (N)");
+  const topRow1 = iconLabel + " a " + periodTitle[stepValue] + (isBack ? " (L)" : " (N)");
   const detailRow1 =
   localization.getDisplayName("dateUtilsMoveTheSelectedRange") + iconLabel.toLowerCase() +
   localization.getDisplayName("dateUtilsMoveByTheStepLevel");
   const topRow2 =
     reduceExpand +
-    " a " +
-    stepValue +
+    " " +
+    periodTitle[stepValue] +
     " " +
     (!ctrl ? iconLabel.toLowerCase() : isBack ? localization.getDisplayName("dateUtilsMoveForward") : localization.getDisplayName("dateUtilsMoveBack")) +
     (!ctrl
@@ -121,9 +130,9 @@ export const moveParms = (
       : " (shift + <)");
   const detailRow2 =
     reduceExpand +
-    " the selected range " +
+    localization.getDisplayName("dateUtilsMoveTheSelectedRange") +
     iconLabel.toLowerCase() +
-    " by the step level.";
+    localization.getDisplayName("dateUtilsMoveByTheStepLevel") ;
   return {
     isBack,
     placement: vert ? (isBack ? "left" : "right") : "bottom",
@@ -417,7 +426,7 @@ export const Increment = (
     {
       menu: periodThis.day,
       tip: localization.getDisplayName("startRange_today"),
-      plural: localization.getDisplayName("Step_Days"),
+      plural: localization.getDisplayName("stepDays"),
       step: periodGranularity.day,
       show: stepViz.day,
       thisPeriod: localization.getDisplayName("buttonText_today"),
@@ -427,7 +436,7 @@ export const Increment = (
     {
       menu: periodThis.week,
       tip: localization.getDisplayName("startRange_thisWeek"),
-      plural: localization.getDisplayName("Step_Weeks"),
+      plural: localization.getDisplayName("stepWeeks"),
       step: periodGranularity.week,
       show: stepViz.week,
       thisPeriod: localization.getDisplayName("buttonText_thisWeek"),
@@ -437,7 +446,7 @@ export const Increment = (
     {
       menu: periodThis.pay,
       tip: payProps?.desc,
-      plural: localization.getDisplayName("Step_Weeks"),
+      plural: localization.getDisplayName("stepWeeks"),
       step: periodGranularity.pay,
       show: stepViz.pay,
       thisPeriod: payProps?.desc,
@@ -447,7 +456,7 @@ export const Increment = (
     {
       menu: periodThis.month,
       tip: localization.getDisplayName("startRange_thisMonth"),
-      plural: localization.getDisplayName("Step_Months"),
+      plural: localization.getDisplayName("stepMonths"),
       step: periodGranularity.month,
       show: stepViz.month,
       thisPeriod: localization.getDisplayName("buttonText_thisMonth"),
@@ -457,7 +466,7 @@ export const Increment = (
     {
       menu: periodThis.quarter,
       tip: localization.getDisplayName("startRange_thisQuarter"),
-      plural: localization.getDisplayName("Step_Quarters"),
+      plural: localization.getDisplayName("stepQuarters"),
       step: periodGranularity.quarter,
       show: stepViz.quarter,
       thisPeriod: localization.getDisplayName("buttonText_thisQuarter"),
@@ -467,7 +476,7 @@ export const Increment = (
     {
       menu: periodThis.year,
       tip: localization.getDisplayName("startRange_thisYear"),
-      plural: localization.getDisplayName("Step_Years"),
+      plural: localization.getDisplayName("stepYears"),
       step: periodGranularity.year,
       show: stepViz.year,
       thisPeriod: localization.getDisplayName("buttonText_thisYear"),

@@ -85,10 +85,12 @@ export const settingProps = (
     rangeScope
   );
 
+  const getSync = restoreRangeFilter(options);
+
   const selectedDates =
-    startRange !== "sync" && !initialised
+    startRange !== "sync" && !initialised // && !getSync
       ? startupFilter
-      : restoreRangeFilter(options) || startupFilter;
+      : getSync || startupFilter;
 
   return {
     landingOff: optionsAreValid(options),

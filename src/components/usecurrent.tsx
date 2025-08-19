@@ -55,34 +55,40 @@ export default function UseCurrent(props: dateCardProps) {
               .map((item, index) => (
                 <DateIntervalPicker
                   handleVal={handleDate}
-                  item = {item}
+                  item={item}
                   key={`dip${item.thisRange}${index}`}
                 >
                   <RngeTooltip
                     title={undefined}
                     key={`rtt${item.thisRange}${index}`}
                     detailRow={
-                      item.menu !== "2" &&  item.menu !== "12"
-                        ?  `${useLocalization().getDisplayName("useCurrentRightClick")} [${item.plural}]`
+                      item.menu !== "2" && item.menu !== "12"
+                        ? `${useLocalization().getDisplayName(
+                            "useCurrentRightClick"
+                          )} [${item.plural}]`
                         : ``
                     }
                     placement="bottom"
                     topRow={
                       item.tip +
-                      (item.step === stepValue && item.menu !== "2" ? " (T)" : "")
+                      (item.step === stepValue && item.menu !== "2"
+                        ? " (T)"
+                        : "")
                     }
                   >
                     <IconButton
                       sx={
                         showIconText
                           ? {
-                                display: "flex",
-                                flexDirection: "row",
-                                justifyContent: "center",
-                                width: item.thisPeriod.length * 0.2 + "rem",
-                                minWidth: "24px",
-                                alignItems: "center",
-                                padding: "2px",top:"3px"
+                              display: "flex",
+                              whiteSpace: "nowrap",
+                              flexDirection: "row",
+                              justifyContent: "center",
+                              width: item.thisPeriod.length * 0.2 + "rem",
+                              minWidth: "36px",
+                              alignItems: "center",
+                              padding: "2px",
+                              top: "3px",
                             }
                           : { minWidth: "24px", padding: "2px" }
                       }
@@ -99,7 +105,6 @@ export default function UseCurrent(props: dateCardProps) {
                         }
                       }}
                     >
-
                       <Badge
                         sx={{
                           "& .MuiBadge-badge": showIconText
@@ -107,17 +112,22 @@ export default function UseCurrent(props: dateCardProps) {
                                 display: "flex",
                                 flexDirection: "row",
                                 minWidth: item.thisPeriod.length * 0.21 + "rem",
-                                padding: "2px", right: "-2px", top: "-2px",
-                                textTransform: 'none',
+                                padding: "2px",
+                                right: "-2px",
+                                top: "-2px",
+                                textTransform: "none",
                               }
-                            : { minWidth: "24px", padding: "2px" , top: "-3px"},
+                            : { minWidth: "24px", padding: "2px", top: "-3px" },
                         }}
                         badgeContent={
                           showIconText && (
                             <Typography
                               key={`typ${item.thisRange}${index}`}
                               variant="caption"
-                              sx={{ color: "text.primary", fontSize: "0.35rem" }}
+                              sx={{
+                                color: "text.primary",
+                                fontSize: "0.35rem",
+                              }}
                             >
                               {item.thisPeriod}
                             </Typography>
