@@ -426,7 +426,7 @@ export const Increment = (
     {
       menu: periodThis.day,
       tip: localization.getDisplayName("startRange_today"),
-      plural: localization.getDisplayName("stepDays"),
+      plural: localization.getDisplayName("Step_Days"),
       step: periodGranularity.day,
       show: stepViz.day,
       thisPeriod: localization.getDisplayName("buttonText_today"),
@@ -436,7 +436,7 @@ export const Increment = (
     {
       menu: periodThis.week,
       tip: localization.getDisplayName("startRange_thisWeek"),
-      plural: localization.getDisplayName("stepWeeks"),
+      plural: localization.getDisplayName("Step_Weeks"),
       step: periodGranularity.week,
       show: stepViz.week,
       thisPeriod: localization.getDisplayName("buttonText_thisWeek"),
@@ -446,7 +446,7 @@ export const Increment = (
     {
       menu: periodThis.pay,
       tip: payProps?.desc,
-      plural: localization.getDisplayName("stepWeeks"),
+      plural: localization.getDisplayName("Step_Weeks"),
       step: periodGranularity.pay,
       show: stepViz.pay,
       thisPeriod: payProps?.desc,
@@ -456,7 +456,7 @@ export const Increment = (
     {
       menu: periodThis.month,
       tip: localization.getDisplayName("startRange_thisMonth"),
-      plural: localization.getDisplayName("stepMonths"),
+      plural: localization.getDisplayName("Step_Months"),
       step: periodGranularity.month,
       show: stepViz.month,
       thisPeriod: localization.getDisplayName("buttonText_thisMonth"),
@@ -466,7 +466,7 @@ export const Increment = (
     {
       menu: periodThis.quarter,
       tip: localization.getDisplayName("startRange_thisQuarter"),
-      plural: localization.getDisplayName("stepQuarters"),
+      plural: localization.getDisplayName("Step_Quarters"),
       step: periodGranularity.quarter,
       show: stepViz.quarter,
       thisPeriod: localization.getDisplayName("buttonText_thisQuarter"),
@@ -476,7 +476,7 @@ export const Increment = (
     {
       menu: periodThis.year,
       tip: localization.getDisplayName("startRange_thisYear"),
-      plural: localization.getDisplayName("stepYears"),
+      plural: localization.getDisplayName("Step_Years"),
       step: periodGranularity.year,
       show: stepViz.year,
       thisPeriod: localization.getDisplayName("buttonText_thisYear"),

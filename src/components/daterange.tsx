@@ -2,9 +2,10 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import Remove from "@mui/icons-material/Remove";
 import { useTheme } from "@mui/material/styles";
-import { format, parse, isValid } from "date-fns";
+import { format, parse, isValid, isEqual } from "date-fns";
 
 import { useInputParms } from "../dateutils";
 import { DateField } from "./datefield";
@@ -13,8 +14,13 @@ import RngeTooltip from "./rngetooltip";
 import { dateCardProps, dateRange } from "../interface";
 import { useDateFnsLocale, useLocalization } from "../localeutils";
 
+// DateRange input with optional reset.
+// Uses the sync value if available; otherwise falls back to preset startup filter or scope.
+// The reset button appears on the separator only when a startup value exists.
+
 export default function DateRange(props: dateCardProps) {
-  const { dates, rangeScope, handleVal, singleDay, startupFilter, startRange } = props;
+  const { dates, rangeScope, handleVal, singleDay, startupFilter, startRange } =
+    props;
 
   const locale = useDateFnsLocale();
   const localization = useLocalization();
@@ -23,7 +29,8 @@ export default function DateRange(props: dateCardProps) {
 
   const tipDesc = `startRange_${startRange ?? ""}`;
   const tipDescription =
-    localization.getDisplayName(tipDesc) && localization.getDisplayName(tipDesc) !== tipDesc
+    localization.getDisplayName(tipDesc) &&
+    localization.getDisplayName(tipDesc) !== tipDesc
       ? localization.getDisplayName(tipDesc)
       : "Start Range";
 
@@ -33,6 +40,8 @@ export default function DateRange(props: dateCardProps) {
   const [endText, setEndText] = useState(() =>
     format(dates.end, "yyyy-MM-dd", { locale })
   );
+
+  const [hovered, setHovered] = useState(false);
 
   useEffect(() => {
     setStartText(format(dates.start, "yyyy-MM-dd", { locale }));
@@ -71,6 +80,14 @@ export default function DateRange(props: dateCardProps) {
     doUpdate(e.target.id as "start" | "end", e.target.value);
   };
 
+  // 🔑 determine if reset is available
+  const canReset =
+    startupFilter &&
+    (!isEqual(dates.start, startupFilter.start) ||
+      !isEqual(dates.end, startupFilter.end));
+
+  const showRefresh = hovered && canReset;
+
   return (
     <Grid container spacing={0.5} sx={{ paddingLeft: 0.3 }}>
       <Grid size="grow">
@@ -96,18 +113,51 @@ export default function DateRange(props: dateCardProps) {
       {!singleDay && (
         <>
           <RngeTooltip
-            topRow={(startRange === "sync") ? topRow : `${localization.getDisplayName("dateRangeResetTo")} ${tipDescription}`}
-            detailRow={(startRange === "sync") ? dateSpan.string: ""}
+            topRow={
+              canReset
+                ? `${localization.getDisplayName(
+                    "dateRangeResetTo"
+                  )} ${tipDescription}`
+                : tipDescription
+            }
+            infoRow={
+              canReset && startupFilter
+                ? `${format(startupFilter.start, "yyyy-MM-dd", { locale })}${
+                    startupFilter.start !== startupFilter.end
+                      ? " - " +
+                        format(startupFilter.end, "yyyy-MM-dd", { locale })
+                      : ""
+                  }`
+                : undefined
+            }
             placement="bottom-start"
           >
-            <IconButton
-              size="small"
-              onClick={(event) =>
-             (startRange != "sync") && startupFilter && event.button === 0 ? handleDate(startupFilter) : undefined
-              }
+            <span
+              onMouseEnter={() => setHovered(true)}
+              onMouseLeave={() => setHovered(false)}
             >
-              <Remove style={{ fontSize: theme.typography.fontSize }} color="disabled" />
-            </IconButton>
+              {showRefresh ? (
+                <IconButton
+                  size="small"
+                  onClick={() =>
+                    canReset && startupFilter
+                      ? handleDate(startupFilter)
+                      : undefined
+                  }
+                >
+                  <RefreshIcon
+                    style={{ fontSize: theme.typography.fontSize }}
+                  />
+                </IconButton>
+              ) : (
+                <IconButton size="small" disabled={!canReset}>
+                  <Remove
+                    style={{ fontSize: theme.typography.fontSize }}
+                    color={canReset ? "action" : "disabled"}
+                  ></Remove>
+                </IconButton>
+              )}
+            </span>
           </RngeTooltip>
 
           <Grid size="grow">

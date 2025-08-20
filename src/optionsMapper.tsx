@@ -78,23 +78,33 @@ export const settingProps = (
   const yearStartMonth = getNum(year.yearStartMonth.value);
   const startRange = String(calendar.startRange.value);
 
-  const startupFilter = getInitRange(
+  // Default initial range (non-sync)
+  const startup_Filter = getInitRange(
     startRange,
     weekStartDay,
     yearStartMonth,
     rangeScope
   );
 
-  const getSync = restoreRangeFilter(options);
+  // Try to restore from synced filter
+  const syncFilter = restoreRangeFilter(options);
 
-  const selectedDates =
-    startRange !== "sync" && !initialised // && !getSync
-      ? startupFilter
-      : getSync || startupFilter;
+  // Decide which to use for `dates`
+  let selectedDates: dateRange;
+  if (syncFilter) {
+    // ✅ always prioritise sync’d values for current dates
+    selectedDates = syncFilter;
+  } else if (!initialised) {
+    // first-time init fallback
+    selectedDates = startup_Filter;
+  } else {
+    // fallback if already initialised and no sync found
+    selectedDates = startup_Filter;
+  }
 
   return {
     landingOff: optionsAreValid(options),
-    dates: selectedDates,
+    dates: singleDay ? startup_Filter : selectedDates,
     rangeScope,
     startRange,
     weekStartDay,
@@ -102,7 +112,10 @@ export const settingProps = (
     stepInit,
     singleDay,
     limitToScope,
-    startupFilter,
+
+    // 👇 persist the resolved value (not just startup_Filter)
+    startupFilter: startup_Filter,
+
     stepSkip: {
       day: day.daySkip.value,
       week: week.weekSkip.value,
