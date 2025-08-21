@@ -62,7 +62,7 @@ import { useDateFnsLocale, useLocalization } from "./localeutils";
 const { periodThis, periodGranularity } = DATEUTILS;
 
 // Arrow icons mapping
-const arrowIcons = {
+export const arrowIcons = {
   arrowLeft: <KeyboardArrowLeft fontSize="inherit" />,
   arrowDoubleLeft: <KeyboardDoubleArrowLeft fontSize="inherit" />,
   arrowRight: <KeyboardArrowRight fontSize="inherit" />,
@@ -88,20 +88,27 @@ export const moveParms = (
   ctrl: boolean,
   stepValue: string
 ): MoveParms => {
-    const localization = useLocalization();
-
-     const periodTitle = {
-      day: localization.getDisplayName("Step_Day"),
-      week: localization.getDisplayName("Step_Week"),
-      pay: localization.getDisplayName("Step_Pay"),
-      month: localization.getDisplayName("Step_Month"),
-      quarter: localization.getDisplayName("Step_Quarter"),
-      year: localization.getDisplayName("Step_Year"),
-    };
-
+  const localization = useLocalization();
 
   const isBack = bf === "b";
-  const iconLabel = isBack ? localization.getDisplayName("dateUtilsMoveBack") : localization.getDisplayName("dateUtilsMoveForward");
+
+  const stepLabels = {
+    day: localization.getDisplayName("Step_Day"),
+    week: localization.getDisplayName("Step_Week"),
+    pay: localization.getDisplayName("Step_Pay"),
+    month: localization.getDisplayName("Step_Month"),
+    quarter: localization.getDisplayName("Step_Quarter"),
+    year: localization.getDisplayName("Step_Year"),
+  };
+
+  const periodLabel = stepLabels[stepValue];
+  const moveLabel = isBack
+    ? localization.getDisplayName("dateUtilsMoveBack")
+    : localization.getDisplayName("dateUtilsMoveForward");
+  const reduceExpand = ctrl
+    ? localization.getDisplayName("dateUtilsMoveReduceBy")
+    : localization.getDisplayName("dateUtilsMoveExtend");
+
   const iconT = isBack ? arrowIcons.arrowLeft : arrowIcons.arrowRight;
   const iconB = ctrl
     ? isBack
@@ -110,33 +117,39 @@ export const moveParms = (
     : isBack
     ? arrowIcons.arrowDoubleLeft
     : arrowIcons.arrowDoubleRight;
-  const reduceExpand = ctrl ? localization.getDisplayName("dateUtilsMoveReduceBy") : localization.getDisplayName("dateUtilsMoveExtend");
-  const topRow1 = iconLabel + " a " + periodTitle[stepValue] + (isBack ? " (L)" : " (N)");
-  const detailRow1 =
-  localization.getDisplayName("dateUtilsMoveTheSelectedRange") + iconLabel.toLowerCase() +
-  localization.getDisplayName("dateUtilsMoveByTheStepLevel");
-  const topRow2 =
-    reduceExpand +
-    " " +
-    periodTitle[stepValue] +
-    " " +
-    (!ctrl ? iconLabel.toLowerCase() : isBack ? localization.getDisplayName("dateUtilsMoveForward") : localization.getDisplayName("dateUtilsMoveBack")) +
-    (!ctrl
-      ? isBack
-        ? " (ctrl + <)"
-        : " (ctrl + >)"
+
+  // --- Helpers to keep template clean ---
+  const ctrlHint = (): string => {
+    if (!ctrl) return isBack ? " (ctrl + <)" : " (ctrl + >)";
+    return isBack ? " (shift + >)" : " (shift + <)";
+  };
+
+  const directionWord = (): string =>
+    !ctrl
+      ? moveLabel.toLowerCase()
       : isBack
-      ? " (shift + >)"
-      : " (shift + <)");
-  const detailRow2 =
-    reduceExpand +
-    localization.getDisplayName("dateUtilsMoveTheSelectedRange") +
-    iconLabel.toLowerCase() +
-    localization.getDisplayName("dateUtilsMoveByTheStepLevel") ;
+      ? localization.getDisplayName("dateUtilsMoveForward")
+      : localization.getDisplayName("dateUtilsMoveBack");
+
+  // --- Tooltip content ---
+  const topRow1 = `${moveLabel} a ${periodLabel}${isBack ? " (L)" : " (N)"}`;
+  const detailRow1 = `${localization.getDisplayName(
+    "dateUtilsMoveTheSelectedRange"
+  )}${moveLabel.toLowerCase()}${localization.getDisplayName(
+    "dateUtilsMoveByTheStepLevel"
+  )}`;
+
+  const topRow2 = `${reduceExpand} ${periodLabel} ${directionWord()}${ctrlHint()}`;
+  const detailRow2 = `${reduceExpand}${localization.getDisplayName(
+    "dateUtilsMoveTheSelectedRange"
+  )}${moveLabel.toLowerCase()}${localization.getDisplayName(
+    "dateUtilsMoveByTheStepLevel"
+  )}`;
+
   return {
     isBack,
     placement: vert ? (isBack ? "left" : "right") : "bottom",
-    iconLabel,
+    iconLabel: moveLabel,
     iconT,
     iconB,
     reduceExpand,

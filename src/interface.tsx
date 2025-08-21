@@ -118,12 +118,10 @@ export interface Settings {
     setStepValue?: (value: string) => void;
     setStepOpen?: (value: boolean) => void;
     toggleSlider?: () => void;
-
   };
 }
 
 export interface dateCardProps {
-
   // date range object representing the selected date range
   dates?: dateRange;
 
@@ -242,6 +240,9 @@ export interface dateCardProps {
   //extras for topRow
   openSlider?: boolean;
   toggleSlider?: () => void;
+  localization?: {
+    getDisplayName: (key: string) => string;
+  };
 
 }
 
@@ -271,20 +272,11 @@ export interface topRowProps {
   enableSlider?: boolean;
 }
 
-export interface DateMoveProps {
-  dates?: dateRange;
-  rangeScope?: dateRange;
-  stepValue?: string;
-  payProps?: pay;
+export interface dateMoveProps extends dateCardProps {
   bf?: string;
-  viz?: boolean;
   vertical?: boolean;
   reverse?: boolean;
-  render?: number;
-  handleVal?: (val) => void;
-  singleDay?: boolean;
-  limitToScope?: boolean;
-  showExpand?: boolean;
+  handleVal?: (val: any) => void;
 }
 
 export interface stepProps {
@@ -295,6 +287,7 @@ export interface stepProps {
   viz?: boolean;
   handleStep?: (newValue: string) => void;
   handleViz?: (viz: boolean) => void;
+  handleClick?: (event: React.MouseEvent<HTMLElement>) => void;
   onClick?: (event: React.MouseEvent<HTMLElement>) => void;
 }
 

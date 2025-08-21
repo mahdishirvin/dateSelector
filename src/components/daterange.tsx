@@ -19,11 +19,11 @@ import { useDateFnsLocale, useLocalization } from "../localeutils";
 // The reset button appears on the separator only when a startup value exists.
 
 export default function DateRange(props: dateCardProps) {
-  const { dates, rangeScope, handleVal, singleDay, startupFilter, startRange } =
+  const { dates, rangeScope, handleVal, singleDay, startupFilter, startRange, localization } =
     props;
 
   const locale = useDateFnsLocale();
-  const localization = useLocalization();
+  // const localization = useLocalization();
   const theme = useTheme();
   const { showExtendedTooltip } = useHelpContext();
 

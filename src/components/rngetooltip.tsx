@@ -21,54 +21,69 @@ const RngeTooltip: React.FC<RngeTooltipProps> = ({
   disableTooltip = false,
   children,
   infoRow,
-  detailFlag = useHelpContext().showExtendedTooltip,
+  detailFlag,
   ...tooltipProps
 }) => {
-  const { showTooltip } = useHelpContext();
+  const { showTooltip, showExtendedTooltip } = useHelpContext();
 
+  const effectiveDetailFlag = detailFlag ?? showExtendedTooltip;
   const shouldShow = showTooltip && !disableTooltip;
-  const content = detailFlag ? (
-    <div>
-      {topRow ||
-        (title && (
-          <div style={{ fontWeight: "bold" }}>{topRow ? topRow : title}</div>
-        ))}
-      {detailRow && <div>{detailRow}</div>}
-      {infoRow && <div style={{ fontStyle: "italic" }}>{infoRow}</div>}
-    </div>
-  ) : (
-    title || topRow
-  );
 
-  if (!shouldShow || !content) return children;
+  const content = React.useMemo(() => {
+    if (!effectiveDetailFlag) {
+      // If not in extended mode, return the top row or title.
+      return topRow || title || null;
+    }
+
+    // In extended mode, build the detailed tooltip content.
+    const header = topRow || title;
+    return (
+      <div style={{ padding: "8px", boxSizing: "border-box" }}>
+        {header && <div style={{ fontWeight: "bold" }}>{header}</div>}
+        {detailRow && <div>{detailRow}</div>}
+        {infoRow && <div style={{ fontStyle: "italic" }}>{infoRow}</div>}
+      </div>
+    );
+  }, [effectiveDetailFlag, topRow, title, detailRow, infoRow]);
+
+  if (!shouldShow || !content) {
+    return children;
+  }
 
   return (
     <Tooltip
       enterDelay={500}
       title={content}
+      arrow
       slotProps={{
         popper: {
-          modifiers: [
-            {
-              name: "offset",
-              options: { offset: [0, -5] },
-            },
-          ],
+          modifiers: [{ name: "offset", options: { offset: [0, -5] } }],
         },
         tooltip: {
           sx: (theme) => ({
-            backgroundColor: theme.palette.text.primary,
-            color: theme.palette.background.paper,
-            fontSize: theme.typography.pxToRem(11),
-            padding: theme.spacing(1),
+            backgroundColor: theme.palette.background.paper,
+            color: theme.palette.text.primary,
+            fontFamily: theme.typography.fontFamily,
+            padding: "4px",
+            boxShadow: theme.shadows[4],
+            // backgroundColor: theme.palette.text.primary,
+            // color: theme.palette.background.paper,
+            // fontSize: theme.typography.pxToRem(11),
+            // Set border-radius to 0 to make the corners sharp
+            borderRadius: 0,
+            // Removed padding here since it's now in the content div
             maxWidth: 250,
+            // Added a border for better definition
+            // border: `1px solid ${theme.palette.text.secondary}`,
           }),
         },
         arrow: {
           sx: (theme) => ({
-            color: theme.palette.text.primary,
+            "&::before": {
+              backgroundColor: theme.palette.background.paper,
+            },
           }),
-        },
+        }
       }}
       {...tooltipProps}
     >
@@ -78,16 +93,3 @@ const RngeTooltip: React.FC<RngeTooltipProps> = ({
 };
 
 export default RngeTooltip;
-interface valueProps {
-  children: React.ReactElement;
-  index: number;
-}
-export function ValueLabel(props: valueProps) {
-  const { children, index } = props;
-  const loc = index === 0 ? "top-end" : "bottom-start";
-  return (
-    <RngeTooltip enterTouchDelay={0} placement={loc} arrow>
-      {children}
-    </RngeTooltip>
-  );
-}

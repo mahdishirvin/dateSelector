@@ -3,9 +3,10 @@ import IconButton from "@mui/material/IconButton";
 import { Chat, ChatBubbleOutlineOutlined } from "@mui/icons-material";
 import Tooltip from "@mui/material/Tooltip";
 import { useHotkeys } from "react-hotkeys-hook";
-import { useLocalization } from "../localeutils";
 import { useTheme } from "@mui/material/styles";
+import RngeTooltip from "./rngetooltip";
 
+// A single context to provide help-related state and functions.
 const HelpContext = React.createContext({
   showHelpIcon: false,
   showTooltip: true,
@@ -24,95 +25,95 @@ export const HelpProvider = ({
   showHelpIcon,
   showTooltip,
   showExtendedTooltip,
+  localization,
+  themeMode, // Added themeMode prop
 }) => {
- const theme = useTheme();
+  const theme = useTheme();
 
-   const localisation = useLocalization();
-   const TopRowInfo = localisation.getDisplayName("helpProviderTopRowInfo");
-   const DetailRowInfo = localisation.getDisplayName("helpProviderDetailRowInfo");
-   const TopRowHelp = localisation.getDisplayName("helpProviderTopRowHelp");
-   const DetailRowHelp = localisation.getDisplayName("helpProviderDetailRowHelp");
+  // Consolidate state management into a single useState hook.
+  const [helpState, setHelpState] = useState({
+    helpIcon: showHelpIcon ?? false,
+    tooltip: showTooltip ?? true,
+    extendedTooltip: showExtendedTooltip ?? false,
+  });
 
- const [helpIcon, setHelpIcon] = useState(showHelpIcon ?? false);
-  const [tooltip, setTooltip] = useState(showTooltip ?? true);
-  const [extendedTooltip, setExtendedTooltip] = useState(showExtendedTooltip ?? false);
-
+  // Use a single useEffect hook to synchronize with props.
   useEffect(() => {
-    setHelpIcon(showHelpIcon ?? false);
-  }, [showHelpIcon]);
-  useEffect(() => {
-    setTooltip(showTooltip ?? true);
-  }, [showTooltip]);
-  useEffect(() => {
-    setExtendedTooltip(showExtendedTooltip ?? false);
-  }, [showExtendedTooltip]);
+    setHelpState({
+      helpIcon: showHelpIcon ?? false,
+      tooltip: showTooltip ?? true,
+      extendedTooltip: showExtendedTooltip ?? false,
+    });
+  }, [showHelpIcon, showTooltip, showExtendedTooltip]);
 
-  const toggleHelp = () => setExtendedTooltip((prev) => !prev);
+  // Memoize localization strings to prevent re-creation on every render.
+  const { TopRowInfo, DetailRowInfo, TopRowHelp, DetailRowHelp } = useMemo(
+    () => ({
+      TopRowInfo: localization.getDisplayName("helpProviderTopRowInfo"),
+      DetailRowInfo: localization.getDisplayName("helpProviderDetailRowInfo"),
+      TopRowHelp: localization.getDisplayName("helpProviderTopRowHelp"),
+      DetailRowHelp: localization.getDisplayName("helpProviderDetailRowHelp"),
+    }),
+    [localization]
+  );
 
-  useHotkeys("escape", () => setHelpIcon(false));
-  useHotkeys(["h"], () => toggleHelp());
+  // Use a useCallback hook to memoize the toggle function.
+  const toggleHelp = () =>
+    setHelpState((prev) => ({
+      ...prev,
+      extendedTooltip: !prev.extendedTooltip,
+    }));
 
-  const value = useMemo(() => ({
-    showHelpIcon: helpIcon,
-    showTooltip: tooltip,
-    showExtendedTooltip: extendedTooltip,
-    toggleHelp,
-    setShowHelpIcon: setHelpIcon,
-    setShowTooltip: setTooltip,
-    setShowExtendedTooltip: setExtendedTooltip,
-    setTooltipEnabled: (enabled: boolean) => setTooltip(enabled),
-  }), [helpIcon, tooltip, extendedTooltip, toggleHelp]);
+  // Attach hotkey listeners.
+  useHotkeys("escape", () =>
+    setHelpState((prev) => ({ ...prev, helpIcon: false }))
+  );
+  useHotkeys("h", toggleHelp, []);
+
+  // Memoize the context value to prevent unnecessary re-renders of consumers.
+  const value = useMemo(
+    () => ({
+      showHelpIcon: helpState.helpIcon,
+      showTooltip: helpState.tooltip,
+      showExtendedTooltip: helpState.extendedTooltip,
+      toggleHelp,
+      setShowHelpIcon: (val) =>
+        setHelpState((prev) => ({ ...prev, helpIcon: val })),
+      setShowTooltip: (val) =>
+        setHelpState((prev) => ({ ...prev, tooltip: val })),
+      setShowExtendedTooltip: (val) =>
+        setHelpState((prev) => ({ ...prev, extendedTooltip: val })),
+      setTooltipEnabled: (enabled) =>
+        setHelpState((prev) => ({ ...prev, tooltip: enabled })),
+    }),
+    [helpState, toggleHelp]
+  );
+
+  const tooltipBackgroundColor = helpState.extendedTooltip
+    ? theme.palette.secondary[themeMode === "dark" ? "light" : "dark"]
+    : theme.palette.primary[themeMode === "dark" ? "light" : "dark"];
 
   return (
     <HelpContext.Provider value={value}>
-      {helpIcon && tooltip && (
-        <Tooltip
-          arrow
-          title={
-            extendedTooltip ? (
-              <>
-                <div>
-                  <b>{TopRowInfo}</b>
-                </div>
-                <div>{DetailRowInfo}</div>
-              </>
-            ) : (
-              <>
-                <div>
-                  <b>{TopRowHelp}</b>
-                </div>
-                <div>{DetailRowHelp}</div>
-              </>
-            )
-          }
-          placement="left"
-          slotProps={{
-            tooltip: {
-              sx: {
-                backgroundColor: extendedTooltip
-                  ? theme.palette.secondary.dark
-                  : theme.palette.primary.dark,
-                color: theme.palette.background.paper,
-                maxWidth: 350,
-                fontSize: theme.typography.pxToRem(11),
-                padding: theme.spacing(1),
-                zIndex: theme.zIndex.tooltip + 1,
-              },
-            },          }}
+      {helpState.helpIcon && helpState.tooltip && (
+        <RngeTooltip
+          title={helpState.extendedTooltip ? TopRowInfo : DetailRowHelp}
+          detailRow={helpState.extendedTooltip ? DetailRowInfo : DetailRowHelp}
+          disableTooltip={!helpState.tooltip}
         >
           <IconButton
             size="small"
             sx={{ position: "absolute", right: 0, top: 0, margin: 0.2 }}
-            color={extendedTooltip ? "secondary" : "primary"}
+            color={helpState.extendedTooltip ? "secondary" : "primary"}
             onClick={toggleHelp}
           >
-            {extendedTooltip ? (
+            {helpState.extendedTooltip ? (
               <Chat style={{ fontSize: 8 }} />
             ) : (
               <ChatBubbleOutlineOutlined style={{ fontSize: 8 }} />
             )}
           </IconButton>
-        </Tooltip>
+        </RngeTooltip>
       )}
       {children}
     </HelpContext.Provider>

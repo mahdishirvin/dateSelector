@@ -8,53 +8,78 @@ import StepToggle from "./steptoggle";
 import { dateCardProps } from "../interface";
 
 function DateInput(props: dateCardProps) {
+  // Destructure props for a clear overview and to avoid prop-drilling
+  const {
+    showMove,
+    stepOpen,
+    openSlider,
+    handleClick,
+    handleVal,
+    dates,
+    stepValue,
+    localization,
+    ...otherProps
+  } = props;
+
   return (
     <>
-      <Grid
-        size="auto"
-        sx={{
-          paddingRight: 1,
-        }}
-      >
-        <DateRange
-          {...props}
-        />
+      <Grid  sx={{ paddingRight: 1 }}>
+        {/* Pass the dates prop explicitly to the DateRange component */}
+        <DateRange dates={dates} {...otherProps} />
       </Grid>
-      {props.showMove && (
+
+      {/* Conditionally render the entire movement section */}
+      {showMove && (
         <Grid container>
-          <Zoom in={props.showMove}>
-            <Grid size="auto">
-              <DateMove {...props}
-                bf={"b"}
+          {/* Backwards movement button */}
+          <Zoom in={showMove}>
+            <Grid >
+              <DateMove
+                dates={dates}
+                stepValue={stepValue}
+                handleVal={handleVal}
+                bf="b"
                 vertical={false}
                 reverse={true}
+                showExpand={true}
+                localization={localization} // Pass localization prop
               />
             </Grid>
           </Zoom>
-          <Grid
-            size="auto"
-            sx={{
-              paddingRight: 1,
-            }}
-          >
-             <StepToggle {...props} onClick={props.handleClick} />
-             </Grid>
-          <Zoom in={props.stepOpen}>
-            <Grid size="auto">
-              <StepsMenu {...props}
-                viz={props.stepOpen}
-              />
-            </Grid>
-          </Zoom>
-          {/* <Zoom in={openSlider}> */}
-          <Grid size="auto">
-            <DateMove {...props}
-              bf={"f"}
-              vertical={false}
-              reverse={false}
-              viz={props.openSlider}
+
+          {/* Toggle for the steps menu */}
+          <Grid  sx={{ paddingRight: 1 }}>
+            <StepToggle
+              stepValue={stepValue}
+              handleClick={handleClick}
+              {...otherProps}
             />
           </Grid>
+
+          {/* Steps menu */}
+          <Zoom in={stepOpen}>
+            <Grid >
+              <StepsMenu
+                stepValue={stepValue}
+                {...otherProps}
+              />
+            </Grid>
+          </Zoom>
+
+          {/* Forward movement button, controlled by the openSlider prop */}
+          {/* <Zoom in={openSlider}> */}
+            <Grid >
+              <DateMove
+                dates={dates}
+                stepValue={stepValue}
+                handleVal={handleVal}
+                bf="f"
+                vertical={false}
+                reverse={false}
+                showExpand={true}
+                localization={localization} // Pass localization prop
+              />
+            </Grid>
           {/* </Zoom> */}
         </Grid>
       )}
