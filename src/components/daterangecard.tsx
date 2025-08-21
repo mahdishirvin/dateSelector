@@ -25,7 +25,7 @@ import { compareAsc } from "date-fns";
 export default function DateRangeCard(props: dateCardProps) {
   // If the landing page is not disabled, render it and exit early.
   if (!props.landingOff) {
-    return <LandingPage />;
+    return <LandingPage  />;
   }
 
   // Memoize the theme creation to avoid re-calculating on every render.
@@ -46,7 +46,7 @@ export default function DateRangeCard(props: dateCardProps) {
   const [stepOpen, setStepOpen] = useState<boolean>(false);
 
   // Memoize the current value to avoid unnecessary recalculations.
-  const current = React.useMemo(
+  const current = useMemo(
     () =>
       Increment(
         props.stepViz,
@@ -75,7 +75,7 @@ export default function DateRangeCard(props: dateCardProps) {
   // Use useCallback to memoize the toggle functions, preventing them from
   // being recreated on every render. This optimizes child component rendering.
   const toggleSlider = useCallback(() => setOpenSlider((prev) => !prev), []);
-  // const toggleStepOpen = useCallback(() => setStepOpen((prev) => !prev), []);
+  const toggleStepOpen = useCallback(() => setStepOpen((prev) => !prev), []);
 
   // Use a single useEffect for side effects related to the document.
   React.useEffect(() => {
@@ -116,14 +116,19 @@ export default function DateRangeCard(props: dateCardProps) {
       >
         <TopRow
           {...props}
+          dates={props.dates}
+          showMore={props.showMore}
+          showMove={props.showMove}
+          localization={props.localization}
+          showSlider={props.showSlider}
           openSlider={openSlider}
           toggleSlider={toggleSlider}
           stepOpen={stepOpen}
           stepValue={stepValue}
           handleVal={onChangeVal}
-          handleClick={() => setStepOpen(!stepOpen)}
-          setStepOpen={setStepOpen}
+          handleClick={toggleStepOpen}
           setStepValue={setStepValue}
+          setStepOpen={setStepOpen}
           current={current}
         />
         <Zoom in={openSlider}>
@@ -131,8 +136,11 @@ export default function DateRangeCard(props: dateCardProps) {
             <Grid size="grow" sx={{ marginLeft: 1, paddingTop: 0.1 }}>
               <RangeSlider
                 {...props}
-                stepValue={stepValue}
+                dates={props.dates}
                 handleVal={onChangeVal}
+                stepValue={stepValue}
+                rangeScope={props.rangeScope}
+                localization={props.localization}
               />
             </Grid>
           </Grid>

@@ -6,20 +6,29 @@ import { useLocalization } from "../localeutils";
 interface ToggleSliderButtonProps {
   openSlider: boolean;
   toggleSlider: () => void;
+  localization?: {
+    getDisplayName: (key: string) => string;
+  };
 }
 
 function ToggleSliderButton({
   openSlider,
   toggleSlider,
+  localization,
 }: ToggleSliderButtonProps) {
-
-  const localisation = useLocalization();
-
-  const TopRowOpen = localisation.getDisplayName("toggleSliderButtonTopRowOpen");
-  const TopRowClosed = localisation.getDisplayName("toggleSliderButtonTopRowClosed");
-  const TopRowEnd = localisation.getDisplayName("toggleSliderButtonTopRowEnd");
-  const DetailRowOpen = localisation.getDisplayName("toggleSliderButtonDetailRowOpen");
-  const DetailRowClosed = localisation.getDisplayName("toggleSliderButtonDetailRowClosed");
+  const TopRowOpen = localization.getDisplayName(
+    "toggleSliderButtonTopRowOpen"
+  );
+  const TopRowClosed = localization.getDisplayName(
+    "toggleSliderButtonTopRowClosed"
+  );
+  const TopRowEnd = localization.getDisplayName("toggleSliderButtonTopRowEnd");
+  const DetailRowOpen = localization.getDisplayName(
+    "toggleSliderButtonDetailRowOpen"
+  );
+  const DetailRowClosed = localization.getDisplayName(
+    "toggleSliderButtonDetailRowClosed"
+  );
 
   const topRow = (openSlider ? TopRowOpen : TopRowClosed) + TopRowEnd;
   const detailRow = openSlider ? DetailRowOpen : DetailRowClosed;

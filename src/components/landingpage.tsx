@@ -1,25 +1,13 @@
-import * as React from "react";
-import { styled } from "@mui/material/styles";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import Tooltip, { TooltipProps, tooltipClasses } from "@mui/material/Tooltip";
 import Icon from "@mui/material/Icon";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { useLocalization } from "../localeutils";
+import RngeTooltip from "./rngetooltip";
 // This component serves as a landing page for the Date Range Slicer visual in Power BI.
 // It provides a brief description and a visual representation of the slicer when no date field is selected.
 
-const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
-  <Tooltip {...props} classes={{ popper: className }} />
-))(({ theme }) => ({
-  [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: theme.palette.background.paper, // "#fefefe",
-    color: theme.palette.text.primary, // "rgba(0, 0, 0, 0.87)",
-    maxWidth: "80vw",
-    boxShadow: theme.shadows[2],
-  },
-}));
 
 export default function LandingPage() {
   const localisation = useLocalization();
@@ -38,42 +26,11 @@ export default function LandingPage() {
       }}
     >
       <Grid size="auto">
-        <HtmlTooltip
-          arrow
-          slotProps={{
-            popper: {
-              modifiers: [
-                {
-                  name: "offset",
-                  options: {
-                    offset: [0, -14],
-                  },
-                },
-              ],
-            },
-          }}
+        <RngeTooltip
           placement="right-start"
-          title={
-            <React.Fragment>
-              <Typography
-                sx={{
-                  fontSize: "0.7rem",
-                }}
-                color="theme.palette.text.primary"
-              >
-                {tipTitle}
-              </Typography>
-              <Typography
-                sx={{
-                  fontWeight: "light",
-                  fontSize: "0.6rem",
-                }}
-                color="theme.palette.text.primary"
-              >
-                {tipDescription}
-              </Typography>
-            </React.Fragment>
-          }
+          detailFlag={true}
+          topRow={tipTitle}
+          detailRow={tipDescription}
         >
           <Icon
             color="disabled"
@@ -87,19 +44,19 @@ export default function LandingPage() {
           >
             <InfoOutlinedIcon style={{ fontSize: "1.2rem" }} />
           </Icon>
-        </HtmlTooltip>
+        </RngeTooltip>
       </Grid>
       <Grid size="grow">
         <Typography
           variant="body1"
           gutterBottom
           color="textDisabled"
-            sx={{
-              fontWeight: "light",
-              fontSize: "0.8rem",
-              padding: 0.5,
-              cursor: "default",
-            }}
+          sx={{
+            fontWeight: "light",
+            fontSize: "0.8rem",
+            padding: 0.5,
+            cursor: "default",
+          }}
         >
           {tipButton}
         </Typography>
@@ -114,33 +71,33 @@ export default function LandingPage() {
             xmlns="http://www.w3.org/2000/svg"
             height="80vh"
             width="80vw"
-            viewBox="0 0 881 227"
+            viewBox="0 0 800 200"
           >
             <g transform="translate(-100 -109)">
               <rect
-                width="881"
-                height="227"
+                width="800"
+                height="200"
                 transform="translate(100 109)"
-                fill="#f4f4f4"
+                fill="#f4f4f433"
               />
               <rect
                 width="197"
                 height="52"
                 transform="translate(156 152)"
-                fill="#d2d3d4"
+                fill="#d2d3d433"
               />
               <rect
                 width="197"
                 height="52"
                 transform="translate(372 152)"
-                fill="#d2d3d4"
+                fill="#d2d3d433"
               />
               <line
                 x2="809"
                 y2="1"
                 transform="translate(138.5 264.5)"
                 fill="none"
-                stroke="#d2d3d4"
+                stroke="#d2d3d433"
                 stroke-width="4"
               />
               <line
@@ -148,13 +105,13 @@ export default function LandingPage() {
                 x2="464"
                 transform="translate(336.5 263.5)"
                 fill="none"
-                stroke="#d2d3d4"
+                stroke="#d2d3d433"
                 stroke-width="5"
               />
               <g
                 transform="translate(800 253)"
-                fill="#d2d3d4"
-                stroke="#d2d3d4"
+                fill="#d2d3d433"
+                stroke="#d2d3d433"
                 stroke-width="3"
               >
                 <circle cx="12" cy="12" r="12" stroke="none" />
@@ -162,8 +119,8 @@ export default function LandingPage() {
               </g>
               <g
                 transform="translate(312 253)"
-                fill="#d2d3d4"
-                stroke="#d2d3d4"
+                fill="#d2d3d433"
+                stroke="#d2d3d433"
                 stroke-width="3"
               >
                 <circle cx="12" cy="12" r="12" stroke="none" />

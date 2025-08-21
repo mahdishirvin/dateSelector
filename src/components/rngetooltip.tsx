@@ -52,7 +52,7 @@ const RngeTooltip: React.FC<RngeTooltipProps> = ({
 
   return (
     <Tooltip
-      enterDelay={500}
+      enterDelay={1000}
       title={content}
       arrow
       slotProps={{
@@ -66,15 +66,8 @@ const RngeTooltip: React.FC<RngeTooltipProps> = ({
             fontFamily: theme.typography.fontFamily,
             padding: "4px",
             boxShadow: theme.shadows[4],
-            // backgroundColor: theme.palette.text.primary,
-            // color: theme.palette.background.paper,
-            // fontSize: theme.typography.pxToRem(11),
-            // Set border-radius to 0 to make the corners sharp
             borderRadius: 0,
-            // Removed padding here since it's now in the content div
-            maxWidth: 250,
-            // Added a border for better definition
-            // border: `1px solid ${theme.palette.text.secondary}`,
+            maxWidth: 350,
           }),
         },
         arrow: {

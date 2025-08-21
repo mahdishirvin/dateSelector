@@ -9,19 +9,18 @@ import RngeTooltip from "./rngetooltip";
 import { useLocalization } from "../localeutils";
 
 export default function StepToggle(props: stepProps) {
-  const { stepViz, stepValue, viz, handleStep, onClick } = props;
+  const { stepViz, stepValue, viz, handleStep, handleClick, localization } = props;
 
-    const localisation = useLocalization();
-    const TopRow = localisation.getDisplayName("stepToggleTopRow");
-    const DetailRow = localisation.getDisplayName("stepToggleDetailRow");
-    const periodTitle = {
-      day: localisation.getDisplayName("Step_Day"),
-      week: localisation.getDisplayName("Step_Week"),
-      pay: localisation.getDisplayName("Step_Pay"),
-      month: localisation.getDisplayName("Step_Month"),
-      quarter: localisation.getDisplayName("Step_Quarter"),
-      year: localisation.getDisplayName("Step_Year"),
-    };
+  const TopRow = localization.getDisplayName("stepToggleTopRow");
+  const DetailRow = localization.getDisplayName("stepToggleDetailRow");
+  const periodTitle = {
+    day: localization.getDisplayName("Step_Day"),
+    week: localization.getDisplayName("Step_Week"),
+    pay: localization.getDisplayName("Step_Pay"),
+    month: localization.getDisplayName("Step_Month"),
+    quarter: localization.getDisplayName("Step_Quarter"),
+    year: localization.getDisplayName("Step_Year"),
+  };
 
   const keyHandler = (period) => {
     if (handleStep && stepViz[period]) {
@@ -30,7 +29,9 @@ export default function StepToggle(props: stepProps) {
   };
 
   const trueKeys = Object.keys(stepViz).filter((key) => stepViz[key]);
-  const ShortCut = trueKeys.map((key) => key.charAt(0).toUpperCase()).join(", ");
+  const ShortCut = trueKeys
+    .map((key) => key.charAt(0).toUpperCase())
+    .join(", ");
 
   useHotkeys("d", () => keyHandler("day"));
   useHotkeys("w", () => keyHandler("week"));
@@ -41,12 +42,17 @@ export default function StepToggle(props: stepProps) {
 
   return (
     !viz && (
-      <IconButton value="on" size="small" onClick={onClick}>
+      <IconButton value="on" size="small" onClick={handleClick}>
         <Badge
           sx={{ "& .MuiBadge-badge": { right: -2, top: -1 } }}
-          badgeContent={<Typography variant="overline" sx={{ fontSize: ".4rem", textTransform: "none" }}>
-                          {stepValue.charAt(0).toUpperCase()}
-                        </Typography>}
+          badgeContent={
+            <Typography
+              variant="overline"
+              sx={{ fontSize: ".4rem", textTransform: "none" }}
+            >
+              {stepValue.charAt(0).toUpperCase()}
+            </Typography>
+          }
           anchorOrigin={{ vertical: "top", horizontal: "right" }}
         >
           <RngeTooltip

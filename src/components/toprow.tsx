@@ -7,49 +7,71 @@ import UseCurrent from "./usecurrent";
 import ToggleSliderButton from "./togglesliderbutton";
 import { dateCardProps } from "../interface";
 
-const TopRow: React.FC<dateCardProps> = (props) => {
+const TopRow: React.FC<dateCardProps> = ({
+  enableSlider,
+  openSlider,
+  toggleSlider,
+  dates,
+  localization,
+  setStepValue,
+  setStepOpen,
+  stepOpen,
+  ...props
+}) => {
   return (
     <Grid
       container
       direction="row"
       rowSpacing={0.3}
-      size={12}
+      // Removed the size={12} prop from the container, as it's not a valid prop for the Grid container.
       sx={{
         paddingLeft: 0.3,
       }}
     >
-      {props.enableSlider && (
-        <Grid
-          size="auto"
-        >
+      {/* Use a fragment for conditionally rendering the slider button */}
+      {enableSlider && (
+        <Grid size="auto">
           <ToggleSliderButton
-            openSlider={props.openSlider}
-            toggleSlider={props.toggleSlider}
+            openSlider={openSlider}
+            toggleSlider={toggleSlider}
+            localization={localization}
           />
         </Grid>
       )}
-        <DateInput
-          {...props}
-          openSlider={props.openSlider}
-          handleStep={props.setStepValue}
-          handleViz={props.setStepOpen}
-        />
+
+      {/* Optimized DateInput prop passing */}
+      <DateInput
+        {...props}
+        dates={dates}
+        localization={localization}
+        openSlider={openSlider}
+        handleStep={setStepValue}
+        handleViz={setStepOpen}
+        stepOpen={stepOpen}
+      />
+
+      {/* Use Grid item for the UseCurrent component */}
       <Grid size="auto">
-        {!props.stepOpen && (
-          <Grow in={!props.stepOpen}
+        {/* Simplified conditional rendering with a single boolean check */}
+        {!stepOpen && (
+          <Grow
+            in={!stepOpen}
             style={{ transformOrigin: "0 0 0" }}
-            {...(props.stepOpen ? { timeout: 1000 } : {})}
+            timeout={stepOpen ? 1000 : 0} // Optimized timeout prop for the Grow component
           >
             <Box>
-              <UseCurrent {...props}
-                handleStep={props.setStepValue}
-                />
+              <UseCurrent
+                {...props}
+                localization={localization}
+                handleStep={setStepValue}
+              />
             </Box>
           </Grow>
-         )}
+        )}
       </Grid>
+      {/* Use Grid item for the empty Box to consume remaining space */}
       <Grid size="grow">
-        <Box></Box>
+        <Box />
       </Grid>
     </Grid>
   );

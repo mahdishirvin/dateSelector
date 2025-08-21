@@ -21,6 +21,7 @@ interface IntervalParmsProps {
   interval: Interval;
   setIntervalValue: React.Dispatch<React.SetStateAction<number>>;
   handleClose: () => void;
+  localization?: any; // Optional localization prop
 }
 
 const IntervalParms: React.FC<IntervalParmsProps> = ({
@@ -29,6 +30,7 @@ const IntervalParms: React.FC<IntervalParmsProps> = ({
   setIntervalValue,
   handleClose,
   interval,
+  localization = useLocalization(), // Default to useLocalization if not provided
 }) => {
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(event.target.value, 10);
@@ -137,6 +139,7 @@ interface DateIntervalPickerProps {
   item: any;
   handleVal?: (interval: Interval) => void;
   clickType?: ClickType;
+  localization?: any; // Optional localization prop
 }
 
 const DateIntervalPicker: React.FC<DateIntervalPickerProps> = ({
@@ -145,6 +148,7 @@ const DateIntervalPicker: React.FC<DateIntervalPickerProps> = ({
   item,
   handleVal,
   clickType = "right",
+  localization = useLocalization(), // Default to useLocalization if not provided
 }) => {
   // FIX: Use useState to ensure baseDate is stable and only created once
   const [currentBaseDate] = useState(baseDate || new Date());
@@ -237,6 +241,7 @@ const DateIntervalPicker: React.FC<DateIntervalPickerProps> = ({
               setIntervalValue={setIntervalValue}
               handleClose={handleClose}
               interval={interval}
+              localization={localization}
             />
           </div>
         </ClickAwayListener>

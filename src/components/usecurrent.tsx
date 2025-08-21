@@ -8,7 +8,7 @@ import { dateCardProps, dateRange } from "../interface";
 import RngeTooltip from "./rngetooltip";
 import DateIntervalPicker from "./dateintervalpicker";
 import { Badge } from "@mui/material";
-import { useLocalization } from "../localeutils";
+// import { useLocalization } from "../localeutils";
 
 export default function UseCurrent(props: dateCardProps) {
   const {
@@ -22,6 +22,7 @@ export default function UseCurrent(props: dateCardProps) {
     handleVal,
     limitToScope,
     handleStep,
+    localization
   } = props;
 
   const [ttl, setTtl] = React.useState(true);
@@ -57,13 +58,14 @@ export default function UseCurrent(props: dateCardProps) {
                   handleVal={handleDate}
                   item={item}
                   key={`dip${item.thisRange}${index}`}
+                  localization={localization}
                 >
                   <RngeTooltip
                     title={undefined}
                     key={`rtt${item.thisRange}${index}`}
                     detailRow={
                       item.menu !== "2" && item.menu !== "12"
-                        ? `${useLocalization().getDisplayName(
+                        ? `${localization.getDisplayName(
                             "useCurrentRightClick"
                           )} [${item.plural}]`
                         : ``

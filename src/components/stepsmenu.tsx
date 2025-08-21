@@ -7,19 +7,17 @@ import Typography from "@mui/material/Typography";
 import RngeTooltip from "./rngetooltip";
 import { Increment } from "../dateutils";
 import { stepProps } from "../interface";
-import { useLocalization } from "../localeutils";
 
 export default function StepsMenu(props: stepProps) {
-  const { stepViz, stepValue, payProps, viz, handleStep, handleViz } = props;
+  const { stepViz, stepValue, payProps, viz, handleStep, handleViz, localization } = props;
   const actions = React.useMemo(() => Increment(stepViz, null, null, payProps), [stepViz, payProps]);
-    const localisation = useLocalization();
       const periodTitle = {
-      day: localisation.getDisplayName("Step_Day"),
-      week: localisation.getDisplayName("Step_Week"),
-      pay: localisation.getDisplayName("Step_Pay"),
-      month: localisation.getDisplayName("Step_Month"),
-      quarter: localisation.getDisplayName("Step_Quarter"),
-      year: localisation.getDisplayName("Step_Year"),
+      day: localization.getDisplayName("Step_Day"),
+      week: localization.getDisplayName("Step_Week"),
+      pay: localization.getDisplayName("Step_Pay"),
+      month: localization.getDisplayName("Step_Month"),
+      quarter: localization.getDisplayName("Step_Quarter"),
+      year: localization.getDisplayName("Step_Year"),
     };
 
 

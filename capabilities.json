@@ -337,7 +337,8 @@
                                 "displayNameKey": "Step_Year"
                             }
                         ]
-                    }
+                    },
+                    "filterState": true
                 }
             }
         },

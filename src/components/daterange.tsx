@@ -12,7 +12,7 @@ import { DateField } from "./datefield";
 import { useHelpContext } from "./helpprovider";
 import RngeTooltip from "./rngetooltip";
 import { dateCardProps, dateRange } from "../interface";
-import { useDateFnsLocale, useLocalization } from "../localeutils";
+import { useDateFnsLocale } from "../localeutils";
 
 // DateRange input with optional reset.
 // Uses the sync value if available; otherwise falls back to preset startup filter or scope.
@@ -23,7 +23,7 @@ export default function DateRange(props: dateCardProps) {
     props;
 
   const locale = useDateFnsLocale();
-  // const localization = useLocalization();
+
   const theme = useTheme();
   const { showExtendedTooltip } = useHelpContext();
 

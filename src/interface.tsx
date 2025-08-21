@@ -240,6 +240,7 @@ export interface dateCardProps {
   //extras for topRow
   openSlider?: boolean;
   toggleSlider?: () => void;
+  toggleStepOpen?: () => void;
   localization?: {
     getDisplayName: (key: string) => string;
   };
@@ -279,7 +280,7 @@ export interface dateMoveProps extends dateCardProps {
   handleVal?: (val: any) => void;
 }
 
-export interface stepProps {
+export interface stepProps  {
   // value: string;
   stepViz?: step<boolean>;
   stepValue?: string;
@@ -289,6 +290,9 @@ export interface stepProps {
   handleViz?: (viz: boolean) => void;
   handleClick?: (event: React.MouseEvent<HTMLElement>) => void;
   onClick?: (event: React.MouseEvent<HTMLElement>) => void;
+  localization?: {
+    getDisplayName: (key: string) => string;
+  };
 }
 
 export interface UseCurrentProps {

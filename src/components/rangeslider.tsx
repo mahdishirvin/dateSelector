@@ -1,5 +1,5 @@
 import * as React from "react";
-import { SliderProps } from "../interface";
+import { dateCardProps } from "../interface";
 import DualSlider from "./dualslider";
 import {
   mainMarks,
@@ -9,8 +9,8 @@ import {
   useSliderMarkText,
 } from "../dateutils";
 
-export default function RangeSlider(props: SliderProps) {
-  const { dates, rangeScope, stepValue, show2ndSlider, handleVal, singleDay } =
+export default function RangeSlider(props: dateCardProps) {
+  const { dates, rangeScope, stepValue, show2ndSlider, handleVal, singleDay, localization } =
     props;
 
   const [sliderStart, setSliderStart] = React.useState<number>(
@@ -102,6 +102,7 @@ export default function RangeSlider(props: SliderProps) {
       valueLabelFormat={(val) => sliderMarkText(val, rangeScope.start)}
       max={sliderMarkNumber(rangeScope.end, rangeScope.start)}
       onChange={handleOnChange}
+      localization={localization}
       {...props}
     />
   );

@@ -1,6 +1,6 @@
 import * as React from "react";
 import Grid from "@mui/material/Grid";
-import Zoom from "@mui/material/Zoom";
+import Grow from "@mui/material/Grow";
 import DateMove from "./datemove";
 import DateRange from "./daterange";
 import StepsMenu from "./stepsmenu";
@@ -25,14 +25,14 @@ function DateInput(props: dateCardProps) {
     <>
       <Grid  sx={{ paddingRight: 1 }}>
         {/* Pass the dates prop explicitly to the DateRange component */}
-        <DateRange dates={dates} {...otherProps} />
+        <DateRange dates={dates} localization={localization} handleVal={handleVal} {...otherProps} />
       </Grid>
 
       {/* Conditionally render the entire movement section */}
       {showMove && (
         <Grid container>
           {/* Backwards movement button */}
-          <Zoom in={showMove}>
+          <Grow in={showMove}>
             <Grid >
               <DateMove
                 dates={dates}
@@ -45,29 +45,32 @@ function DateInput(props: dateCardProps) {
                 localization={localization} // Pass localization prop
               />
             </Grid>
-          </Zoom>
+          </Grow>
 
           {/* Toggle for the steps menu */}
           <Grid  sx={{ paddingRight: 1 }}>
             <StepToggle
               stepValue={stepValue}
               handleClick={handleClick}
+              localization={localization}
               {...otherProps}
             />
           </Grid>
 
           {/* Steps menu */}
-          <Zoom in={stepOpen}>
+          <Grow in={stepOpen}>
             <Grid >
               <StepsMenu
                 stepValue={stepValue}
+                localization={localization}
+                viz={stepOpen}
                 {...otherProps}
               />
             </Grid>
-          </Zoom>
+          </Grow>
 
           {/* Forward movement button, controlled by the openSlider prop */}
-          {/* <Zoom in={openSlider}> */}
+          {/* <Grow in={openSlider}> */}
             <Grid >
               <DateMove
                 dates={dates}
@@ -80,7 +83,7 @@ function DateInput(props: dateCardProps) {
                 localization={localization} // Pass localization prop
               />
             </Grid>
-          {/* </Zoom> */}
+          {/* </Grow> */}
         </Grid>
       )}
     </>
