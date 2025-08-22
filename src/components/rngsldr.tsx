@@ -9,24 +9,9 @@ import {
   useSliderMarkText,
 } from "../dateutils";
 
-/**
- * A component that renders a dual-thumb slider for selecting a date range.
- * The component handles state for the slider values and translates them
- * to and from date objects based on the provided props.
- *
- * @param {dateCardProps} props - The props for the component, including dates, range scope, and various handlers.
- * @returns {React.FC} The RangeSlider component.
- */
 export default function RangeSlider(props: dateCardProps) {
-  const {
-    dates,
-    rangeScope,
-    stepValue,
-    show2ndSlider,
-    handleVal,
-    singleDay,
-    localization,
-  } = props;
+  const { dates, rangeScope, stepValue, show2ndSlider, handleVal, singleDay, localization } =
+    props;
 
   const [sliderStart, setSliderStart] = React.useState<number>(
     sliderMarkNumber(dates.start, rangeScope.start)
@@ -35,7 +20,6 @@ export default function RangeSlider(props: dateCardProps) {
     sliderMarkNumber(dates.end, rangeScope.start)
   );
 
-  // Effect to update the slider values when the dates or range scope props change.
   React.useEffect(() => {
     setSliderStart(sliderMarkNumber(dates.start, rangeScope.start));
     setSliderEnd(
@@ -46,34 +30,18 @@ export default function RangeSlider(props: dateCardProps) {
     );
   }, [dates, rangeScope]);
 
-  /**
-   * Finds the closest valid mark value to the given slider value(s).
-   * @param {number[]} val - The current slider value(s).
-   * @returns {number[]} The closest valid mark values.
-   */
-  const closestMark = React.useCallback(
-    (val: number[]) => {
-      // Memoize the marks array to avoid re-creation on every render.
-      const marks = mainMarks(props).map((v) => v.value);
-      return val.map(
-        (x) => marks.sort((a, b) => Math.abs(x - a) - Math.abs(x - b))[0]
-      );
-    },
-    [props] // Dependency is the props object.
-  );
+  const closestMark = (val: number[]) => {
+    const marks = mainMarks(props).map((v) => v.value);
+    return val.map(
+      (x) => marks.sort((a, b) => Math.abs(x - a) - Math.abs(x - b))[0]
+    );
+  };
 
-  /**
-   * Main handler for all slider change events, including drag and commit.
-   * @param {MouseEvent} event - The mouse event.
-   * @param {number[]} val - The new slider value array [start, end].
-   * @param {boolean} isStepped - Flag to check if the step is "day".
-   * @param {boolean} isCommit - Flag to check if the user has released the thumb.
-   */
   const handleChange = (
     event: MouseEvent,
     val: number[],
-    isStepped: boolean,
-    isCommit: boolean
+    stp: boolean,
+    commit: boolean
   ): void => {
     if (!isNaN(val.reduce((a, b) => a + b, 0))) {
       if (event.ctrlKey) {
@@ -81,17 +49,16 @@ export default function RangeSlider(props: dateCardProps) {
           (v) => v !== 0
         )[0];
         val = d ? [sliderStart, sliderEnd].map((v) => v + d) : val;
-        val = isStepped ? val : closestMark(val);
+        val = stp ? val : closestMark(val);
       }
-
 
       val[1] = singleDay
         ? val[0]
-        : sliderEnd === val[1] || isStepped
+        : sliderEnd === val[1] || stp
         ? val[1]
         : val[1] - 1;
 
-      if (isCommit) {
+      if (commit) {
         handleVal([
           sliderMarkDate(val[0], rangeScope.start),
           sliderMarkDate(val[1], rangeScope.start),
@@ -104,20 +71,15 @@ export default function RangeSlider(props: dateCardProps) {
   };
 
   const handleOnChange = (e: MouseEvent, val: number[], thumb: number) => {
-    let newValues = [...val];
-    // For single day mode, ensure both thumbs are at the same value.
-    if (singleDay) {
-      newValues = thumb === 1 ? [val[1], val[1]] : [val[0], val[0]];
-    }
+    val = singleDay ? (thumb === 1 ? [val[1], val[1]] : [val[0], val[0]]) : val;
     handleChange(
       e,
-      newValues,
+      val,
       e.target["name"] === "top" ? stepValue === "day" : false,
       false
     );
   };
 
-  // Helper functions for commit events, which are clearer and more explicit.
   const handleTopCommit = (e: MouseEvent, val: number[]) => {
     handleChange(e, val, stepValue === "day", true);
   };
@@ -132,7 +94,6 @@ export default function RangeSlider(props: dateCardProps) {
     <DualSlider
       value={[sliderStart, sliderEnd]}
       step={stepValue === "day" ? 1 : null}
-      stepValue={stepValue}
       showBottomSlider={show2ndSlider}
       handleTopCommit={handleTopCommit}
       handleBottomCommit={handleBottomCommit}
@@ -142,7 +103,6 @@ export default function RangeSlider(props: dateCardProps) {
       max={sliderMarkNumber(rangeScope.end, rangeScope.start)}
       onChange={handleOnChange}
       localization={localization}
-      // Spreading props here is less explicit; it's better to pass them individually if possible.
       {...props}
     />
   );

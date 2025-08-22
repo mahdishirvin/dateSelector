@@ -92,7 +92,7 @@ export const moveParms = (
 
   const isBack = bf === "b";
 
-  const stepLabels = {
+ const stepLabels = {
     day: localization.getDisplayName("Step_Day"),
     week: localization.getDisplayName("Step_Week"),
     pay: localization.getDisplayName("Step_Pay"),

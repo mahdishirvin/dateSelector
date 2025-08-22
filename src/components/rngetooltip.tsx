@@ -38,7 +38,7 @@ const RngeTooltip: React.FC<RngeTooltipProps> = ({
     // In extended mode, build the detailed tooltip content.
     const header = topRow || title;
     return (
-      <div style={{ padding: "8px", boxSizing: "border-box" }}>
+      <div style={{ padding: "4px", boxSizing: "border-box" }}>
         {header && <div style={{ fontWeight: "bold" }}>{header}</div>}
         {detailRow && <div>{detailRow}</div>}
         {infoRow && <div style={{ fontStyle: "italic" }}>{infoRow}</div>}

@@ -1,23 +1,37 @@
 import * as React from "react";
-// import Box from "@mui/material/Box";
-import Slider, {SliderValueLabelProps } from "@mui/material/Slider";
-import Tooltip from "@mui/material/Tooltip";
+import Slider, { SliderValueLabelProps } from "@mui/material/Slider";
 import Zoom from "@mui/material/Zoom";
-// import { ValueLabel } from "./rngetooltip";
-import { style, styleB, styleT } from "./sliderstyles";
 import Grid from "@mui/material/Grid";
 
-function ValueLabelComponent(props: SliderValueLabelProps) {
-  const { children, value ,index} = props;
-  const loc = index === 0 ? "top-end" : "bottom-start";
+// The style objects are assumed to be imported from a separate file.
+import {  getBottomSliderStyles,getTopSliderStyles } from "./sliderstyles";
+import RngeTooltip from "./rngetooltip";
 
+/**
+ * Custom value label component for the slider thumbs.
+ * This component provides a tooltip with the value of the thumb.
+ *
+ * @param {SliderValueLabelProps & { granularity?: string; sliderId?: string }} props - The props from the Slider component, extended with granularity and sliderId.
+ * @returns {React.ReactElement} A Tooltip-wrapped component.
+ */
+const ValueLabelComponent = React.memo(({ children, value, index }: SliderValueLabelProps) => {
+  // Determine the placement of the tooltip based on the thumb index.
+  const loc = index === 0 ? "top-end" : "top-start";
   return (
-    <Tooltip enterTouchDelay={10} placement={loc} title={value}  enterDelay={500} arrow  color="primary">
+    <RngeTooltip
+      enterTouchDelay={10}
+      placement={loc}
+      topRow={value.toString()}
+      detailRow={index === 0 ? "▶▶▶▶▶" : "◀◀◀◀◀"}
+      enterDelay={1000}
+      arrow
+    >
       {children}
-    </Tooltip>
+    </RngeTooltip>
   );
-}
+});
 
+ValueLabelComponent.displayName = "ValueLabelComponent";
 
 interface DualSliderProps {
   value: number[];
@@ -31,7 +45,6 @@ interface DualSliderProps {
   handleBottomCommit: (e: Event, val: number[]) => void;
   onChange: (event: Event, value: number | number[], activeThumb?: number) => void;
   onClick?: (event: React.SyntheticEvent) => void;
-  localization?: any; // Optional localization prop
 }
 
 function DualSlider(props: DualSliderProps): React.ReactElement {
@@ -42,43 +55,59 @@ function DualSlider(props: DualSliderProps): React.ReactElement {
     mainMarks,
     superMarks,
     valueLabelFormat,
-    localization
+        // Extracting props meant for the top slider.
+    value,
+    step,
+    max,
+    onChange,
+
   } = props;
+
+   // Use a common set of props for both sliders to reduce duplication.
+  const commonSliderProps = {
+    value,
+    min: 0,
+    max,
+    onChange,
+    valueLabelFormat,
+    slots: { valueLabel: ValueLabelComponent },
+  };
+
 
   return (
     <Grid container size={12}>
+      {/* Top Slider (always visible) */}
       <Grid sx={{ height: "52px" }} size={12}>
         <Slider
           name="top"
           key="slider1"
           size="medium"
+          step={step}
           color="primary"
           onChangeCommitted={handleTopCommit}
-          marks={mainMarks}
           valueLabelDisplay="auto"
-          slots={{ valueLabel: ValueLabelComponent }}
-          min={0}
-          sx={{ ...style, ...styleT }}
-          {...props}
+          marks={mainMarks}
+          sx={getTopSliderStyles}
+            aria-labelledby="range-slider11"
+          {...commonSliderProps}
         />
       </Grid>
+      {/* Bottom Slider (conditionally rendered) */}
       <Zoom in={showBottomSlider}>
         <Grid sx={{ height: "55px" }} size={12}>
           <Slider
             name="bottom"
             key="slider2"
             size="small"
-            color="secondary"
+            color="primary"
             onChangeCommitted={handleBottomCommit}
             step={null}
             marks={superMarks}
-            slots={{ valueLabel: ValueLabelComponent }}
             valueLabelDisplay="auto"
             aria-labelledby="range-slider2"
             getAriaValueText={valueLabelFormat}
-            min={0}
-            sx={{ ...style, ...styleB }}
-            {...props}
+            sx={getBottomSliderStyles}
+            {...commonSliderProps}
           />
         </Grid>
       </Zoom>
