@@ -12,10 +12,10 @@ const TopRow: React.FC<dateCardProps> = ({
   openSlider,
   toggleSlider,
   dates,
-  localization,
   setStepValue,
   setStepOpen,
   stepOpen,
+  localization,
   ...props
 }) => {
   return (
@@ -43,11 +43,11 @@ const TopRow: React.FC<dateCardProps> = ({
       <DateInput
         {...props}
         dates={dates}
-        localization={localization}
         openSlider={openSlider}
         handleStep={setStepValue}
         handleViz={setStepOpen}
         stepOpen={stepOpen}
+        localization={localization}
       />
 
       {/* Use Grid item for the UseCurrent component */}
@@ -62,8 +62,8 @@ const TopRow: React.FC<dateCardProps> = ({
             <Box>
               <UseCurrent
                 {...props}
-                localization={localization}
                 handleStep={setStepValue}
+                localization={localization}
               />
             </Box>
           </Grow>

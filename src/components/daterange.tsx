@@ -5,7 +5,7 @@ import IconButton from "@mui/material/IconButton";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import Remove from "@mui/icons-material/Remove";
 import { useTheme } from "@mui/material/styles";
-import { format, parse, isValid, isEqual } from "date-fns";
+import { format, parse, isValid, isEqual,parseJSON } from "date-fns";
 
 import { useInputParms } from "../dateutils";
 import { DateField } from "./datefield";
@@ -55,7 +55,10 @@ export default function DateRange(props: dateCardProps) {
   };
 
   const handleDate = (val: dateRange) => {
-    handleVal([val.start, singleDay ? val.start : val.end]);
+    let start=    (val.start.toString() !== "Invalid Date") ? parseJSON(val.start.toString()) : dates.start;
+    let end=    (val.end.toString() !== "Invalid Date") ? parseJSON(val.end.toString()) : dates.end;
+
+    handleVal([start, singleDay ? start : end]);
   };
 
   const input = useInputParms();
@@ -87,6 +90,8 @@ export default function DateRange(props: dateCardProps) {
       !isEqual(dates.end, startupFilter.end));
 
   const showRefresh = hovered && canReset;
+
+  // console.log("DateRange render:", format(dates.start,"dd/MM/yy"), format(dates.end,"dd/MM/yy"), "canReset:", canReset, "startupFilter:", startupFilter);
 
   return (
     <Grid container spacing={0.5} sx={{ paddingLeft: 0.3 }}>

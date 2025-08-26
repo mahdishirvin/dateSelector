@@ -17,7 +17,6 @@ import {
 } from "./interface";
 import { IAdvancedFilter } from "powerbi-models";
 import { VisualSettingsModel } from "./vsettings";
-import { useLocalization } from "./localeutils";
 
 const { extractFilterColumnTarget } = interactivityFilterService;
 
@@ -86,7 +85,6 @@ export const settingProps = (
     yearStartMonth,
     rangeScope
   );
-
   // Try to restore from synced filter
   const syncFilter = restoreRangeFilter(options);
 
@@ -104,11 +102,6 @@ export const settingProps = (
   }
 
   return {
-    localization: {
-      getDisplayName: (key: string) =>
-        useLocalization().getDisplayName(key) ||
-        key, // Fallback to key if not found
-    },
     landingOff: optionsAreValid(options),
     dates: singleDay ? startup_Filter : selectedDates,
     rangeScope,

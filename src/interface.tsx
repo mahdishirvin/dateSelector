@@ -244,7 +244,6 @@ export interface dateCardProps {
   localization?: {
     getDisplayName: (key: string) => string;
   };
-
 }
 
 export interface topRowProps {
@@ -280,7 +279,7 @@ export interface dateMoveProps extends dateCardProps {
   handleVal?: (val: any) => void;
 }
 
-export interface stepProps  {
+export interface stepProps {
   // value: string;
   stepViz?: step<boolean>;
   stepValue?: string;
@@ -290,6 +289,14 @@ export interface stepProps  {
   handleViz?: (viz: boolean) => void;
   handleClick?: (event: React.MouseEvent<HTMLElement>) => void;
   onClick?: (event: React.MouseEvent<HTMLElement>) => void;
+  localization?: {
+    getDisplayName: (key: string) => string;
+  };
+}
+
+export interface ToggleSliderButtonProps {
+  openSlider: boolean;
+  toggleSlider: () => void;
   localization?: {
     getDisplayName: (key: string) => string;
   };
@@ -353,7 +360,7 @@ export interface step<T> {
   year: T;
 }
 
-interface pay {
+export interface pay {
   desc: string;
   ref: Date;
   len: number;
@@ -365,4 +372,37 @@ export interface current {
   thisPeriod: string;
   thisRange: any;
   icon: React.ReactSVGElement;
+}
+
+export interface themeProps {
+  themeFont: string;
+  themeColor: string;
+  themeMode: any; // "light" | "dark";
+  themeFontSize?: number; // value representing the theme font size to use
+  fontColor: string;
+  fontSize: number;
+  fontBold: boolean;
+  fontUnderline?: boolean;
+  fontItalic?: boolean;
+}
+
+export interface payProps {
+  desc: string;
+  ref: Date;
+  len: number;
+}
+
+interface stepPeriodVals {
+show?: boolean;
+skip?: number;
+format?: string;
+}
+
+export interface stepPeriod {
+  day: stepPeriodVals;
+  week: stepPeriodVals;
+  pay: stepPeriodVals;
+  month: stepPeriodVals;
+  quarter: stepPeriodVals;
+  year: stepPeriodVals;
 }

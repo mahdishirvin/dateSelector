@@ -9,6 +9,7 @@ import { getRange } from "../dateutils";
 import { dateMoveProps } from "../interface";
 import RngeTooltip from "./rngetooltip";
 import { arrowIcons } from "../dateutils"; // Assuming arrowIcons is from a utility file
+import { parseJSON } from "date-fns";
 
 type MoveParms = {
   isBack: boolean;
@@ -33,7 +34,13 @@ type MoveParms = {
  * @param {object} localization - An object containing localization display names.
  * @returns {MoveParms} - The parameters for the move component.
  */
-const getMoveParms = (bf, vert, ctrl, stepValue, localization): MoveParms => {
+const getMoveParms = (
+  bf: string,
+  vert: boolean,
+  ctrl: boolean,
+  stepValue: string,
+  localization: any
+): MoveParms => {
   const isBack = bf === "b";
 
   const stepLabels = {
@@ -86,9 +93,7 @@ const getMoveParms = (bf, vert, ctrl, stepValue, localization): MoveParms => {
   const topRow2 = `${reduceExpand} ${periodLabel} ${directionWord()}${ctrlHint()}`;
   const detailRow2 = `${reduceExpand}${localization.getDisplayName(
     "dateUtilsMoveTheSelectedRange"
-  )}${localization.getDisplayName(
-    "dateUtilsMoveByTheStepLevel"
-  )}`;
+  )}${localization.getDisplayName("dateUtilsMoveByTheStepLevel")}`;
 
   return {
     isBack,
@@ -128,8 +133,16 @@ export default function DateMove(props: dateMoveProps) {
 
   // Use useRef to create a stable reference to the debounced function.
   // This prevents the debounce timer from resetting on every re-render.
+  const handleValRef = useRef(handleVal);
+  useEffect(() => {
+    handleValRef.current = handleVal;
+  }, [handleVal]);
+
   const debouncedHandleValRef = useRef(
-    debounce((dt) => handleVal(dt), 500, { leading: false, trailing: true })
+    debounce((dt) => handleValRef.current?.(dt), 500, {
+      leading: false,
+      trailing: true,
+    })
   );
 
   // Clean up the debounced function on component unmount to prevent memory leaks
@@ -141,11 +154,42 @@ export default function DateMove(props: dateMoveProps) {
     };
   }, []);
 
+  // Hotkey logic moved to a useEffect hook to avoid dependency issues
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Shift") {
+        setCtrl(true);
+      }
+    };
+
+    const handleKeyUp = (event: KeyboardEvent) => {
+      if (event.key === "Shift") {
+        setCtrl(false);
+      }
+    };
+
+    // New: Added `{ passive: true }` to both event listeners to fix the warning.
+    window.addEventListener("keydown", handleKeyDown, { passive: true });
+    window.addEventListener("keyup", handleKeyUp, { passive: true });
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, []);
+
   const handleClick = (fn: string) => {
     if (handleVal) {
       const newDates = getRange(fn, stepValue, dates);
-      // Call the debounced function through the stable ref
-      debouncedHandleValRef.current(newDates);
+      let start =
+        parseJSON(newDates[0].toString()).toString() !== "Invalid Date"
+          ? parseJSON(newDates[0].toString())
+          : newDates[0];
+      let end =
+        parseJSON(newDates[1].toString()).toString() !== "Invalid Date"
+          ? parseJSON(newDates[1].toString())
+          : newDates[1];
+      debouncedHandleValRef.current([start, end]);
     }
   };
 
@@ -156,11 +200,6 @@ export default function DateMove(props: dateMoveProps) {
     const fn = _ctl ? "r" + _bf : "e" + _bf;
     handleClick(fn);
   };
-
-  // Attach hotkey listeners. The empty dependency array ensures these listeners are
-  // only set up once, preventing the "repeating" issue.
-  useHotkeys("shift", () => setCtrl(true), { keydown: true }, []);
-  useHotkeys("shift", () => setCtrl(false), { keyup: true }, []);
 
   return (
     <Grid

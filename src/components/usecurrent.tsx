@@ -2,7 +2,7 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import ButtonGroup from "@mui/material/ButtonGroup";
-import { areIntervalsOverlapping } from "date-fns";
+import { areIntervalsOverlapping, parseJSON } from "date-fns";
 import Typography from "@mui/material/Typography";
 import { dateCardProps, dateRange } from "../interface";
 import RngeTooltip from "./rngetooltip";
@@ -22,13 +22,21 @@ export default function UseCurrent(props: dateCardProps) {
     handleVal,
     limitToScope,
     handleStep,
-    localization
+    localization,
   } = props;
 
   const [ttl, setTtl] = React.useState(true);
 
   const handleDate = (val: dateRange) => {
-    handleVal([val.start, singleDay ? val.start : val.end]);
+    let start =
+      parseJSON(val.start.toString()).toString() !== "Invalid Date"
+        ? parseJSON(val.start.toString())
+        : val.start;
+    let end =
+      parseJSON(val.end.toString()).toString() !== "Invalid Date"
+        ? parseJSON(val.end.toString())
+        : val.end;
+    handleVal([start, singleDay ? start : end]);
   };
 
   const handleStepChange = (val: string) => {

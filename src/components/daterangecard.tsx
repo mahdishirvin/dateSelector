@@ -20,13 +20,22 @@ import { DateMoveKeys } from "./datemovekeys";
 import { Increment } from "../dateutils";
 import { HelpProvider } from "./helpprovider";
 import LandingPage from "./landingpage";
-import { compareAsc } from "date-fns";
+import { compareAsc, format ,parseJSON} from "date-fns";
+import { useLocalization } from "../localeutils";
 
 export default function DateRangeCard(props: dateCardProps) {
   // If the landing page is not disabled, render it and exit early.
   if (!props.landingOff) {
-    return <LandingPage  />;
+    return <LandingPage />;
   }
+
+  console.log(
+    "DateRangeCard dates:",
+    format(props.dates.start, "dd/MM/yy"),
+    format(props.dates.end, "dd/MM/yy") );
+
+  // Use the localization hook to get the localization manager.
+  const localization = useLocalization();
 
   // Memoize the theme creation to avoid re-calculating on every render.
   const theme = useMemo(
@@ -111,7 +120,7 @@ export default function DateRangeCard(props: dateCardProps) {
         showHelpIcon={props.showHelpIcon}
         showTooltip={props.showTooltip}
         showExtendedTooltip={props.showExtendedTooltip}
-        localization={props.localization}
+        localization={localization}
         themeMode={props.themeMode}
       >
         <TopRow
@@ -119,7 +128,7 @@ export default function DateRangeCard(props: dateCardProps) {
           dates={props.dates}
           showMore={props.showMore}
           showMove={props.showMove}
-          localization={props.localization}
+          localization={localization}
           showSlider={props.showSlider}
           openSlider={openSlider}
           toggleSlider={toggleSlider}
@@ -140,7 +149,7 @@ export default function DateRangeCard(props: dateCardProps) {
                 handleVal={onChangeVal}
                 stepValue={stepValue}
                 rangeScope={props.rangeScope}
-                localization={props.localization}
+                localization={localization}
               />
             </Grid>
           </Grid>

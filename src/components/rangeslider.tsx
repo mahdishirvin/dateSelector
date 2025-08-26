@@ -76,13 +76,14 @@ export default function RangeSlider(props: dateCardProps) {
     isCommit: boolean
   ): void => {
     if (!isNaN(val.reduce((a, b) => a + b, 0))) {
-      if (event.ctrlKey) {
-        const d = [val[0] - sliderStart, val[1] - sliderEnd].filter(
-          (v) => v !== 0
-        )[0];
-        val = d ? [sliderStart, sliderEnd].map((v) => v + d) : val;
-        val = isStepped ? val : closestMark(val);
-      }
+      // if (event.ctrlKey) {
+      //   console.log("Ctrl key pressed", val);
+      //   const d = [val[0] - sliderStart, val[1] - sliderEnd].filter(
+      //     (v) => v !== 0
+      //   )[0];
+      //   val = d ? [sliderStart, sliderEnd].map((v) => v + d) : val;
+      //   val = isStepped ? val : closestMark(val);
+      // }
 
 
       val[1] = singleDay

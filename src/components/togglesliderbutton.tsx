@@ -1,34 +1,24 @@
 import * as React from "react";
+import {useMemo} from "react";
 import IconButton from "@mui/material/IconButton";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import RngeTooltip from "./rngetooltip";
-import { useLocalization } from "../localeutils";
-interface ToggleSliderButtonProps {
-  openSlider: boolean;
-  toggleSlider: () => void;
-  localization?: {
-    getDisplayName: (key: string) => string;
-  };
-}
+import { ToggleSliderButtonProps } from "../interface";
 
-function ToggleSliderButton({
-  openSlider,
-  toggleSlider,
-  localization,
-}: ToggleSliderButtonProps) {
-  const TopRowOpen = localization.getDisplayName(
-    "toggleSliderButtonTopRowOpen"
-  );
-  const TopRowClosed = localization.getDisplayName(
-    "toggleSliderButtonTopRowClosed"
-  );
-  const TopRowEnd = localization.getDisplayName("toggleSliderButtonTopRowEnd");
-  const DetailRowOpen = localization.getDisplayName(
-    "toggleSliderButtonDetailRowOpen"
-  );
-  const DetailRowClosed = localization.getDisplayName(
-    "toggleSliderButtonDetailRowClosed"
-  );
+ function ToggleSliderButton(props: ToggleSliderButtonProps) {
+
+  const {localization, openSlider, toggleSlider} = props;
+
+    const { TopRowOpen, TopRowClosed, TopRowEnd, DetailRowOpen, DetailRowClosed } = useMemo(
+      () => ({
+        TopRowOpen: localization.getDisplayName("toggleSliderButtonTopRowOpen"),
+        TopRowClosed: localization.getDisplayName("toggleSliderButtonTopRowClosed"),
+        TopRowEnd: localization.getDisplayName("toggleSliderButtonTopRowEnd"),
+        DetailRowOpen: localization.getDisplayName("toggleSliderButtonDetailRowOpen"),
+        DetailRowClosed: localization.getDisplayName("toggleSliderButtonDetailRowClosed"),
+      }),
+      [localization]
+    );
 
   const topRow = (openSlider ? TopRowOpen : TopRowClosed) + TopRowEnd;
   const detailRow = openSlider ? DetailRowOpen : DetailRowClosed;

@@ -54,6 +54,7 @@ import {
   isFirstDayOfMonth,
   isWithinInterval,
   getDay,
+  parseJSON,
 } from "date-fns";
 import { step, dateRange, SliderProps } from "./interface";
 import { DATEUTILS } from "./constants";
@@ -92,7 +93,7 @@ export const moveParms = (
 
   const isBack = bf === "b";
 
- const stepLabels = {
+  const stepLabels = {
     day: localization.getDisplayName("Step_Day"),
     week: localization.getDisplayName("Step_Week"),
     pay: localization.getDisplayName("Step_Pay"),
@@ -201,7 +202,9 @@ export const week = (
       : i + 1
     : i;
   return {
-    start: startOfWeek(subWeeks(startBaseDate, j), { weekStartsOn: weekStartDay }),
+    start: startOfWeek(subWeeks(startBaseDate, j), {
+      weekStartsOn: weekStartDay,
+    }),
     end: endOfWeek(subWeeks(startBaseDate, j), { weekStartsOn: weekStartDay }),
   };
 };
@@ -299,7 +302,11 @@ export const getInitRange = (
 };
 
 // --- Pay Period Calculation ---
-function getPayPeriod(referenceDay: Date, periodOne: Date, periodLength: number) {
+function getPayPeriod(
+  referenceDay: Date,
+  periodOne: Date,
+  periodLength: number
+) {
   const daysPeriodOneFromRef = differenceInDays(
     startOfDay(periodOne),
     startOfDay(referenceDay)
@@ -315,28 +322,28 @@ const moveFns = {
   day: (_rnge: dateRange) => ({
     b: [subDays(_rnge.start, 1), subDays(_rnge.end, 1)],
     f: [addDays(_rnge.start, 1), addDays(_rnge.end, 1)],
-    eb: [subDays(_rnge.start, 1), _rnge.end],
-    ef: [_rnge.start, addDays(_rnge.end, 1)],
-    rb: [_rnge.start, subDays(_rnge.end, 1)],
-    rf: [addDays(_rnge.start, 1), _rnge.end],
+    eb: [subDays(_rnge.start, 1), subDays(_rnge.end,0)],
+    ef: [subDays(_rnge.start,0), addDays(_rnge.end, 1)],
+    rb: [subDays(_rnge.start,0), subDays(_rnge.end, 1)],
+    rf: [addDays(_rnge.start, 1), subDays(_rnge.end,0)],
   }),
   week: (_rnge: dateRange) => ({
     b: [subWeeks(_rnge.start, 1), subWeeks(_rnge.end, 1)],
     f: [addWeeks(_rnge.start, 1), addWeeks(_rnge.end, 1)],
-    eb: [subWeeks(_rnge.start, 1), _rnge.end],
-    ef: [_rnge.start, addWeeks(_rnge.end, 1)],
-    rb: [_rnge.start, subWeeks(_rnge.end, 1)],
-    rf: [addWeeks(_rnge.start, 1), _rnge.end],
+    eb: [subWeeks(_rnge.start, 1), subDays(_rnge.end,0)],
+    ef: [subDays(_rnge.start,0), addWeeks(_rnge.end, 1)],
+    rb: [subDays(_rnge.start,0), subWeeks(_rnge.end, 1)],
+    rf: [addWeeks(_rnge.start, 1), subDays(_rnge.end,0)],
   }),
   pay: (_rnge: dateRange) => {
     const len = differenceInDays(_rnge.end, _rnge.start) + 1;
     return {
       b: [subDays(_rnge.start, len), subDays(_rnge.end, len)],
       f: [addDays(_rnge.start, len), addDays(_rnge.end, len)],
-      eb: [subDays(_rnge.start, len), _rnge.end],
-      ef: [_rnge.start, addDays(_rnge.end, len)],
-      rb: [_rnge.start, subDays(_rnge.end, len)],
-      rf: [addDays(_rnge.start, len), _rnge.end],
+      eb: [subDays(_rnge.start, len), subDays(_rnge.end,0)],
+      ef: [subDays(_rnge.start,0), addDays(_rnge.end, len)],
+      rb: [subDays(_rnge.start,0), subDays(_rnge.end, len)],
+      rf: [addDays(_rnge.start, len), subDays(_rnge.end,0)],
     };
   },
   month: (_rnge: dateRange) => {
@@ -355,7 +362,7 @@ const moveFns = {
           ? lastDayOfMonth(addMonths(_rnge.end, 1))
           : addDays(addMonths(_rnge.start, 1), dd),
       ],
-      eb: [subMonths(_rnge.start, 1), _rnge.end],
+      eb: [subMonths(_rnge.start, 1), subDays(_rnge.end,0)],
       ef: [
         _rnge.start,
         ld ? lastDayOfMonth(addMonths(_rnge.end, 1)) : addMonths(_rnge.end, 1),
@@ -364,7 +371,7 @@ const moveFns = {
         _rnge.start,
         ld ? lastDayOfMonth(subMonths(_rnge.end, 1)) : subMonths(_rnge.end, 1),
       ],
-      rf: [addMonths(_rnge.start, 1), _rnge.end],
+      rf: [addMonths(_rnge.start, 1), subDays(_rnge.end,0)],
     };
   },
   quarter: (_rnge: dateRange) => {
@@ -382,7 +389,7 @@ const moveFns = {
           ? lastDayOfMonth(addQuarters(_rnge.end, 1))
           : addQuarters(_rnge.end, 1),
       ],
-      eb: [subQuarters(_rnge.start, 1), _rnge.end],
+      eb: [subQuarters(_rnge.start, 1), subDays(_rnge.end,0)],
       ef: [
         _rnge.start,
         ld
@@ -395,22 +402,25 @@ const moveFns = {
           ? lastDayOfMonth(subQuarters(_rnge.end, 1))
           : subQuarters(_rnge.end, 1),
       ],
-      rf: [addQuarters(_rnge.start, 1), _rnge.end],
+      rf: [addQuarters(_rnge.start, 1), subDays(_rnge.end,0)],
     };
   },
   year: (_rnge: dateRange) => ({
-    b: [subYears(_rnge.start, 1), subMonths(_rnge.end, 12)],
-    f: [addYears(_rnge.start, 1), addMonths(_rnge.end, 12)],
-    eb: [subYears(_rnge.start, 1), _rnge.end],
-    ef: [_rnge.start, addMonths(_rnge.end, 12)],
-    rb: [_rnge.start, subMonths(_rnge.end, 12)],
-    rf: [addYears(_rnge.start, 1), _rnge.end],
+    b: [subYears(_rnge.start, 1), subYears(_rnge.end, 1)],
+    f: [addYears(_rnge.start, 1), addYears(_rnge.end, 1)],
+    eb: [subYears(_rnge.start, 1), subDays(_rnge.end,0)],
+    ef: [subDays(_rnge.start,0), addMonths(_rnge.end, 12)],
+    rb: [subDays(_rnge.start,0), subMonths(_rnge.end, 12)],
+    rf: [addYears(_rnge.start, 1), subDays(_rnge.end,0)],
   }),
 };
 
 export const getRange = (fn: string, step: string, dates: dateRange) => {
-  const dte = moveFns[step]?.(dates)[fn];
-  return isAfter(dte[0], dte[1]) ? [dates.start, dates.end] : dte;
+  const [start, end] = moveFns[step]?.(dates)[fn];
+  if (isAfter(start, end)) {
+    return [end, start]; // normalize instead of reverting
+  }
+  return [start, end];
 };
 
 export type IncrementType = {
@@ -434,7 +444,13 @@ export const Increment = (
   scope?: dateRange
 ) => {
   const localization = useLocalization();
-  const _rnge = getInitRange("today", weekStartDay, yearStartMonth, { start: null, end: null }, "matrix");
+  const _rnge = getInitRange(
+    "today",
+    weekStartDay,
+    yearStartMonth,
+    { start: null, end: null },
+    "matrix"
+  );
   return [
     {
       menu: periodThis.day,
@@ -504,7 +520,12 @@ export const Increment = (
       show: (stepViz.day || stepViz.year || stepViz.month) && showMore,
       thisPeriod: localization.getDisplayName("dateUtilsMore"),
       thisRange: null,
-      icon: <MultipleStop style={{ fontSize: 12, opacity: 0.5 }} color="secondary" />,
+      icon: (
+        <MultipleStop
+          style={{ fontSize: 12, opacity: 0.5 }}
+          color="secondary"
+        />
+      ),
     },
     {
       menu: periodThis.range,
@@ -513,8 +534,10 @@ export const Increment = (
       step: periodGranularity.range,
       show: true,
       thisPeriod: localization.getDisplayName("buttonText_rangeScope"),
-      thisRange: scope,
-      icon: <SettingsEthernet style={{ fontSize: "inherit" }} color="primary" />,
+      thisRange: scope, // [parseJSON(scope.start.toString()) , parseJSON(scope.end.toString())],
+      icon: (
+        <SettingsEthernet style={{ fontSize: "inherit" }} color="primary" />
+      ),
     },
     {
       menu: periodThis.ytd,
@@ -524,7 +547,12 @@ export const Increment = (
       show: stepViz.day || stepViz.year,
       thisPeriod: localization.getDisplayName("buttonText_ytdToday"),
       thisRange: _rnge["ytdToday"],
-      icon: <PlayArrow style={{ fontSize: "inherit", opacity: 0.7 }} color="primary" />,
+      icon: (
+        <PlayArrow
+          style={{ fontSize: "inherit", opacity: 0.7 }}
+          color="primary"
+        />
+      ),
     },
     {
       menu: periodThis.yearPast,
@@ -534,7 +562,12 @@ export const Increment = (
       show: stepViz.day || stepViz.year,
       thisPeriod: localization.getDisplayName("buttonText_ytToday"),
       thisRange: _rnge["ytToday"],
-      icon: <SwitchLeft style={{ fontSize: "inherit", opacity: 0.7 }} color="primary" />,
+      icon: (
+        <SwitchLeft
+          style={{ fontSize: "inherit", opacity: 0.7 }}
+          color="primary"
+        />
+      ),
     },
     {
       menu: periodThis.ytdLastMonth,
@@ -544,7 +577,12 @@ export const Increment = (
       show: stepViz.month || stepViz.year,
       thisPeriod: localization.getDisplayName("buttonText_ytdLastMonth"),
       thisRange: _rnge["ytdLastMonth"],
-      icon: <SkipPrevious style={{ fontSize: "inherit", opacity: 0.7 }} color="primary" />,
+      icon: (
+        <SkipPrevious
+          style={{ fontSize: "inherit", opacity: 0.7 }}
+          color="primary"
+        />
+      ),
     },
     {
       menu: periodThis.ytdThisMonth,
@@ -554,7 +592,12 @@ export const Increment = (
       show: stepViz.month || stepViz.year,
       thisPeriod: localization.getDisplayName("buttonText_ytdThisMonth"),
       thisRange: _rnge["ytdThisMonth"],
-      icon: <SkipNext style={{ fontSize: "inherit", opacity: 0.7 }} color="primary" />,
+      icon: (
+        <SkipNext
+          style={{ fontSize: "inherit", opacity: 0.7 }}
+          color="primary"
+        />
+      ),
     },
   ];
 };
@@ -596,7 +639,10 @@ function eachPaydayOfInterval(range: dateRange, pay) {
     range.start,
     differenceInDays(range.start, pay.ref) % pay.len
   );
-  return eachDayOfInterval({ start: result, end: range.end }, { step: pay.len });
+  return eachDayOfInterval(
+    { start: result, end: range.end },
+    { step: pay.len }
+  );
 }
 
 // --- Timeline Setup ---
@@ -630,9 +676,14 @@ export const createMarks = (
         addMonths(x, yearStart)
       ),
   };
+
   const result = periodHandlers[period] ? periodHandlers[period]() : [];
   const resultSet = new Set([range.start, ...result, range.end]);
-  return Array.from(resultSet).sort((a, b) => a.getTime() - b.getTime());
+
+  // Filter out any non-Date objects before sorting.
+  return Array.from(resultSet)
+    .filter((d): d is Date => d instanceof Date)
+    .sort((a, b) => a.getTime() - b.getTime());
 };
 
 export const doMarks = (
@@ -705,8 +756,14 @@ export const useInputParms = () => {
         ? endOfDay(dates.end)
         : endOfDay(rangeScope.end);
 
-    const _startInRange: boolean = isWithinInterval(endOfDay(dates.start), rangeScope);
-    const _endInRange: boolean = isWithinInterval(startOfDay(dates.end), rangeScope);
+    const _startInRange: boolean = isWithinInterval(
+      endOfDay(dates.start),
+      rangeScope
+    );
+    const _endInRange: boolean = isWithinInterval(
+      startOfDay(dates.end),
+      rangeScope
+    );
 
     try {
       const noDays = differenceInDays(_end, _start);

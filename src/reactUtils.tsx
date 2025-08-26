@@ -14,8 +14,20 @@ interface ReactContainerProps {
   onFilterChanged?: (data: Interval) => void;
 }
 
-const ReactContainer: React.FC<ReactContainerProps> = ({ component: Component, data, onFilterChanged }) => {
-  return <Component {...data} onFilterChanged={onFilterChanged} />;
+const ReactContainer: React.FC<ReactContainerProps> = ({
+  component: Component,
+  data,
+  onFilterChanged,
+}) => {
+  // Ensure handler is instance-scoped and stable
+  const handleFilterChanged = React.useCallback(
+    (interval: Interval) => {
+      onFilterChanged(interval);
+    },
+    [onFilterChanged]
+  );
+
+  return <Component {...data} onFilterChanged={handleFilterChanged} />;
 };
 
 /**
@@ -55,12 +67,16 @@ export abstract class ReactVisual {
    * in the visual's `update` method.
    * @param data The props to pass to the main component.
    */
+  // in your visual class
   protected updateReactContainers = (data: any): void => {
     if (this.root && this.mainComponent) {
+      // 👇 ensure "data" is stable unless something truly changed
+      const stableData = JSON.parse(JSON.stringify(data));
+
       this.root.render(
         React.createElement(ReactContainer, {
           component: this.mainComponent,
-          data,
+          data: stableData,
           onFilterChanged: this.filterCallback,
         })
       );

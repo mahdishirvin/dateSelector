@@ -2,6 +2,7 @@ import { getRange } from "../dateutils";
 import { useHotkeys } from "react-hotkeys-hook";
 import debounce from "lodash.debounce";
 import type { dateRange } from "../interface";
+import { parseJSON } from "date-fns";
 
 export function DateMoveKeys(
   fn: (result: Date[]) => void,
@@ -11,8 +12,17 @@ export function DateMoveKeys(
   debounceTime = 500
 ) {
   const updateResult = (x: string) => {
-    const dteRange = getRange(x, stepValue, dates);
-    fn(dteRange);
+    const newDates = getRange(x, stepValue, dates);
+          let start =
+            parseJSON(newDates[0].toString()).toString() !== "Invalid Date"
+              ? parseJSON(newDates[0].toString())
+              : newDates[0];
+          let end =
+            parseJSON(newDates[1].toString()).toString() !== "Invalid Date"
+              ? parseJSON(newDates[1].toString())
+              : newDates[1];
+          fn([start, end]);
+
   };
 
   const debouncedResult = debounce(updateResult, debounceTime, {

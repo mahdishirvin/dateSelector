@@ -1,7 +1,6 @@
 import React, { useState, useContext, useMemo, useEffect } from "react";
 import IconButton from "@mui/material/IconButton";
 import { Chat, ChatBubbleOutlineOutlined } from "@mui/icons-material";
-import Tooltip from "@mui/material/Tooltip";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useTheme } from "@mui/material/styles";
 import RngeTooltip from "./rngetooltip";
@@ -20,7 +19,7 @@ const HelpContext = React.createContext({
 
 export const useHelpContext = () => useContext(HelpContext);
 
-export const HelpProvider = ({
+export const HelpProvider  = ({
   children,
   showHelpIcon,
   showTooltip,

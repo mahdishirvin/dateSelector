@@ -1,6 +1,6 @@
 import React from "react";
 import { Locale as DateFnsLocale } from "date-fns";
-import { enAU, enUS, fr, es, nl, enGB } from "date-fns/locale"; // import only the locales you actually need
+import { enUS, fr, es, nl, enGB } from "date-fns/locale"; // import only the locales you actually need
 import ILocalizationManager = powerbi.extensibility.ILocalizationManager;
 
 /**
