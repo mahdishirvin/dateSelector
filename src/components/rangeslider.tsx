@@ -1,3 +1,8 @@
+/*
+This component renders a dual-thumb slider for selecting a date range.
+It handles state for the slider values and translates them to and from
+date objects based on the provided props.
+*/
 import * as React from "react";
 import { dateCardProps } from "../interface";
 import DualSlider from "./dualslider";
@@ -9,25 +14,42 @@ import {
   useSliderMarkText,
 } from "../dateutils";
 
+type Props = dateCardProps & {
+  onPreview: (range: [Date, Date]) => void;
+  onCommit: (range: [Date, Date]) => void;
+};
+
 /**
  * A component that renders a dual-thumb slider for selecting a date range.
  * The component handles state for the slider values and translates them
  * to and from date objects based on the provided props.
+ * Dual-thumb slider for selecting a date range.
+ * - Drag → preview only (UI updates)
+ * - Release / click → commit to host
  *
  * @param {dateCardProps} props - The props for the component, including dates, range scope, and various handlers.
  * @returns {React.FC} The RangeSlider component.
  */
-export default function RangeSlider(props: dateCardProps) {
+
+export default function RangeSlider(props: Props) {
   const {
-    dates,
     rangeScope,
-    stepValue,
+    dates,
     show2ndSlider,
-    handleVal,
     singleDay,
+    stepValue,
+    onPreview,
+    onCommit,
     localization,
   } = props;
 
+  // Memoize the marks array to prevent unnecessary re-calculation on every render.
+  const marks = React.useMemo(
+    () => mainMarks(props).map((v) => v.value),
+    [props]
+  );
+
+  // State for the slider's numerical values, synchronized with props.dates.
   const [sliderStart, setSliderStart] = React.useState<number>(
     sliderMarkNumber(dates.start, rangeScope.start)
   );
@@ -35,7 +57,17 @@ export default function RangeSlider(props: dateCardProps) {
     sliderMarkNumber(dates.end, rangeScope.start)
   );
 
-  // Effect to update the slider values when the dates or range scope props change.
+  // State to track if the Ctrl key is currently pressed
+  const [isCtrlPressed, setIsCtrlPressed] = React.useState<boolean>(false);
+
+  // Ref to store the initial values and range length at the start of a Ctrl+drag
+  const dragStartRef = React.useRef<{
+    start: number;
+    end: number;
+    length: number;
+  } | null>(null);
+
+  // Effect to keep the slider values in sync with changes to the dates prop.
   React.useEffect(() => {
     setSliderStart(sliderMarkNumber(dates.start, rangeScope.start));
     setSliderEnd(
@@ -53,97 +85,105 @@ export default function RangeSlider(props: dateCardProps) {
    */
   const closestMark = React.useCallback(
     (val: number[]) => {
-      // Memoize the marks array to avoid re-creation on every render.
-      const marks = mainMarks(props).map((v) => v.value);
-      return val.map(
-        (x) => marks.sort((a, b) => Math.abs(x - a) - Math.abs(x - b))[0]
-      );
+      return val.map((x) => {
+        let closestValue = marks[0];
+        let minDiff = Math.abs(x - closestValue);
+
+        for (let i = 1; i < marks.length; i++) {
+          const currentDiff = Math.abs(x - marks[i]);
+          if (currentDiff < minDiff) {
+            minDiff = currentDiff;
+            closestValue = marks[i];
+          }
+        }
+        return closestValue;
+      });
     },
-    [props] // Dependency is the props object.
+    [marks]
   );
 
   /**
-   * Main handler for all slider change events, including drag and commit.
-   * @param {MouseEvent} event - The mouse event.
-   * @param {number[]} val - The new slider value array [start, end].
-   * @param {boolean} isStepped - Flag to check if the step is "day".
-   * @param {boolean} isCommit - Flag to check if the user has released the thumb.
+   * Handles the live drag/change event of the slider.
+   * Updates the local state to show the user the new position and calls the onPreview prop.
    */
-  const handleChange = (
-    event: MouseEvent,
-    val: number[],
-    isStepped: boolean,
-    isCommit: boolean
-  ): void => {
-    if (!isNaN(val.reduce((a, b) => a + b, 0))) {
-      // if (event.ctrlKey) {
-      //   console.log("Ctrl key pressed", val);
-      //   const d = [val[0] - sliderStart, val[1] - sliderEnd].filter(
-      //     (v) => v !== 0
-      //   )[0];
-      //   val = d ? [sliderStart, sliderEnd].map((v) => v + d) : val;
-      //   val = isStepped ? val : closestMark(val);
-      // }
+  const handleOnChange = (event: Event, val: number[], thumb: number) => {
+    let newValues = [...val];
+    const isStepped = stepValue === "day";
 
+    const isKeyboard = event.type === "keydown"; // ← detect keyboard events
+    const isCtrlPressed =
+      (event as KeyboardEvent).ctrlKey ?? (event as any).ctrlKey;
 
-      val[1] = singleDay
-        ? val[0]
-        : sliderEnd === val[1] || isStepped
-        ? val[1]
-        : val[1] - 1;
+    if (!isKeyboard && isCtrlPressed) {
+      if (!dragStartRef.current) {
+        // Start of a new Ctrl+drag, capture initial state
+        dragStartRef.current = {
+          start: sliderStart,
+          end: sliderEnd,
+          length: sliderEnd - sliderStart,
+        };
+      }
 
-      if (isCommit) {
-        handleVal([
-          sliderMarkDate(val[0], rangeScope.start),
-          sliderMarkDate(val[1], rangeScope.start),
-        ]);
-      } else {
-        setSliderStart(val[0]);
-        setSliderEnd(val[1]);
+      // Calculate the new positions based on the drag and the original range length
+      const delta = val[thumb] - dragStartRef.current.start;
+      newValues[0] = dragStartRef.current.start + delta;
+      newValues[1] = newValues[0] + dragStartRef.current.length;
+
+      // ✅ Only snap to marks for mouse interactions, not keyboard
+    } else {
+      // Normal drag behavior
+      if (singleDay) {
+        newValues = thumb === 1 ? [val[1], val[1]] : [val[0], val[0]];
       }
     }
-  };
 
-  const handleOnChange = (e: MouseEvent, val: number[], thumb: number) => {
-    let newValues = [...val];
-    // For single day mode, ensure both thumbs are at the same value.
-    if (singleDay) {
-      newValues = thumb === 1 ? [val[1], val[1]] : [val[0], val[0]];
+    if (!isStepped) {
+      newValues = closestMark(newValues);
+      newValues[1] = newValues[1] - 1;
     }
-    handleChange(
-      e,
-      newValues,
-      e.target["name"] === "top" ? stepValue === "day" : false,
-      false
-    );
+
+    setSliderStart(newValues[0]);
+    setSliderEnd(newValues[1]);
+
+    // Preview the change to the parent component
+    onPreview([
+      sliderMarkDate(newValues[0], rangeScope.start),
+      sliderMarkDate(newValues[1], rangeScope.start),
+    ]);
   };
 
-  // Helper functions for commit events, which are clearer and more explicit.
-  const handleTopCommit = (e: MouseEvent, val: number[]) => {
-    handleChange(e, val, stepValue === "day", true);
-  };
+  /**
+   * Handles the commit event when the user releases a slider thumb or clicks the track.
+   * This function sends the new date range to the parent component via the onCommit prop.
+   */
+  const handleOnCommit = (_: MouseEvent, val: number[]) => {
+    let newStart = sliderStart;
+    let newEnd = sliderEnd;
 
-  const handleBottomCommit = (e: MouseEvent, val: number[]) => {
-    handleChange(e, val, false, true);
+    // Reset the drag state
+    dragStartRef.current = null;
+
+    onCommit([
+      sliderMarkDate(newStart, rangeScope.start),
+      sliderMarkDate(newEnd, rangeScope.start),
+    ]);
   };
 
   const sliderMarkText = useSliderMarkText();
-
   return (
     <DualSlider
       value={[sliderStart, sliderEnd]}
       step={stepValue === "day" ? 1 : null}
       stepValue={stepValue}
       showBottomSlider={show2ndSlider}
-      handleTopCommit={handleTopCommit}
-      handleBottomCommit={handleBottomCommit}
+      handleTopCommit={handleOnCommit}
+      handleBottomCommit={handleOnCommit}
       mainMarks={mainMarks(props)}
       superMarks={superMarks(props)}
       valueLabelFormat={(val) => sliderMarkText(val, rangeScope.start)}
       max={sliderMarkNumber(rangeScope.end, rangeScope.start)}
       onChange={handleOnChange}
       localization={localization}
-      // Spreading props here is less explicit; it's better to pass them individually if possible.
       {...props}
     />
   );

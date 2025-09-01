@@ -18,6 +18,7 @@ function DateInput(props: dateCardProps) {
     dates,
     stepValue,
     localization,
+    showExpand,
     ...otherProps
   } = props;
 
@@ -41,7 +42,7 @@ function DateInput(props: dateCardProps) {
                 bf="b"
                 vertical={false}
                 reverse={true}
-                showExpand={true}
+                showExpand={showExpand}
                 localization={localization} // Pass localization prop
               />
             </Grid>
@@ -79,7 +80,7 @@ function DateInput(props: dateCardProps) {
                 bf="f"
                 vertical={false}
                 reverse={false}
-                showExpand={true}
+                showExpand={showExpand}
                 localization={localization} // Pass localization prop
               />
             </Grid>

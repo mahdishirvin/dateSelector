@@ -18,13 +18,16 @@ import { FormattingSettingsService } from "powerbi-visuals-utils-formattingmodel
 import { VisualSettingsModel } from "./vsettings";
 import { ColorHelper } from "powerbi-visuals-utils-colorutils";
 import { VisualState, dateRange, dateCardProps } from "./interface";
-import { mapOptionsToState } from "./optionsMapper";
+import { mapOptionsToState, restoreRangeFilter } from "./optionsMapper";
 import tinycolor from "tinycolor2";
 import DateRangeCard from "./components/daterangecard";
 import isEqual from "lodash.isequal";
 import { LocalizationContext, DateFnsLocaleProvider } from "./localeutils";
 import { ReactVisual } from "./reactUtils";
 import { HotkeysProvider } from "react-hotkeys-hook";
+import { equalRanges } from "./dateutils"
+import { parseJSON, format } from "date-fns";
+import * as React from "react";
 
 /**
  * The DateSelector class is the main entry point for the visual. It manages the
@@ -44,9 +47,11 @@ export class DateSelector extends ReactVisual implements IVisual {
   private state: VisualState;
   private locale: string;
   // We now use a single state variable to track the applied filter, simplifying the logic.
-  private currentFilter: dateRange;
-  // We keep track of the filter being applied to prevent update loops.
-  private isApplyingFilter: boolean = false;
+   private currentFilter: dateRange | null = null;
+  private isApplyingFilter = false;
+  private pendingFilter: dateRange | null = null;
+ // A flag to prevent a redundant UI update when the visual applies its own filter.
+  private isUpdatingFromVisual: boolean = false;
   // A flag to ensure we only apply the initial state once.
   private initialLoadComplete: boolean = false;
 
@@ -112,72 +117,76 @@ export class DateSelector extends ReactVisual implements IVisual {
     try {
       this.events.renderingStarted(options);
 
-      // Prevent a filter-apply loop. If a filter is being applied,
-      // we should ignore subsequent update calls until it's done.
-      if (this.isApplyingFilter) {
+      // We need to immediately check if this update was triggered by the visual itself.
+      // If so, we should do nothing to avoid a redundant render loop.
+      if (this.isUpdatingFromVisual) {
+        this.isUpdatingFromVisual = false;
         this.events.renderingFinished(options);
         return;
       }
 
-      const defaultLandingProps: dateCardProps = { landingOff: false };
-
-      if (!this.isValidDataView(options)) {
+     if (!this.isValidDataView(options)) {
         this.initialiseVisualState();
-        this.updateReactContainers(defaultLandingProps);
+        this.updateReactContainers({ landingOff: false });
         this.events.renderingFinished(options);
         return;
       }
 
-      // Fix for the `isEqual` typo. We now correctly compare the incoming
-      // dataView with the stored dataView to determine if settings need to be reloaded.
       const shouldGetSettings = !isEqual(options.dataViews[0], this.dataView);
       this.dataView = options.dataViews[0];
+      if (shouldGetSettings) this.loadVisualSettings(options);
 
-      if (shouldGetSettings) {
-        this.loadVisualSettings(options);
-      }
+      // Always check what host says now
+      const hostFilter = restoreRangeFilter(options) || null;
 
-      const persistedFilter = this.getPersistedFilter(options);
-      let datesToApply: dateRange;
-
-      if (persistedFilter) {
-        // If a bookmark has a filter, we use that.
-        datesToApply = persistedFilter;
-        // console.log("Restoring filter from bookmark:", datesToApply);
-      } else if (!this.initialLoadComplete) {
-        // If there's no bookmark, we apply the initial settings from the properties pane.
-        datesToApply = this.state?.settings?.dates;
-        // console.log("Applying initial filter from settings:", datesToApply);
-      } else if (this.state.settings.dates !== this.currentFilter) {
-        // If the user has changed the dates in the properties pane,
-        // we apply those changes.
-        datesToApply = this.state.settings.dates;
-        // console.log("Applying updated filter from settings:", datesToApply);
+      // If we are waiting for host to apply our last write, confirm it landed
+      if (this.isApplyingFilter) {
+        if (equalRanges(hostFilter, this.pendingFilter)) {
+          // landed
+          this.currentFilter = hostFilter;
+          this.pendingFilter = null;
+          this.isApplyingFilter = false;
+        } else {
+          // not yet landed — skip rendering to avoid echo
+          this.events.renderingFinished(options);
+          return;
+        }
       } else {
-        // If the visual has already loaded and there's no bookmark,
-        // we'll keep the currently applied filter.
-        datesToApply = this.currentFilter;
-        // console.log("Keeping existing filter:", datesToApply);
+        // normal path: adopt host filter if it differs
+        if (!equalRanges(this.currentFilter, hostFilter)) {
+          this.currentFilter = hostFilter;
+        }
       }
 
-      // This condition is now simpler: apply a filter if it's the first time loading,
-      // or if the dates to apply are different from the ones currently applied.
-      // Using `isEqual` on the date objects is the most reliable way to check for a change.
-      const isFilterChanged = !isEqual(this.currentFilter, datesToApply);
-
-      if (isFilterChanged && datesToApply?.start && datesToApply?.end) {
-        this.applyDateFilter(datesToApply);
+         // Fall back to settings dates once at startup if host has none
+      if (!this.currentFilter?.start || !this.currentFilter?.end) {
+        const initial = this.state?.settings?.dates;
+        if (initial?.start && initial?.end) {
+          this.currentFilter = initial;
+        }
       }
 
-      // Always update the React component with the correct settings and dates.
-      const currentSettings = this.state?.settings || defaultLandingProps;
-      this.updateReactContainers({ ...currentSettings, dates: datesToApply });
+      // Push to React (DateRangeCard). It will only update local UI if dates changed.
+      this.updateReactContainers({
+        ...this.state.settings,
+        dates: this.currentFilter!,
+      });
 
       this.initialLoadComplete = true;
       this.events.renderingFinished(options);
     } catch (e) {
       console.error(e);
       this.events.renderingFailed(options);
+    }
+  }
+
+  private cloneRange<T>(range: T): T {
+    try {
+      // Modern environments (Node 17+, browsers) support structuredClone
+      return structuredClone(range);
+    } catch {
+      // Fallback for older environments
+      return JSON.parse(JSON.stringify(range));
     }
   }
 
@@ -217,28 +226,18 @@ export class DateSelector extends ReactVisual implements IVisual {
         options.dataViews[0]
       );
 
-    // 1. Get the new visual state from the mapper.
-    // The mapper ensures that the bookmark data is prioritized.
+    // Correcting the mapOptionsToState call to match the provided signature.
     const newVisualState = mapOptionsToState(
       options,
       this.formattingSettings,
       this.initialLoadComplete
     );
 
-    // 2. IMPORTANT: Create a new state object to force a re-render.
-    // We are not just modifying properties on the existing object.
     this.state = {
-      ...this.state, // Copy existing state
-      ...newVisualState, // Overwrite with new values from the bookmark
+      ...this.state,
+      ...newVisualState,
     };
 
-    // // We now pass `this.initialLoadComplete` to `mapOptionsToState`
-    // // so it can handle the initial state.
-    // this.state = mapOptionsToState(
-    //     options,
-    //     this.formattingSettings,
-    //     this.initialLoadComplete
-    // );
     if (this.colorHelper.isHighContrast) {
       const foregroundColor =
         this.colorHelper.getHighContrastColor("foreground");
@@ -254,34 +253,6 @@ export class DateSelector extends ReactVisual implements IVisual {
   }
 
   /**
-   * A helper method to get the persisted filter from bookmarks.
-   * @param options The visual update options.
-   * @returns The persisted date range or null if not found.
-   */
-  private getPersistedFilter(options: VisualUpdateOptions): dateRange | null {
-    const objects = options.dataViews?.[0]?.metadata?.objects;
-    const persistedFilterValue = objects?.[DateSelector.BOOKMARK_OBJECT]?.[
-      DateSelector.BOOKMARK_PROPERTY
-    ] as DataViewPropertyValue;
-
-    if (typeof persistedFilterValue === "string") {
-      try {
-        const persistedState = JSON.parse(persistedFilterValue);
-        if (persistedState?.filter?.start && persistedState.filter?.end) {
-          console.log("Restoring persisted filter:", persistedState.filter);
-          return {
-            start: new Date(persistedState.filter.start),
-            end: new Date(persistedState.filter.end),
-          };
-        }
-      } catch (e) {
-        console.error("Failed to parse persisted bookmark state:", e);
-      }
-    }
-    return null;
-  }
-
-  /**
    * Returns the visual's properties for the formatting pane.
    * @param options The enumeration options.
    */
@@ -291,7 +262,6 @@ export class DateSelector extends ReactVisual implements IVisual {
     let objectEnumeration: VisualObjectInstance[] = [];
 
     if (options.objectName === DateSelector.BOOKMARK_OBJECT) {
-      // We now use the single `currentFilter` variable to persist the state.
       const bookmarkState = {
         filter: this.currentFilter || { start: null, end: null },
       };
@@ -315,37 +285,18 @@ export class DateSelector extends ReactVisual implements IVisual {
    * @param dates The date range to filter by.
    */
   public applyDateFilter = (dates: dateRange): void => {
-    if (this.state?.category) {
-      this.isApplyingFilter = true;
-      this.visualHost.applyJsonFilter(
-        this.createFilter(
-          dates.start,
-          dates.end,
-          this.state.category.filterTarget
-        ),
-        DateSelector.filterObjectProperty.objectName,
-        DateSelector.filterObjectProperty.propertyName,
-        dates.start && dates.end
-          ? powerbi.FilterAction.merge
-          : powerbi.FilterAction.remove
-      );
-      // This `setTimeout` is a common anti-pattern in Power BI custom visuals,
-      // but we'll leave it as-is since it's part of the original code's design.
-      // The `isApplyingFilter` flag check in the `update` method is what truly prevents the loop.
-      setTimeout(() => {
-        this.isApplyingFilter = false;
-      }, 0);
+    if (!this.state?.category) return;
 
-      // The single source of truth for the applied filter is now `currentFilter`.
-      this.currentFilter = dates;
+    // Mark pending; do NOT push to React here — DateRangeCard already updated UI locally.
+    this.isApplyingFilter = true;
+    this.pendingFilter = { start: new Date(dates.start), end: new Date(dates.end) };
 
-      // We also update the settings to reflect the new dates.
-      if (this.state.settings) {
-        this.state.settings.dates = dates;
-      }
-    } else {
-      console.error("State is undefined, cannot apply filter.");
-    }
+    this.visualHost.applyJsonFilter(
+      this.createFilter(dates.start, dates.end, this.state.category.filterTarget),
+      DateSelector.filterObjectProperty.objectName,
+      DateSelector.filterObjectProperty.propertyName,
+      dates.start && dates.end ? powerbi.FilterAction.merge : powerbi.FilterAction.remove
+    );
   };
 
   /**
@@ -360,6 +311,8 @@ export class DateSelector extends ReactVisual implements IVisual {
     endDate: Date,
     filterTarget: IFilterColumnTarget
   ): AdvancedFilter {
+
+    // The dates are already Date objects, so we can directly use toJSON().
     return new AdvancedFilter(
       filterTarget,
       "And",

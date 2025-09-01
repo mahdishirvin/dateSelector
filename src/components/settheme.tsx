@@ -1,17 +1,22 @@
 import { createTheme } from "@mui/material/styles";
 
-export function SetTheme({ themeMode, themeColor, themeFont, fontSize }: {
+export function SetTheme({ themeMode, themeColor, themeFont, fontSize ,fontColor}: {
   themeMode: "light" | "dark";
   themeColor: string;
   themeFont: string;
   fontSize: string;
+  fontColor?: string;
 }) {
   return createTheme({
-    palette: {
+colorSchemes: {
+    light: true,
+    dark: true,
+  },    palette: {
       mode: themeMode,
       primary: {
         main: themeColor,
       },
+      text: {primary: fontColor}
     },
     typography: {
       fontFamily: themeFont,

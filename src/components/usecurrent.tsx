@@ -2,13 +2,12 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import ButtonGroup from "@mui/material/ButtonGroup";
-import { areIntervalsOverlapping, parseJSON } from "date-fns";
+import { areIntervalsOverlapping, format } from "date-fns";
 import Typography from "@mui/material/Typography";
 import { dateCardProps, dateRange } from "../interface";
 import RngeTooltip from "./rngetooltip";
 import DateIntervalPicker from "./dateintervalpicker";
 import { Badge } from "@mui/material";
-// import { useLocalization } from "../localeutils";
 
 export default function UseCurrent(props: dateCardProps) {
   const {
@@ -27,22 +26,35 @@ export default function UseCurrent(props: dateCardProps) {
 
   const [ttl, setTtl] = React.useState(true);
 
-  const handleDate = (val: dateRange) => {
-    let start =
-      parseJSON(val.start.toString()).toString() !== "Invalid Date"
-        ? parseJSON(val.start.toString())
-        : val.start;
-    let end =
-      parseJSON(val.end.toString()).toString() !== "Invalid Date"
-        ? parseJSON(val.end.toString())
-        : val.end;
-    handleVal([start, singleDay ? start : end]);
-  };
+  // ✅ memoized handler avoids redundant renders
+  const handleDate = React.useCallback(
+    (val: dateRange) => {
+      // console.log(
+      //   "UseCurrent dates:",
+      //   format(val.start, "dd/MM/yy"),
+      //   format(val.end, "dd/MM/yy")
+      // );
 
-  const handleStepChange = (val: string) => {
-    const _val = val === "today" ? "day" : val;
-    handleStep(_val);
-  };
+      const newDates: [Date, Date] = [
+        val.start,
+        singleDay ? val.start : val.end,
+      ];
+      handleVal(newDates);
+    },
+    [handleVal, singleDay]
+  );
+
+  const handleStepChange = React.useCallback(
+    (val: string) => {
+      const _val = val === "today" ? "day" : val;
+      handleStep(_val);
+    },
+    [handleStep]
+  );
+
+  const toggleTtl = React.useCallback(() => {
+    setTtl((prev) => !prev);
+  }, []);
 
   return (
     <>
@@ -106,12 +118,12 @@ export default function UseCurrent(props: dateCardProps) {
                       color="primary"
                       key={`tbn${item.thisRange}${index}`}
                       value={item.tip.toLowerCase().trim()}
-                      onMouseDown={() => {
+                      onClick={() => {
                         if (item.thisRange) {
                           handleDate(item.thisRange);
                           handleStepChange(item.step);
                         } else {
-                          setTtl(!ttl);
+                          toggleTtl();
                         }
                       }}
                     >

@@ -6,21 +6,19 @@ It receives several props to customize its behavior and appearance.
 */
 import * as React from "react";
 import { useState, useEffect, useMemo, useCallback } from "react";
-
 import Grid from "@mui/material/Grid";
 import Zoom from "@mui/material/Zoom";
 import { ThemeProvider } from "@mui/material/styles";
 import { SetTheme } from "./settheme";
-// import { LanguageProvider } from "../languages/LanguageContext";
 import { useHotkeys } from "react-hotkeys-hook";
 import TopRow from "./toprow";
 import RangeSlider from "./rangeslider";
-import { dateCardProps } from "../interface";
+import { dateCardProps, dateRange } from "../interface";
 import { DateMoveKeys } from "./datemovekeys";
-import { Increment } from "../dateutils";
+import { Increment, equalRanges } from "../dateutils";
 import { HelpProvider } from "./helpprovider";
 import LandingPage from "./landingpage";
-import { compareAsc, format ,parseJSON} from "date-fns";
+import { compareAsc, format } from "date-fns";
 import { useLocalization } from "../localeutils";
 
 export default function DateRangeCard(props: dateCardProps) {
@@ -29,10 +27,21 @@ export default function DateRangeCard(props: dateCardProps) {
     return <LandingPage />;
   }
 
-  console.log(
-    "DateRangeCard dates:",
-    format(props.dates.start, "dd/MM/yy"),
-    format(props.dates.end, "dd/MM/yy") );
+  // Use useState to manage the UI's date state, initialized from props.
+  const [currentDates, setCurrentDates] = useState<dateRange>(props.dates);
+
+  // keep UI in sync if the Power BI changes dates externally
+  useEffect(() => {
+    // only replace if it actually changed, to avoid extra renders
+    if (!equalRanges(props.dates, currentDates)) {
+      setCurrentDates(props.dates);
+      console.log(
+        "DateRangeCard dates:",
+        format(currentDates.start, "dd/MM/yy"),
+        format(currentDates.end, "dd/MM/yy")
+      );
+    }
+  }, [props.dates]);
 
   // Use the localization hook to get the localization manager.
   const localization = useLocalization();
@@ -45,6 +54,7 @@ export default function DateRangeCard(props: dateCardProps) {
         themeColor: props.themeColor,
         themeFont: props.themeFont,
         fontSize: String(props.fontSize),
+        fontColor: props.fontColor,
       }),
     [props.themeMode, props.themeColor, props.themeFont, props.fontSize]
   );
@@ -91,27 +101,58 @@ export default function DateRangeCard(props: dateCardProps) {
     const handleContextMenu = (event: MouseEvent) => {
       event.preventDefault();
     };
-
     document.addEventListener("contextmenu", handleContextMenu);
-
     return () => {
       document.removeEventListener("contextmenu", handleContextMenu);
     };
   }, []);
 
-  const onChangeVal = useCallback(
+  // UI-only updates
+  const handlePreviewChange = useCallback(
+    (range: [Date, Date]) => {
+      const sorted = props.singleDay
+        ? [range[0], range[0]]
+        : [...range].sort((a, b) => a.getTime() - b.getTime());
+      setCurrentDates({ start: sorted[0], end: sorted[1] });
+    },
+    [props.singleDay]
+  );
+
+  // This is the centralized handler. It updates the local state and then
+  // calls the prop function to inform Power BI.
+  const handleDateChange = useCallback(
     (filter: [Date, Date]) => {
       // Sort dates to ensure the start is always before the end.
       const sortedDates = props.singleDay
         ? [filter[0], filter[0]]
         : filter.sort(compareAsc);
-      props.onFilterChanged({ start: sortedDates[0], end: sortedDates[1] });
+
+      // Update local state first to trigger UI re-render
+      setCurrentDates({
+        start: sortedDates[0],
+        end: sortedDates[1],
+      });
+
+      // Then inform Power BI
+      props.onFilterChanged({
+        start: sortedDates[0],
+        end: sortedDates[1],
+      });
     },
     [props.singleDay, props.onFilterChanged]
   );
 
+  // This is the onChangeVal method that passes up a simple array of dates
+  // to the main handler.
+  const onChangeVal = useCallback(
+    (filter: [Date, Date]) => {
+      handleDateChange(filter);
+    },
+    [handleDateChange]
+  );
+
   // Use the custom hook for keyboard shortcuts.
-  DateMoveKeys(onChangeVal, stepValue, props.dates, current);
+  DateMoveKeys(onChangeVal, stepValue, currentDates, current);
   useHotkeys("s", toggleSlider, [openSlider]);
 
   return (
@@ -125,10 +166,11 @@ export default function DateRangeCard(props: dateCardProps) {
       >
         <TopRow
           {...props}
-          dates={props.dates}
+          dates={currentDates}
           showMore={props.showMore}
           showMove={props.showMove}
           localization={localization}
+          showExpand={props.showExpand}
           showSlider={props.showSlider}
           openSlider={openSlider}
           toggleSlider={toggleSlider}
@@ -145,11 +187,14 @@ export default function DateRangeCard(props: dateCardProps) {
             <Grid size="grow" sx={{ marginLeft: 1, paddingTop: 0.1 }}>
               <RangeSlider
                 {...props}
-                dates={props.dates}
-                handleVal={onChangeVal}
+                dates={currentDates}
                 stepValue={stepValue}
                 rangeScope={props.rangeScope}
                 localization={localization}
+                // During drag: preview only
+                onPreview={handlePreviewChange}
+                // On release: commit to host
+                onCommit={onChangeVal}
               />
             </Grid>
           </Grid>

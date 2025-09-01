@@ -83,13 +83,44 @@ type MoveParms = {
   detailRow2: string;
 };
 
-export const moveParms = (
+  // --- add helpers ---
+  function normDay(d: Date | null): Date | null {
+    if (!d) return null;
+    const x = new Date(d);
+    // compare by UTC day to ignore local time shifts
+    return new Date(
+      Date.UTC(x.getUTCFullYear(), x.getUTCMonth(), x.getUTCDate())
+    );
+  }
+
+  export function equalRanges(a?: dateRange | null, b?: dateRange | null): boolean {
+    if (!a && !b) return true;
+    if (!a || !b) return false;
+    const sa = normDay(a.start)?.getTime();
+    const ea = normDay(a.end)?.getTime();
+    const sb = normDay(b.start)?.getTime();
+    const eb = normDay(b.end)?.getTime();
+    return sa === sb && ea === eb;
+  }
+
+
+/**
+ * A utility function to build parameters for the DateMove component.
+ * This function no longer uses a hook directly and is now a pure function.
+ * @param {string} bf - Back ("b") or Forward ("f").
+ * @param {boolean} vert - Is the layout vertical?
+ * @param {boolean} ctrl - Is the control (Shift) key pressed?
+ * @param {string} stepValue - The current step value (e.g., "day", "week").
+ * @param {object} localization - An object containing localization display names.
+ * @returns {MoveParms} - The parameters for the move component.
+ */
+export const getMoveParms = (
   bf: string,
   vert: boolean,
   ctrl: boolean,
-  stepValue: string
+  stepValue: string,
+  localization: any
 ): MoveParms => {
-  const localization = useLocalization();
 
   const isBack = bf === "b";
 

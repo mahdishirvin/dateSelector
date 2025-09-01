@@ -16,6 +16,7 @@ const TopRow: React.FC<dateCardProps> = ({
   setStepOpen,
   stepOpen,
   localization,
+  showExpand,
   ...props
 }) => {
   return (
@@ -48,6 +49,7 @@ const TopRow: React.FC<dateCardProps> = ({
         handleViz={setStepOpen}
         stepOpen={stepOpen}
         localization={localization}
+        showExpand={showExpand}
       />
 
       {/* Use Grid item for the UseCurrent component */}

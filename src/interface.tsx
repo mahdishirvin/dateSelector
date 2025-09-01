@@ -233,7 +233,7 @@ export interface dateCardProps {
   handleViz?: (val: any) => void;
   handleClick?: () => void;
   handleStep?: (value: string) => void;
-  onFilterChanged?: (val: dateRange) => void;
+  onFilterChanged?: (result:dateRange) => void,
   setStepValue?: (value: string) => void;
   setStepOpen?: (value: boolean) => void;
 

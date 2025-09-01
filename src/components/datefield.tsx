@@ -35,7 +35,8 @@ export const DateField: React.FC<DateFieldProps> = (props) => {
   const { id, value, doUpdate, underline, max, min = "date" } = props;
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
+        // console.log("Enter key pressed:", e);
+  if (e.key === "Enter") {
       e.preventDefault();
       const inputElement = e.target as HTMLInputElement;
       if (inputElement && inputElement.value) {

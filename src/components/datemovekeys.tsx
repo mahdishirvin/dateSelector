@@ -3,47 +3,77 @@ import { useHotkeys } from "react-hotkeys-hook";
 import debounce from "lodash.debounce";
 import type { dateRange } from "../interface";
 import { parseJSON } from "date-fns";
+import { useState, useEffect } from "react";
 
+/**
+ * Custom hook to handle hotkeys for date range navigation.
+ * This version separates the immediate UI update from the debounced filter
+ * application by managing a local state within the hook itself.
+ *
+ * @param {function} applyFilterFn - The function to apply the filter to the Power BI host.
+ * @param {string} stepValue - The current step value (day, week, month, etc.).
+ * @param {dateRange} externalDates - The current date range from the parent component's props.
+ * @param {any} current - The current period details.
+ * @param {number} debounceTime - The debounce time in milliseconds.
+ */
 export function DateMoveKeys(
-  fn: (result: Date[]) => void,
+  applyFilterFn: (result: Date[]) => void,
   stepValue: string,
-  dates: dateRange,
+  externalDates: dateRange,
   current: any,
   debounceTime = 500
 ) {
-  const updateResult = (x: string) => {
-    const newDates = getRange(x, stepValue, dates);
-          let start =
-            parseJSON(newDates[0].toString()).toString() !== "Invalid Date"
-              ? parseJSON(newDates[0].toString())
-              : newDates[0];
-          let end =
-            parseJSON(newDates[1].toString()).toString() !== "Invalid Date"
-              ? parseJSON(newDates[1].toString())
-              : newDates[1];
-          fn([start, end]);
+  // Use local state to manage the dates for the UI during a rapid key press.
+  const [internalDates, setInternalDates] = useState(externalDates);
 
+  // Synchronize the internal state with the external dates. This ensures that
+  // when the debounced filter is finally applied and new props are received,
+  // the internal state updates to reflect the latest values.
+  useEffect(() => {
+    setInternalDates(externalDates);
+  }, [externalDates]);
+
+  // Debounced function that actually applies the filter.
+  // This will only be called after the user stops pressing keys.
+  const debouncedApplyFilter = debounce((newDates: dateRange) => {
+    applyFilterFn([newDates.start, newDates.end]);
+  }, debounceTime, { leading: false, trailing: true });
+
+  const updateDates = (direction: string) => {
+    // console.log("move",internalDates)
+    // Calculate the new date range based on the direction.
+    const newDatesArr = getRange(direction, stepValue, internalDates);
+    const start = parseJSON(newDatesArr[0].toString()).toString() !== "Invalid Date"
+      ? parseJSON(newDatesArr[0].toString())
+      : newDatesArr[0];
+    const end = parseJSON(newDatesArr[1].toString()).toString() !== "Invalid Date"
+      ? parseJSON(newDatesArr[1].toString())
+      : newDatesArr[1];
+
+    // Update the local state for a snappy UI experience.
+    const newDates = { start, end };
+    setInternalDates(newDates);
+
+    // Call the debounced function with the new dates.
+    debouncedApplyFilter(newDates);
   };
 
-  const debouncedResult = debounce(updateResult, debounceTime, {
-    leading: false,
-    trailing: true
-  });
+  useHotkeys(["n", "right"], () => updateDates("f"), [stepValue, internalDates]);
+  useHotkeys(["left", "l"], () => updateDates("b"), [stepValue, internalDates]);
+  useHotkeys("ctrl+right", () => updateDates("ef"), [stepValue, internalDates]);
+  useHotkeys("ctrl+left", () => updateDates("eb"), [stepValue, internalDates]);
+  useHotkeys("shift+right", () => updateDates("rf"), [stepValue, internalDates]);
+  useHotkeys("shift+left", () => updateDates("rb"), [stepValue, internalDates]);
 
-  useHotkeys(["n", "right"], () => debouncedResult("f"), [stepValue, dates]);
-  useHotkeys(["left", "l"], () => debouncedResult("b"), [stepValue, dates]);
-  useHotkeys("ctrl+right", () => debouncedResult("ef"), [stepValue, dates]);
-  useHotkeys("ctrl+left", () => debouncedResult("eb"), [stepValue, dates]);
-  useHotkeys("shift+right", () => debouncedResult("rf"), [stepValue, dates]);
-  useHotkeys("shift+left", () => debouncedResult("rb"), [stepValue, dates]);
-  useHotkeys(
-    "t",
-    () => {
-      const thisRange = current
-        .filter((item) => item.step === stepValue)
-        .map((item) => item.thisRange)[0];
-      fn([thisRange.start, thisRange.end]);
-    },
-    [stepValue]
-  );
+  useHotkeys("t", () => {
+    const thisRange = current
+      .filter((item) => item.step === stepValue)
+      .map((item) => item.thisRange)[0];
+
+    // Update the local state immediately.
+    setInternalDates(thisRange);
+
+    // Immediately apply the filter, as this is a single, non-repeated action.
+    applyFilterFn([thisRange.start, thisRange.end]);
+  }, [stepValue]);
 }

@@ -5,7 +5,7 @@ import IconButton from "@mui/material/IconButton";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import Remove from "@mui/icons-material/Remove";
 import { useTheme } from "@mui/material/styles";
-import { format, parse, isValid, isEqual,parseJSON } from "date-fns";
+import { format, parse, isValid, isEqual } from "date-fns";
 
 import { useInputParms } from "../dateutils";
 import { DateField } from "./datefield";
@@ -13,14 +13,22 @@ import { useHelpContext } from "./helpprovider";
 import RngeTooltip from "./rngetooltip";
 import { dateCardProps, dateRange } from "../interface";
 import { useDateFnsLocale } from "../localeutils";
+import { HorizontalRule, LinearScale } from "@mui/icons-material";
 
 // DateRange input with optional reset.
 // Uses the sync value if available; otherwise falls back to preset startup filter or scope.
 // The reset button appears on the separator only when a startup value exists.
 
 export default function DateRange(props: dateCardProps) {
-  const { dates, rangeScope, handleVal, singleDay, startupFilter, startRange, localization } =
-    props;
+  const {
+    dates,
+    rangeScope,
+    handleVal,
+    singleDay,
+    startupFilter,
+    startRange,
+    localization,
+  } = props;
 
   const locale = useDateFnsLocale();
 
@@ -54,12 +62,31 @@ export default function DateRange(props: dateCardProps) {
     else setEndText(value);
   };
 
-  const handleDate = (val: dateRange) => {
-    let start=    (val.start.toString() !== "Invalid Date") ? parseJSON(val.start.toString()) : dates.start;
-    let end=    (val.end.toString() !== "Invalid Date") ? parseJSON(val.end.toString()) : dates.end;
+  // const handleDate = (val: dateRange) => {
+  //   handleVal([val.start, singleDay ? val.start : val.end]);
+  // };
 
-    handleVal([start, singleDay ? start : end]);
-  };
+  // ✅ memoized handler avoids redundant renders
+  const handleDate = React.useCallback(
+    (val: dateRange) => {
+      // console.log(
+      //   "DateRange dates:",
+      //   format(val.start, "dd/MM/yy"),
+      //   format(val.end, "dd/MM/yy")
+      // );
+
+      const newDates: [Date, Date] = [
+        val.start,
+        singleDay ? val.start : val.end,
+      ];
+
+      setStartText(format(newDates[0], "yyyy-MM-dd", { locale }));
+      setEndText(format(newDates[1], "yyyy-MM-dd", { locale }));
+
+      handleVal(newDates);
+    },
+    [handleVal, singleDay]
+  );
 
   const input = useInputParms();
   const dateSpan = input(dates, rangeScope);
@@ -90,8 +117,6 @@ export default function DateRange(props: dateCardProps) {
       !isEqual(dates.end, startupFilter.end));
 
   const showRefresh = hovered && canReset;
-
-  // console.log("DateRange render:", format(dates.start,"dd/MM/yy"), format(dates.end,"dd/MM/yy"), "canReset:", canReset, "startupFilter:", startupFilter);
 
   return (
     <Grid container spacing={0.5} sx={{ paddingLeft: 0.3 }}>
@@ -156,10 +181,17 @@ export default function DateRange(props: dateCardProps) {
                 </IconButton>
               ) : (
                 <IconButton size="small" disabled={!canReset}>
-                  <Remove
-                    style={{ fontSize: theme.typography.fontSize }}
-                    color={canReset ? "action" : "disabled"}
-                  ></Remove>
+                  {canReset ? (
+                    <LinearScale
+                      style={{ fontSize: theme.typography.fontSize }}
+                      color={canReset ? "action" : "disabled"}
+                    ></LinearScale>
+                  ) : (
+                    <HorizontalRule
+                      style={{ fontSize: theme.typography.fontSize }}
+                      color={canReset ? "action" : "disabled"}
+                    ></HorizontalRule>
+                  )}{" "}
                 </IconButton>
               )}
             </span>

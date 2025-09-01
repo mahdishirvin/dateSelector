@@ -1,7 +1,7 @@
 {
     "visual": {
         "name": "dateSelector",
-        "displayName": "Date Selector 3.8.26",
+        "displayName": "Date Selector 3.9.1",
         "guid": "dateSel4A1A0033E6F54D1B809B6E51058D54E3",
         "visualClassName": "DateSelector",
         "version": "3.2025.08.19",
@@ -15,7 +15,7 @@
         "email": "josborn@oahi.com.au"
     },
     "assets": {
-        "icon": "assets/dateSelector.svg"
+        "icon": "assets/dateSelector1.svg"
     },
     "capabilities": "capabilities.json",
     "dependencies": null,
