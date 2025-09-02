@@ -639,11 +639,11 @@ export const sliderMarkNumber = (val: Date, min: Date) =>
 
 export const sliderMarkDate = (val: number, min: Date) => addDays(min, val);
 
-export const useSliderMarkText = () => {
-  const locale = useDateFnsLocale();
-  return (num: number, min: Date, fmt = "d-MMM-yy") =>
-    format(addDays(min, num), fmt, { locale });
-};
+// export const useSliderMarkText = () => {
+//   const locale = useDateFnsLocale();
+//   return (num: number, min: Date, fmt = "d-MMM-yy") =>
+//     format(addDays(min, num), fmt, { locale });
+// };
 
 type Step = "day" | "week" | "pay" | "month" | "quarter" | "year";
 
@@ -717,29 +717,32 @@ export const createMarks = (
     .sort((a, b) => a.getTime() - b.getTime());
 };
 
+export const sliderMarkText = (num: number, min: Date, fmt = "d-MMM-yy") =>
+{  const locale = useDateFnsLocale();
+ return format(addDays(min, num), fmt, {locale})};
+
 export const doMarks = (
-  _val: any,
-  _fmt: any,
-  _min: Date,
-  _skip: number,
-  _offset: number
+_val: any,
+_fmt: any,
+_min: Date,
+_skip: number,
+_offset: number
 ) => {
-  const sliderMarkText = useSliderMarkText();
-  return _val.map((x: Date, i: number) => {
-    const v: number = sliderMarkNumber(_skip === 0 ? startOfToday() : x, _min);
-    const dateValue =
-      _offset === 0
-        ? _min
-        : addYears(_min, sliderMarkDate(v, _min).getMonth() <= _offset ? 1 : 0);
-    const l =
-      (i + 1) % _skip === 0 || i === 0 || i === _val.length - 1
-        ? sliderMarkText(v, dateValue, _fmt)
-        : "";
-    return { value: v, label: l };
-  });
+return _val.map((x: Date, i: number) => {
+const v: number = sliderMarkNumber(_skip === 0 ? startOfToday(): x, _min);
+const dateValue =
+_offset === 0
+? _min
+: addYears(_min, sliderMarkDate(v, _min).getMonth() <= _offset ? 1 : 0);
+const l =
+(i + 1) % _skip === 0 || i === 0 || i === _val.length - 1
+? sliderMarkText(v, dateValue, _fmt)
+: "";
+return { value: v, label: l };
+});
 };
 
-export const buildMarks = (period: string, props: SliderProps) => {
+ const buildMarks = (period: string, props: SliderProps) => {
   const marks = createMarks(
     period,
     props.rangeScope,

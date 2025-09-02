@@ -72,6 +72,7 @@ export const settingProps = (
   const stepInit = String(calendar.stepInit.value);
   const singleDay = calendar.singleDay.value;
   const limitToScope = calendar.limitToScope.value;
+  const     forceStartRange = calendar.forceStartRange.value;
 
   const rangeScope = mapDataView(options).category.rangeValues;
   const weekStartDay = getDayNum(week.weekStartDay.value);
@@ -90,7 +91,11 @@ export const settingProps = (
 
   // Decide which to use for `dates`
   let selectedDates: dateRange;
-  if (syncFilter) {
+  if (forceStartRange)
+    {selectedDates = startup_Filter;
+  console.log(selectedDates)}
+    // force the startupDate to the start filter if not initialised.
+   else if (syncFilter) {
     // ✅ always prioritise sync’d values for current dates
     selectedDates = syncFilter;
   } else if (!initialised) {
@@ -103,7 +108,7 @@ export const settingProps = (
 
   return {
     landingOff: optionsAreValid(options),
-    dates: singleDay ? startup_Filter : selectedDates,
+    dates: selectedDates,
     rangeScope,
     startRange,
     weekStartDay,

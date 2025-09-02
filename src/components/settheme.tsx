@@ -1,6 +1,12 @@
 import { createTheme } from "@mui/material/styles";
 
-export function SetTheme({ themeMode, themeColor, themeFont, fontSize ,fontColor}: {
+export function SetTheme({
+  themeMode,
+  themeColor,
+  themeFont,
+  fontSize,
+  fontColor,
+}: {
   themeMode: "light" | "dark";
   themeColor: string;
   themeFont: string;
@@ -8,15 +14,12 @@ export function SetTheme({ themeMode, themeColor, themeFont, fontSize ,fontColor
   fontColor?: string;
 }) {
   return createTheme({
-colorSchemes: {
-    light: true,
-    dark: true,
-  },    palette: {
+    palette: {
       mode: themeMode,
       primary: {
         main: themeColor,
       },
-      text: {primary: fontColor}
+      text: { primary: fontColor },
     },
     typography: {
       fontFamily: themeFont,
@@ -55,4 +58,3 @@ colorSchemes: {
     },
   });
 }
-

@@ -189,6 +189,7 @@ export default function DateRangeCard(props: dateCardProps) {
                 {...props}
                 dates={currentDates}
                 stepValue={stepValue}
+                stepFmt={props.stepFmt}
                 rangeScope={props.rangeScope}
                 localization={localization}
                 // During drag: preview only

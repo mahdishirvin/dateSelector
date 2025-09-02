@@ -158,6 +158,8 @@
   "fmtYear_Yy": "aa - 00, 17, ... 20",
   "fmtDate_DMY": "jj MMM aaaa",
   "fmtDate_MDY": "MMM j aa",
+  "calendar_forceStartRange_description": "Force la date de démarrage à s'activer au lieu d'utiliser l'état enregistré pour la plage de dates initiale.",
+  "calendar_forceStartRange_displayName": "Forcer la plage de démarrage",
   "startRange_sync": "Par défaut",
   "startRange_rangeScope": "Tout dans la portée",
   "startRange_today": "Aujourd'hui",

@@ -182,6 +182,11 @@
                         "bool": true
                     }
                 },
+                "forceStartRange": {
+                    "type": {
+                        "bool": true
+                    }
+                },
                 "startRange": {
                     "type": {
                         "enumeration": [

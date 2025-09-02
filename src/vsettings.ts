@@ -159,10 +159,18 @@ class calendarSettings extends FormattingSettingsCard {
     value: defaultSettings.calendarSettings.limitToScope,
   });
 
+  forceStartRange = new formattingSettings.ToggleSwitch({
+    name: "forceStartRange",
+    descriptionKey: "calendar_forceStartRange_description",
+    displayNameKey: "calendar_forceStartRange_displayName",
+    value: defaultSettings.calendarSettings.limitToScope,
+  });
+
   slices: Array<FormattingSettingsSlice> = [
     this.singleDay,
     // this.limitToScope,
     this.startRange,
+    this.forceStartRange,
     this.stepInit,
   ];
 }

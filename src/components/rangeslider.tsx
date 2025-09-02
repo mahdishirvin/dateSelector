@@ -11,7 +11,7 @@ import {
   superMarks,
   sliderMarkNumber,
   sliderMarkDate,
-  useSliderMarkText,
+  sliderMarkText,
 } from "../dateutils";
 
 type Props = dateCardProps & {
@@ -169,7 +169,7 @@ export default function RangeSlider(props: Props) {
     ]);
   };
 
-  const sliderMarkText = useSliderMarkText();
+  // const sliderMarkText = useSliderMarkText();
   return (
     <DualSlider
       value={[sliderStart, sliderEnd]}

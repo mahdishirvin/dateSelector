@@ -49,6 +49,7 @@ export interface Settings {
     stepInit?: string;
     payLength?: number;
     fmtDate?: string;
+    forceStartRange?: boolean;
   };
   layoutSettings?: {
     timelineSettings: {
@@ -132,6 +133,7 @@ export interface dateCardProps {
   landingOff?: boolean;
 
   startRange?: string;
+    forceStartRange?: boolean;
 
   // date range object representing the initial filter state
   startupFilter?: dateRange;

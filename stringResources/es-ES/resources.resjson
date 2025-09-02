@@ -158,6 +158,8 @@
   "fmtYear_Yy": "aa - 00, 17, ... 20",
   "fmtDate_DMY": "dd MMM aaaa",
   "fmtDate_MDY": "MMM d aa",
+  "calendar_forceStartRange_description": "Forzar que la fecha de inicio se active en lugar de usar el estado guardado para el rango de fechas inicial.",
+  "calendar_forceStartRange_displayName": "Forzar rango de inicio",
   "startRange_sync": "Predeterminado",
   "startRange_rangeScope": "Todo en el rango",
   "startRange_today": "Hoy",

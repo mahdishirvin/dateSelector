@@ -158,6 +158,8 @@
   "fmtYear_Yy": "yy - 00, 17, ... 20",
   "fmtDate_DMY": "dd MMM yyyy",
   "fmtDate_MDY": "MMM d yy",
+  "calendar_forceStartRange_description": "Force the startup date to activate rather than using the saved state for the initial date range.",
+  "calendar_forceStartRange_displayName": "Force Startup Range",
   "startRange_sync": "Default",
   "startRange_rangeScope": "All in Scope",
   "startRange_today": "Today",

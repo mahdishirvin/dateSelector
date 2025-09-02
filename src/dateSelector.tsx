@@ -12,7 +12,6 @@ import IVisualEventService = powerbi.extensibility.IVisualEventService;
 import ILocalizationManager = powerbi.extensibility.ILocalizationManager;
 import IColorPalette = powerbi.extensibility.IColorPalette;
 import DataView = powerbi.DataView;
-import DataViewPropertyValue = powerbi.DataViewPropertyValue;
 import { IFilterColumnTarget, AdvancedFilter } from "powerbi-models";
 import { FormattingSettingsService } from "powerbi-visuals-utils-formattingmodel";
 import { VisualSettingsModel } from "./vsettings";
@@ -26,8 +25,6 @@ import { LocalizationContext, DateFnsLocaleProvider } from "./localeutils";
 import { ReactVisual } from "./reactUtils";
 import { HotkeysProvider } from "react-hotkeys-hook";
 import { equalRanges } from "./dateutils"
-import { parseJSON, format } from "date-fns";
-import * as React from "react";
 
 /**
  * The DateSelector class is the main entry point for the visual. It manages the
@@ -177,16 +174,6 @@ export class DateSelector extends ReactVisual implements IVisual {
     } catch (e) {
       console.error(e);
       this.events.renderingFailed(options);
-    }
-  }
-
-  private cloneRange<T>(range: T): T {
-    try {
-      // Modern environments (Node 17+, browsers) support structuredClone
-      return structuredClone(range);
-    } catch {
-      // Fallback for older environments
-      return JSON.parse(JSON.stringify(range));
     }
   }
 
