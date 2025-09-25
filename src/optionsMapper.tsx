@@ -45,7 +45,7 @@ export const settingProps = (
   options: powerbi.extensibility.visual.VisualUpdateOptions,
   formatSettings: VisualSettingsModel,
   initialised: boolean
-): dateCardProps => {
+):  Omit<dateCardProps, "dates"> => {
   const {
     styleSettings: style,
     calendarSettings: calendar,
@@ -72,43 +72,25 @@ export const settingProps = (
   const stepInit = String(calendar.stepInit.value);
   const singleDay = calendar.singleDay.value;
   const limitToScope = calendar.limitToScope.value;
-  const     forceStartRange = calendar.forceStartRange.value;
+  const forceStartRange = calendar.forceStartRange.value;
 
-  const rangeScope = mapDataView(options).category.rangeValues;
+  const rangeScope = mapDataView(options).category?.rangeValues;
   const weekStartDay = getDayNum(week.weekStartDay.value);
   const yearStartMonth = getNum(year.yearStartMonth.value);
   const startRange = String(calendar.startRange.value);
 
-  // Default initial range (non-sync)
-  const startup_Filter = getInitRange(
+ // just compute a startup default
+  const startupFilter = getInitRange(
     startRange,
     weekStartDay,
     yearStartMonth,
     rangeScope
   );
-  // Try to restore from synced filter
-  const syncFilter = restoreRangeFilter(options);
-
-  // Decide which to use for `dates`
-  let selectedDates: dateRange;
-  if (forceStartRange)
-    {selectedDates = startup_Filter;
-  console.log(selectedDates)}
-    // force the startupDate to the start filter if not initialised.
-   else if (syncFilter) {
-    // ✅ always prioritise sync’d values for current dates
-    selectedDates = syncFilter;
-  } else if (!initialised) {
-    // first-time init fallback
-    selectedDates = startup_Filter;
-  } else {
-    // fallback if already initialised and no sync found
-    selectedDates = startup_Filter;
-  }
 
   return {
     landingOff: optionsAreValid(options),
-    dates: selectedDates,
+    // dates: startupFilter,          // parent will override
+    startupFilter,                 // 👈 expose this
     rangeScope,
     startRange,
     weekStartDay,
@@ -116,9 +98,7 @@ export const settingProps = (
     stepInit,
     singleDay,
     limitToScope,
-
-    // 👇 persist the resolved value (not just startup_Filter)
-    startupFilter: startup_Filter,
+    forceStartRange,
 
     stepSkip: {
       day: day.daySkip.value,

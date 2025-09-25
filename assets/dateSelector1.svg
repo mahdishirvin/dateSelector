@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 28 27">
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 28 27">
   <g id="DateSelector" transform="translate(-1085 -523.5)">
     <g id="Group_2" data-name="Group 2">
       <line id="Line_10" data-name="Line 10" x1="15" transform="translate(1085.5 549.5)" fill="#707070" stroke="#707070" stroke-linecap="round" stroke-width="1"/>
@@ -16,27 +16,27 @@
       <line id="Line_12" data-name="Line 12" y1="24" transform="translate(1085.5 525.5)" fill="#707070" stroke="#707070" stroke-linecap="round" stroke-width="1"/>
       <line id="Line_23" data-name="Line 23" y1="3" transform="translate(1091.5 523.5)" fill="#707070" stroke="#707070" stroke-width="2"/>
       <line id="Line_24" data-name="Line 24" y1="3" transform="translate(1105.5 523.5)" fill="#707070" stroke="#707070" stroke-width="2"/>
-      <rect id="Rectangle_3" data-name="Rectangle 3" width="7" height="5" transform="translate(1087 531)" fill="#c9cc6d"/>
-      <rect id="Rectangle_18" data-name="Rectangle 18" width="7" height="5" transform="translate(1087 537)" fill="#c9cc6d"/>
-      <rect id="Rectangle_21" data-name="Rectangle 21" width="7" height="5" transform="translate(1087 543)" fill="#c9cc6d"/>
-      <rect id="Rectangle_15" data-name="Rectangle 15" width="7" height="5" transform="translate(1095 531)" fill="#c9cc6d"/>
-      <rect id="Rectangle_19" data-name="Rectangle 19" width="3" height="5" transform="translate(1095 537)" fill="#c9cc6d"/>
-      <rect id="Rectangle_24" data-name="Rectangle 24" width="1" height="3" transform="translate(1098 539)" fill="#c9cc6d"/>
-      <rect id="Rectangle_25" data-name="Rectangle 25" width="1" height="2" transform="translate(1099 540)" fill="#c9cc6d"/>
-      <rect id="Rectangle_26" data-name="Rectangle 26" width="1" height="1" transform="translate(1100 541)" fill="#c9cc6d"/>
-      <rect id="Rectangle_22" data-name="Rectangle 22" width="7" height="5" transform="translate(1095 543)" fill="#c9cc6d"/>
-      <rect id="Rectangle_17" data-name="Rectangle 17" width="7" height="5" transform="translate(1103 531)" fill="#c9cc6d"/>
-      <rect id="Rectangle_23" data-name="Rectangle 23" width="3" height="5" transform="translate(1107 543)" fill="#c9cc6d"/>
+      <rect id="Rectangle_3" data-name="Rectangle 3" width="7" height="5" transform="translate(1087 531)" fill="#505b3ecc"/>
+      <rect id="Rectangle_18" data-name="Rectangle 18" width="7" height="5" transform="translate(1087 537)" fill="#505b3ecc"/>
+      <rect id="Rectangle_21" data-name="Rectangle 21" width="7" height="5" transform="translate(1087 543)" fill="#505b3ecc"/>
+      <rect id="Rectangle_15" data-name="Rectangle 15" width="7" height="5" transform="translate(1095 531)" fill="#505b3ecc"/>
+      <rect id="Rectangle_19" data-name="Rectangle 19" width="3" height="5" transform="translate(1095 537)" fill="#505b3ecc"/>
+      <rect id="Rectangle_24" data-name="Rectangle 24" width="1" height="3" transform="translate(1098 539)" fill="#505b3ecc"/>
+      <rect id="Rectangle_25" data-name="Rectangle 25" width="1" height="2" transform="translate(1099 540)" fill="#505b3ecc"/>
+      <rect id="Rectangle_26" data-name="Rectangle 26" width="1" height="1" transform="translate(1100 541)" fill="#505b3ecc"/>
+      <rect id="Rectangle_22" data-name="Rectangle 22" width="7" height="5" transform="translate(1095 543)" fill="#505b3ecc"/>
+      <rect id="Rectangle_17" data-name="Rectangle 17" width="7" height="5" transform="translate(1103 531)" fill="#505b3ecc"/>
+      <rect id="Rectangle_23" data-name="Rectangle 23" width="3" height="5" transform="translate(1107 543)" fill="#505b3ecc"/>
       <g id="Group_1" data-name="Group 1" transform="translate(-1)">
-        <line id="Line_1" data-name="Line 1" x1="14" transform="translate(1098.5 535.5)" fill="none" stroke="#505b3e" stroke-linecap="round" stroke-width="1"/>
-        <line id="Line_9" data-name="Line 9" x1="14" transform="translate(1098.5 535.5)" fill="none" stroke="#505b3e" stroke-linecap="round" stroke-width="1"/>
-        <line id="Line_8" data-name="Line 8" x1="4" transform="translate(1103.5 549.5)" fill="none" stroke="#505b3e" stroke-linecap="round" stroke-width="1"/>
-        <line id="Line_2" data-name="Line 2" y1="3" transform="translate(1098.5 535.5)" fill="none" stroke="#505b3e" stroke-linecap="round" stroke-width="1"/>
-        <line id="Line_3" data-name="Line 3" y1="3" transform="translate(1112.5 535.5)" fill="none" stroke="#505b3e" stroke-linecap="round" stroke-width="1"/>
-        <line id="Line_4" data-name="Line 4" y1="4" x2="5" transform="translate(1107.5 538.5)" fill="none" stroke="#505b3e" stroke-linecap="round" stroke-width="1"/>
-        <line id="Line_5" data-name="Line 5" x1="5" y1="4" transform="translate(1098.5 538.5)" fill="none" stroke="#505b3e" stroke-linecap="round" stroke-width="1"/>
-        <line id="Line_6" data-name="Line 6" y1="7" transform="translate(1103.5 542.5)" fill="none" stroke="#505b3e" stroke-linecap="round" stroke-width="1"/>
-        <line id="Line_7" data-name="Line 7" y1="7" transform="translate(1107.5 542.5)" fill="none" stroke="#505b3e" stroke-linecap="round" stroke-width="1"/>
+        <line id="Line_1" data-name="Line 1" x1="14" transform="translate(1098.5 535.5)" fill="none" stroke="#33333333" stroke-linecap="round" stroke-width="1"/>
+        <line id="Line_9" data-name="Line 9" x1="14" transform="translate(1098.5 535.5)" fill="none" stroke="#33333333" stroke-linecap="round" stroke-width="1"/>
+        <line id="Line_8" data-name="Line 8" x1="4" transform="translate(1103.5 549.5)" fill="none" stroke="#33333333" stroke-linecap="round" stroke-width="1"/>
+        <line id="Line_2" data-name="Line 2" y1="3" transform="translate(1098.5 535.5)" fill="none" stroke="#33333333" stroke-linecap="round" stroke-width="1"/>
+        <line id="Line_3" data-name="Line 3" y1="3" transform="translate(1112.5 535.5)" fill="none" stroke="#33333333" stroke-linecap="round" stroke-width="1"/>
+        <line id="Line_4" data-name="Line 4" y1="4" x2="5" transform="translate(1107.5 538.5)" fill="none" stroke="#33333333" stroke-linecap="round" stroke-width="1"/>
+        <line id="Line_5" data-name="Line 5" x1="5" y1="4" transform="translate(1098.5 538.5)" fill="none" stroke="#33333333" stroke-linecap="round" stroke-width="1"/>
+        <line id="Line_6" data-name="Line 6" y1="7" transform="translate(1103.5 542.5)" fill="none" stroke="#33333333" stroke-linecap="round" stroke-width="1"/>
+        <line id="Line_7" data-name="Line 7" y1="7" transform="translate(1107.5 542.5)" fill="none" stroke="#33333333" stroke-linecap="round" stroke-width="1"/>
       </g>
     </g>
   </g>

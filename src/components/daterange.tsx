@@ -88,10 +88,13 @@ export default function DateRange(props: dateCardProps) {
     [handleVal, singleDay]
   );
 
-  const input = useInputParms();
-  const dateSpan = input(dates, rangeScope);
+const input = useInputParms();
 
-  const topRow = showExtendedTooltip
+const dateSpan = React.useMemo(() => {
+  return input(dates, rangeScope);
+}, [input, dates, rangeScope]);
+
+const topRow = showExtendedTooltip
     ? localization.getDisplayName("dateRangeTopRow")
     : dateSpan.string;
 
@@ -184,12 +187,12 @@ export default function DateRange(props: dateCardProps) {
                   {canReset ? (
                     <LinearScale
                       style={{ fontSize: theme.typography.fontSize }}
-                      color={canReset ? "action" : "disabled"}
+                      color={canReset ? "success" : "disabled"}
                     ></LinearScale>
                   ) : (
                     <HorizontalRule
                       style={{ fontSize: theme.typography.fontSize }}
-                      color={canReset ? "action" : "disabled"}
+                      color={canReset ? "success" : "disabled"}
                     ></HorizontalRule>
                   )}{" "}
                 </IconButton>

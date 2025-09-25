@@ -35,11 +35,11 @@ export default function DateRangeCard(props: dateCardProps) {
     // only replace if it actually changed, to avoid extra renders
     if (!equalRanges(props.dates, currentDates)) {
       setCurrentDates(props.dates);
-      console.log(
-        "DateRangeCard dates:",
-        format(currentDates.start, "dd/MM/yy"),
-        format(currentDates.end, "dd/MM/yy")
-      );
+      // console.log(
+      //   "DateRangeCard dates:",
+      //   format(currentDates.start, "dd/MM/yy"),
+      //   format(currentDates.end, "dd/MM/yy")
+      // );
     }
   }, [props.dates]);
 

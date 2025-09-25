@@ -54,7 +54,9 @@ import {
   isFirstDayOfMonth,
   isWithinInterval,
   getDay,
-  parseJSON,
+  parseISO,
+  clamp,
+  isDate,
 } from "date-fns";
 import { step, dateRange, SliderProps } from "./interface";
 import { DATEUTILS } from "./constants";
@@ -83,26 +85,53 @@ type MoveParms = {
   detailRow2: string;
 };
 
-  // --- add helpers ---
-  function normDay(d: Date | null): Date | null {
-    if (!d) return null;
-    const x = new Date(d);
-    // compare by UTC day to ignore local time shifts
-    return new Date(
-      Date.UTC(x.getUTCFullYear(), x.getUTCMonth(), x.getUTCDate())
-    );
-  }
+// --- add helpers ---
+function normDay(d: Date | null): Date | null {
+  if (!d) return null;
+  const x = new Date(d);
+  // compare by UTC day to ignore local time shifts
+  return new Date(
+    Date.UTC(x.getUTCFullYear(), x.getUTCMonth(), x.getUTCDate())
+  );
+}
 
-  export function equalRanges(a?: dateRange | null, b?: dateRange | null): boolean {
-    if (!a && !b) return true;
-    if (!a || !b) return false;
-    const sa = normDay(a.start)?.getTime();
-    const ea = normDay(a.end)?.getTime();
-    const sb = normDay(b.start)?.getTime();
-    const eb = normDay(b.end)?.getTime();
-    return sa === sb && ea === eb;
-  }
+export function equalRanges(
+  a?: dateRange | null,
+  b?: dateRange | null
+): boolean {
+  if (!a && !b) return true;
+  if (!a || !b) return false;
+  const sa = normDay(a.start)?.getTime();
+  const ea = normDay(a.end)?.getTime();
+  const sb = normDay(b.start)?.getTime();
+  const eb = normDay(b.end)?.getTime();
+  return sa === sb && ea === eb;
+}
 
+/**
+ * Type guard: check if an object is already a valid dateRange (both start & end are Date instances).
+ */
+export function isDateRange(obj: any): obj is dateRange {
+  return obj && typeof obj === "object" && isDate(obj.start) && isDate(obj.end);
+}
+
+/**
+ * Convert a plain object with Date or ISO string fields into a proper dateRange.
+ * Falls back to parsing if not already Date.
+ */
+export function toDateRange(input: {
+  start: Date | string;
+  end: Date | string;
+}): dateRange {
+  if (isDateRange(input)) {
+    return input; // already good
+  }
+  const start = isDate(input.start)
+    ? input.start
+    : parseISO(String(input.start));
+  const end = isDate(input.end) ? input.end : parseISO(String(input.end));
+  return { start, end };
+}
 
 /**
  * A utility function to build parameters for the DateMove component.
@@ -121,7 +150,6 @@ export const getMoveParms = (
   stepValue: string,
   localization: any
 ): MoveParms => {
-
   const isBack = bf === "b";
 
   const stepLabels = {
@@ -353,28 +381,28 @@ const moveFns = {
   day: (_rnge: dateRange) => ({
     b: [subDays(_rnge.start, 1), subDays(_rnge.end, 1)],
     f: [addDays(_rnge.start, 1), addDays(_rnge.end, 1)],
-    eb: [subDays(_rnge.start, 1), subDays(_rnge.end,0)],
-    ef: [subDays(_rnge.start,0), addDays(_rnge.end, 1)],
-    rb: [subDays(_rnge.start,0), subDays(_rnge.end, 1)],
-    rf: [addDays(_rnge.start, 1), subDays(_rnge.end,0)],
+    eb: [subDays(_rnge.start, 1), subDays(_rnge.end, 0)],
+    ef: [subDays(_rnge.start, 0), addDays(_rnge.end, 1)],
+    rb: [subDays(_rnge.start, 0), subDays(_rnge.end, 1)],
+    rf: [addDays(_rnge.start, 1), subDays(_rnge.end, 0)],
   }),
   week: (_rnge: dateRange) => ({
     b: [subWeeks(_rnge.start, 1), subWeeks(_rnge.end, 1)],
     f: [addWeeks(_rnge.start, 1), addWeeks(_rnge.end, 1)],
-    eb: [subWeeks(_rnge.start, 1), subDays(_rnge.end,0)],
-    ef: [subDays(_rnge.start,0), addWeeks(_rnge.end, 1)],
-    rb: [subDays(_rnge.start,0), subWeeks(_rnge.end, 1)],
-    rf: [addWeeks(_rnge.start, 1), subDays(_rnge.end,0)],
+    eb: [subWeeks(_rnge.start, 1), subDays(_rnge.end, 0)],
+    ef: [subDays(_rnge.start, 0), addWeeks(_rnge.end, 1)],
+    rb: [subDays(_rnge.start, 0), subWeeks(_rnge.end, 1)],
+    rf: [addWeeks(_rnge.start, 1), subDays(_rnge.end, 0)],
   }),
   pay: (_rnge: dateRange) => {
     const len = differenceInDays(_rnge.end, _rnge.start) + 1;
     return {
       b: [subDays(_rnge.start, len), subDays(_rnge.end, len)],
       f: [addDays(_rnge.start, len), addDays(_rnge.end, len)],
-      eb: [subDays(_rnge.start, len), subDays(_rnge.end,0)],
-      ef: [subDays(_rnge.start,0), addDays(_rnge.end, len)],
-      rb: [subDays(_rnge.start,0), subDays(_rnge.end, len)],
-      rf: [addDays(_rnge.start, len), subDays(_rnge.end,0)],
+      eb: [subDays(_rnge.start, len), subDays(_rnge.end, 0)],
+      ef: [subDays(_rnge.start, 0), addDays(_rnge.end, len)],
+      rb: [subDays(_rnge.start, 0), subDays(_rnge.end, len)],
+      rf: [addDays(_rnge.start, len), subDays(_rnge.end, 0)],
     };
   },
   month: (_rnge: dateRange) => {
@@ -393,7 +421,7 @@ const moveFns = {
           ? lastDayOfMonth(addMonths(_rnge.end, 1))
           : addDays(addMonths(_rnge.start, 1), dd),
       ],
-      eb: [subMonths(_rnge.start, 1), subDays(_rnge.end,0)],
+      eb: [subMonths(_rnge.start, 1), subDays(_rnge.end, 0)],
       ef: [
         _rnge.start,
         ld ? lastDayOfMonth(addMonths(_rnge.end, 1)) : addMonths(_rnge.end, 1),
@@ -402,7 +430,7 @@ const moveFns = {
         _rnge.start,
         ld ? lastDayOfMonth(subMonths(_rnge.end, 1)) : subMonths(_rnge.end, 1),
       ],
-      rf: [addMonths(_rnge.start, 1), subDays(_rnge.end,0)],
+      rf: [addMonths(_rnge.start, 1), subDays(_rnge.end, 0)],
     };
   },
   quarter: (_rnge: dateRange) => {
@@ -420,7 +448,7 @@ const moveFns = {
           ? lastDayOfMonth(addQuarters(_rnge.end, 1))
           : addQuarters(_rnge.end, 1),
       ],
-      eb: [subQuarters(_rnge.start, 1), subDays(_rnge.end,0)],
+      eb: [subQuarters(_rnge.start, 1), subDays(_rnge.end, 0)],
       ef: [
         _rnge.start,
         ld
@@ -433,16 +461,16 @@ const moveFns = {
           ? lastDayOfMonth(subQuarters(_rnge.end, 1))
           : subQuarters(_rnge.end, 1),
       ],
-      rf: [addQuarters(_rnge.start, 1), subDays(_rnge.end,0)],
+      rf: [addQuarters(_rnge.start, 1), subDays(_rnge.end, 0)],
     };
   },
   year: (_rnge: dateRange) => ({
     b: [subYears(_rnge.start, 1), subYears(_rnge.end, 1)],
     f: [addYears(_rnge.start, 1), addYears(_rnge.end, 1)],
-    eb: [subYears(_rnge.start, 1), subDays(_rnge.end,0)],
-    ef: [subDays(_rnge.start,0), addMonths(_rnge.end, 12)],
-    rb: [subDays(_rnge.start,0), subMonths(_rnge.end, 12)],
-    rf: [addYears(_rnge.start, 1), subDays(_rnge.end,0)],
+    eb: [subYears(_rnge.start, 1), subDays(_rnge.end, 0)],
+    ef: [subDays(_rnge.start, 0), addMonths(_rnge.end, 12)],
+    rb: [subDays(_rnge.start, 0), subMonths(_rnge.end, 12)],
+    rf: [addYears(_rnge.start, 1), subDays(_rnge.end, 0)],
   }),
 };
 
@@ -717,32 +745,33 @@ export const createMarks = (
     .sort((a, b) => a.getTime() - b.getTime());
 };
 
-export const sliderMarkText = (num: number, min: Date, fmt = "d-MMM-yy") =>
-{  const locale = useDateFnsLocale();
- return format(addDays(min, num), fmt, {locale})};
-
-export const doMarks = (
-_val: any,
-_fmt: any,
-_min: Date,
-_skip: number,
-_offset: number
-) => {
-return _val.map((x: Date, i: number) => {
-const v: number = sliderMarkNumber(_skip === 0 ? startOfToday(): x, _min);
-const dateValue =
-_offset === 0
-? _min
-: addYears(_min, sliderMarkDate(v, _min).getMonth() <= _offset ? 1 : 0);
-const l =
-(i + 1) % _skip === 0 || i === 0 || i === _val.length - 1
-? sliderMarkText(v, dateValue, _fmt)
-: "";
-return { value: v, label: l };
-});
+export const sliderMarkText = (num: number, min: Date, fmt = "d-MMM-yy") => {
+  const locale = useDateFnsLocale();
+  return format(addDays(min, num), fmt, { locale });
 };
 
- const buildMarks = (period: string, props: SliderProps) => {
+export const doMarks = (
+  _val: any,
+  _fmt: any,
+  _min: Date,
+  _skip: number,
+  _offset: number
+) => {
+  return _val.map((x: Date, i: number) => {
+    const v: number = sliderMarkNumber(_skip === 0 ? startOfToday() : x, _min);
+    const dateValue =
+      _offset === 0
+        ? _min
+        : addYears(_min, sliderMarkDate(v, _min).getMonth() <= _offset ? 1 : 0);
+    const l =
+      (i + 1) % _skip === 0 || i === 0 || i === _val.length - 1
+        ? sliderMarkText(v, dateValue, _fmt)
+        : "";
+    return { value: v, label: l };
+  });
+};
+
+const buildMarks = (period: string, props: SliderProps) => {
   const marks = createMarks(
     period,
     props.rangeScope,
@@ -781,68 +810,61 @@ export const useInputParms = () => {
   const localization = useLocalization();
 
   return (dates: dateRange, rangeScope: dateRange) => {
-    const _start =
-      dates.start >= rangeScope.start
-        ? startOfDay(dates.start)
-        : startOfDay(rangeScope.start);
-    const _end =
-      dates.end <= rangeScope.end
-        ? endOfDay(dates.end)
-        : endOfDay(rangeScope.end);
+    // ✅ Always reflect the selected range
+    const selStart = startOfDay(dates.start);
+    const selEnd = endOfDay(dates.end);
 
-    const _startInRange: boolean = isWithinInterval(
-      endOfDay(dates.start),
-      rangeScope
-    );
-    const _endInRange: boolean = isWithinInterval(
-      startOfDay(dates.end),
-      rangeScope
-    );
+    // ✅ Validation only
+    const startInRange = isWithinInterval(dates.start, rangeScope);
+    const endInRange = isWithinInterval(dates.end, rangeScope);
+
+    const clampedStart = clamp(dates.start, rangeScope);
+    const clampedEnd = clamp(dates.end, rangeScope);
+
+    const _start = startOfDay(clampedStart);
+    const _end = endOfDay(clampedEnd);
+
+    const formatDate = (d: Date) => format(d, "EEE, d MMM yy", { locale });
 
     try {
-      const noDays = differenceInDays(_end, _start);
-
-      const _startDate = format(_start, "EEE, d MMM yy", { locale });
-      const _endDate = format(_end, "EEE, d MMM yy", { locale });
-
-      const _startStory = _startInRange
-        ? _startDate
-        : format(dates.start, "EEE, d MMM yy", { locale });
-
-      const _endStory = _endInRange
-        ? _endDate
-        : format(dates.end, "EEE, d MMM yy", { locale });
+      const days = differenceInDays(_end, _start);
+      const startDate = formatDate(_start);
+      const endDate = formatDate(_end);
+      const duration = formatDistance(_start, _end, { locale });
 
       return {
+        // 🔑 Always show the *selected* range, not clamped scope
         string:
-          (noDays > 0
-            ? formatDistance(_start, _end, { locale })
+          days > 0
+            ? `${duration
                 .toLowerCase()
-                .replace(/\b\w/g, (s) => s.toUpperCase()) +
-              ": " +
-              _startDate +
-              " - "
-            : " ") + _endDate,
+                .replace(/\b\w/g, (s) =>
+                  s.toUpperCase()
+                )}: ${startDate} - ${endDate}`
+            : ` ${endDate}`,
+
+        // 🔑 Info row only warns if selection is outside scope
         info:
-          _startInRange && _endInRange
+          startInRange && endInRange
             ? ""
-            : ` [${_startStory} - ${_endStory} ${localization.getDisplayName(
+            : ` [${formatDate(dates.start)} - ${formatDate(dates.end)} ${localization.getDisplayName(
                 "dateUtilsExceedsScope"
               )}]`,
-        duration: formatDistance(_start, _end, { locale }),
-        fmDoW: format(dates.start, "EEEE", { locale }),
-        toDoW: format(dates.end, "EEE", { locale }),
-        fmValid: _startInRange,
-        toValid: _endInRange,
+
+        duration,
+        fmDoW: format(selStart, "EEEE", { locale }),
+        toDoW: format(selEnd, "EEE", { locale }),
+        fmValid: startInRange,
+        toValid: endInRange,
       };
     } catch {
       return {
         string: localization.getDisplayName("dateUtilsInvalid"),
-        duration: formatDistance(_start, _end, { locale }),
-        fmDoW: format(dates.start, "EEEE", { locale }),
-        toDoW: format(dates.end, "EEE", { locale }),
-        fmValid: _startInRange,
-        toValid: _endInRange,
+        duration: "",
+        fmDoW: "",
+        toDoW: "",
+        fmValid: false,
+        toValid: false,
       };
     }
   };

@@ -24,7 +24,7 @@ import isEqual from "lodash.isequal";
 import { LocalizationContext, DateFnsLocaleProvider } from "./localeutils";
 import { ReactVisual } from "./reactUtils";
 import { HotkeysProvider } from "react-hotkeys-hook";
-import { equalRanges } from "./dateutils"
+import { equalRanges, toDateRange } from "./dateutils";
 
 /**
  * The DateSelector class is the main entry point for the visual. It manages the
@@ -44,10 +44,10 @@ export class DateSelector extends ReactVisual implements IVisual {
   private state: VisualState;
   private locale: string;
   // We now use a single state variable to track the applied filter, simplifying the logic.
-   private currentFilter: dateRange | null = null;
+  private currentFilter: dateRange | null = null;
   private isApplyingFilter = false;
   private pendingFilter: dateRange | null = null;
- // A flag to prevent a redundant UI update when the visual applies its own filter.
+  // A flag to prevent a redundant UI update when the visual applies its own filter.
   private isUpdatingFromVisual: boolean = false;
   // A flag to ensure we only apply the initial state once.
   private initialLoadComplete: boolean = false;
@@ -110,74 +110,114 @@ export class DateSelector extends ReactVisual implements IVisual {
    * It handles the core logic of the visual.
    * @param options The visual update options from Power BI.
    */
-  public update(options: VisualUpdateOptions) {
+// ... (imports and class definition)
+
+// ... (imports and class definition)
+
+public update(options: VisualUpdateOptions) {
     try {
-      this.events.renderingStarted(options);
+        this.events.renderingStarted(options);
 
-      // We need to immediately check if this update was triggered by the visual itself.
-      // If so, we should do nothing to avoid a redundant render loop.
-      if (this.isUpdatingFromVisual) {
-        this.isUpdatingFromVisual = false;
-        this.events.renderingFinished(options);
-        return;
-      }
+        // prevent infinite loops when the visual itself applies a filter
+        if (this.isUpdatingFromVisual) {
+            this.isUpdatingFromVisual = false;
+            this.events.renderingFinished(options);
+            return;
+        }
 
-     if (!this.isValidDataView(options)) {
-        this.initialiseVisualState();
-        this.updateReactContainers({ landingOff: false });
-        this.events.renderingFinished(options);
-        return;
-      }
+        // if no valid dataview, initialise blank state
+        if (!this.isValidDataView(options)) {
+            this.initialiseVisualState();
+            this.updateReactContainers({ landingOff: false });
+            this.events.renderingFinished(options);
+            return;
+        }
 
-      const shouldGetSettings = !isEqual(options.dataViews[0], this.dataView);
-      this.dataView = options.dataViews[0];
-      if (shouldGetSettings) this.loadVisualSettings(options);
+        // update settings if dataview changed
+        const shouldGetSettings = !isEqual(options.dataViews[0], this.dataView);
+        this.dataView = options.dataViews[0];
+        if (shouldGetSettings) this.loadVisualSettings(options);
 
-      // Always check what host says now
-      const hostFilter = restoreRangeFilter(options) || null;
+        const hostFilter = restoreRangeFilter(options);
+        let resolvedFilter: dateRange | null = null;
+        let shouldApplyFilter = false;
 
-      // If we are waiting for host to apply our last write, confirm it landed
-      if (this.isApplyingFilter) {
-        if (equalRanges(hostFilter, this.pendingFilter)) {
-          // landed
-          this.currentFilter = hostFilter;
-          this.pendingFilter = null;
-          this.isApplyingFilter = false;
+        // ---------------------------------------------------------
+        // Rule hierarchy
+        // ---------------------------------------------------------
+
+        // 1. Forced startup date range (first load or when settings changed)
+        if ((!this.initialLoadComplete || shouldGetSettings) && this.state.settings.forceStartRange) {
+            resolvedFilter = this.state.settings.startupFilter;
+            shouldApplyFilter = true; // push forced filter into host
+        }
+        // 2. Bookmark or persisted host filter always overrides forced startup
+        else if (hostFilter) {
+            resolvedFilter = hostFilter;
+        }
+        // 3. Synced slicer behaviour
+        else if (this.state.settings.startRange === "sync") {
+            resolvedFilter =
+                this.currentFilter ?? this.state.settings.startupFilter;
+        }
+        // 4. Startup default (if defined)
+        else if (this.state.settings.startupFilter) {
+            resolvedFilter = this.state.settings.startupFilter;
+            // apply if first load OR settings just changed
+            shouldApplyFilter = !this.initialLoadComplete || shouldGetSettings;
+        }
+        // 5. Standard Power BI behaviour
+        else {
+            resolvedFilter = this.currentFilter;
+        }
+
+        // ---------------------------------------------------------
+        // Apply filter if needed
+        // ---------------------------------------------------------
+        if (shouldApplyFilter && resolvedFilter) {
+            this.applyDateFilter(resolvedFilter);
+            this.currentFilter = resolvedFilter;
+            this.initialLoadComplete = true;
+            this.events.renderingFinished(options);
+            return;
+        }
+
+        // ---------------------------------------------------------
+        // Echo suppression (prevent loops when applying filters)
+        // ---------------------------------------------------------
+        if (this.isApplyingFilter) {
+            if (equalRanges(hostFilter, this.pendingFilter)) {
+                this.currentFilter = hostFilter;
+                this.pendingFilter = null;
+                this.isApplyingFilter = false;
+            } else {
+                this.currentFilter = hostFilter;
+                this.isApplyingFilter = false;
+            }
         } else {
-          // not yet landed — skip rendering to avoid echo
-          this.events.renderingFinished(options);
-          return;
+            this.currentFilter = resolvedFilter;
         }
-      } else {
-        // normal path: adopt host filter if it differs
-        if (!equalRanges(this.currentFilter, hostFilter)) {
-          this.currentFilter = hostFilter;
+
+        // ---------------------------------------------------------
+        // Update React UI
+        // ---------------------------------------------------------
+        if (this.currentFilter) {
+            this.updateReactContainers({
+                ...this.state.settings,
+                dates: this.currentFilter,
+            });
         }
-      }
 
-         // Fall back to settings dates once at startup if host has none
-      if (!this.currentFilter?.start || !this.currentFilter?.end) {
-        const initial = this.state?.settings?.dates;
-        if (initial?.start && initial?.end) {
-          this.currentFilter = initial;
-        }
-      }
+        this.initialLoadComplete = true;
+        this.events.renderingFinished(options);
 
-      // Push to React (DateRangeCard). It will only update local UI if dates changed.
-      this.updateReactContainers({
-        ...this.state.settings,
-        dates: this.currentFilter!,
-      });
-
-      this.initialLoadComplete = true;
-      this.events.renderingFinished(options);
     } catch (e) {
-      console.error(e);
-      this.events.renderingFailed(options);
+        console.error("Update failed:", e);
+        this.events.renderingFailed(options);
     }
-  }
+}
 
-  /**
+/**
    * A helper method to validate the data view.
    * @param options The visual update options.
    * @returns True if the data view is valid, false otherwise.
@@ -274,15 +314,22 @@ export class DateSelector extends ReactVisual implements IVisual {
   public applyDateFilter = (dates: dateRange): void => {
     if (!this.state?.category) return;
 
+    const dtes = toDateRange(dates);
+
     // Mark pending; do NOT push to React here — DateRangeCard already updated UI locally.
     this.isApplyingFilter = true;
-    this.pendingFilter = { start: new Date(dates.start), end: new Date(dates.end) };
+    this.pendingFilter = {
+      start: new Date(dtes.start),
+      end: new Date(dtes.end),
+    };
 
     this.visualHost.applyJsonFilter(
-      this.createFilter(dates.start, dates.end, this.state.category.filterTarget),
+      this.createFilter(dtes.start, dtes.end, this.state.category.filterTarget),
       DateSelector.filterObjectProperty.objectName,
       DateSelector.filterObjectProperty.propertyName,
-      dates.start && dates.end ? powerbi.FilterAction.merge : powerbi.FilterAction.remove
+      dates.start && dates.end
+        ? powerbi.FilterAction.merge
+        : powerbi.FilterAction.remove
     );
   };
 
@@ -298,7 +345,6 @@ export class DateSelector extends ReactVisual implements IVisual {
     endDate: Date,
     filterTarget: IFilterColumnTarget
   ): AdvancedFilter {
-
     // The dates are already Date objects, so we can directly use toJSON().
     return new AdvancedFilter(
       filterTarget,

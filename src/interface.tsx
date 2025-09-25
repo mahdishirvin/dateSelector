@@ -133,10 +133,9 @@ export interface dateCardProps {
   landingOff?: boolean;
 
   startRange?: string;
-    forceStartRange?: boolean;
-
   // date range object representing the initial filter state
   startupFilter?: dateRange;
+  forceStartRange?: boolean;
 
   // boolean value indicating whether to display step controls for selecting dates
   stepViz?: step<boolean>;
