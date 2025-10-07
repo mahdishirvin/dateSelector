@@ -3,9 +3,11 @@ import IValueFormatter = vf.IValueFormatter;
 import { IFilterColumnTarget } from "powerbi-models";
 
 export interface VisualState {
-  viewport: ViewportData;
+  viewport?: ViewportData;
   settings: dateCardProps;
-  category: CategoryData;
+  category?: CategoryData;
+  currentFilter?: dateRange | null
+  landingOff?: boolean;
 }
 
 export interface ViewportData {

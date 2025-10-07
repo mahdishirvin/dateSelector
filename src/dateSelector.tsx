@@ -29,7 +29,7 @@ import { equalRanges, toDateRange } from "./dateutils";
 /**
  * The DateSelector class is the main entry point for the visual. It manages the
  * lifecycle of the visual and handles communication between Power BI and the React component.
- * It now inherits from ReactVisual to abstract away the React rendering logic.
+ * It now inherits from ReactVisual to abstract away the React rendering debugic.
  */
 export class DateSelector extends ReactVisual implements IVisual {
   private visualHost: IVisualHost;
@@ -43,8 +43,10 @@ export class DateSelector extends ReactVisual implements IVisual {
   private colorHelper: ColorHelper;
   private state: VisualState;
   private locale: string;
-  // We now use a single state variable to track the applied filter, simplifying the logic.
+  // We now use a single state variable to track the applied filter, simplifying the debugic.
   private currentFilter: dateRange | null = null;
+  // private persistedFilter: dateRange | null = null;
+  // private bookmarkFilter: dateRange | null = null;
   private isApplyingFilter = false;
   private pendingFilter: dateRange | null = null;
   // A flag to prevent a redundant UI update when the visual applies its own filter.
@@ -58,6 +60,17 @@ export class DateSelector extends ReactVisual implements IVisual {
     objectName: "general",
     propertyName: "filter",
   };
+  private lastKnownFilterSignature: string | null = null;
+  private bookmarkDetectionWindow = 1000; // 1 second grace period after load
+  private lastUpdateTime = 0;
+  private maybeBookmarkActive = false;
+
+  // simplified signature generator
+  private getFilterSignature(options: VisualUpdateOptions): string {
+    const filters =
+      options.jsonFilters?.map((f) => JSON.stringify(f)).join("|") ?? "";
+    return filters;
+  }
 
   /**
    * The constructor initializes visual properties and the React root.
@@ -107,117 +120,141 @@ export class DateSelector extends ReactVisual implements IVisual {
 
   /**
    * The update method is called whenever the visual's data or settings change.
-   * It handles the core logic of the visual.
+   * It handles the core debugic of the visual.
    * @param options The visual update options from Power BI.
    */
-// ... (imports and class definition)
 
-// ... (imports and class definition)
-
-public update(options: VisualUpdateOptions) {
+  // In the following update function, bookmark always wins is nto happening on a page with forced start up value set..
+  public update(options: VisualUpdateOptions) {
     try {
-        this.events.renderingStarted(options);
+      this.events.renderingStarted(options);
+      // prevent infinite loops when the visual itself applies a filter
+      if (this.isUpdatingFromVisual) {
+        this.isUpdatingFromVisual = false;
+        this.events.renderingFinished(options);
+        return;
+      }
 
-        // prevent infinite loops when the visual itself applies a filter
-        if (this.isUpdatingFromVisual) {
-            this.isUpdatingFromVisual = false;
-            this.events.renderingFinished(options);
-            return;
-        }
-
-        // if no valid dataview, initialise blank state
-        if (!this.isValidDataView(options)) {
-            this.initialiseVisualState();
-            this.updateReactContainers({ landingOff: false });
-            this.events.renderingFinished(options);
-            return;
-        }
-
-        // update settings if dataview changed
+         // 2. DATA VIEW AND SETTINGS LOAD (CRITICAL REORDERING)
+        // Check for data view change
         const shouldGetSettings = !isEqual(options.dataViews[0], this.dataView);
         this.dataView = options.dataViews[0];
-        if (shouldGetSettings) this.loadVisualSettings(options);
 
-        const hostFilter = restoreRangeFilter(options);
-        let resolvedFilter: dateRange | null = null;
-        let shouldApplyFilter = false;
-
-        // ---------------------------------------------------------
-        // Rule hierarchy
-        // ---------------------------------------------------------
-
-        // 1. Forced startup date range (first load or when settings changed)
-        if ((!this.initialLoadComplete || shouldGetSettings) && this.state.settings.forceStartRange) {
-            resolvedFilter = this.state.settings.startupFilter;
-            shouldApplyFilter = true; // push forced filter into host
-        }
-        // 2. Bookmark or persisted host filter always overrides forced startup
-        else if (hostFilter) {
-            resolvedFilter = hostFilter;
-        }
-        // 3. Synced slicer behaviour
-        else if (this.state.settings.startRange === "sync") {
-            resolvedFilter =
-                this.currentFilter ?? this.state.settings.startupFilter;
-        }
-        // 4. Startup default (if defined)
-        else if (this.state.settings.startupFilter) {
-            resolvedFilter = this.state.settings.startupFilter;
-            // apply if first load OR settings just changed
-            shouldApplyFilter = !this.initialLoadComplete || shouldGetSettings;
-        }
-        // 5. Standard Power BI behaviour
-        else {
-            resolvedFilter = this.currentFilter;
+        // Load settings FIRST if data view changed or if it's the very first time.
+        // This ensures this.state is always fresh.
+        if (shouldGetSettings || !this.dataView) {
+            this.loadVisualSettings(options);
         }
 
-        // ---------------------------------------------------------
-        // Apply filter if needed
-        // ---------------------------------------------------------
-        if (shouldApplyFilter && resolvedFilter) {
-            this.applyDateFilter(resolvedFilter);
-            this.currentFilter = resolvedFilter;
-            this.initialLoadComplete = true;
+        // 3. VALIDATION (Now that this.state exists)
+        if (!this.isValidDataView(options)) {
+            // Use this.initialiseVisualState() to set a default landingOff state
+            this.initialiseVisualState();
+            this.updateReactContainers({ landingOff: false }); // Show landing page
             this.events.renderingFinished(options);
             return;
         }
 
-        // ---------------------------------------------------------
-        // Echo suppression (prevent loops when applying filters)
-        // ---------------------------------------------------------
-        if (this.isApplyingFilter) {
-            if (equalRanges(hostFilter, this.pendingFilter)) {
-                this.currentFilter = hostFilter;
-                this.pendingFilter = null;
-                this.isApplyingFilter = false;
-            } else {
-                this.currentFilter = hostFilter;
-                this.isApplyingFilter = false;
-            }
-        } else {
-            this.currentFilter = resolvedFilter;
+        // 4. LANDING PAGE OFF (Now that this.state is guaranteed to exist and have data)
+        // If we reach here, we have a valid data view. Turn the landing page off.
+        if (!this.state.landingOff) {
+            this.state.landingOff = true;
+            // Immediate UI update to dismiss landing page (before long filter debugic)
+            this.updateReactContainers({ landingOff: true });
         }
 
-        // ---------------------------------------------------------
-        // Update React UI
-        // ---------------------------------------------------------
-        if (this.currentFilter) {
-            this.updateReactContainers({
-                ...this.state.settings,
-                dates: this.currentFilter,
-            });
-        }
+      const now = Date.now();
+      const filterSignature = this.getFilterSignature(options);
+      const isFilterChange = filterSignature !== this.lastKnownFilterSignature;
+      const elapsed = now - this.lastUpdateTime;
+      this.lastUpdateTime = now;
+
+      console.debug("Update called. isFilterChange:", isFilterChange);
+
+      // 👇 detect bookmark-like condition
+      if (
+        isFilterChange &&
+        elapsed < this.bookmarkDetectionWindow &&
+        this.initialLoadComplete
+      ) {
+        this.maybeBookmarkActive = true;
+      } else {
+        this.maybeBookmarkActive = false;
+      }
+      console.debug("maybeBookmarkActive:", this.maybeBookmarkActive);
+      // store signature for next pass
+      this.lastKnownFilterSignature = filterSignature;
+
+
+      // normalise host filter from options (may be null)
+      const hostFilter = restoreRangeFilter(options);
+
+      let resolvedFilter: dateRange | null = null;
+      let shouldApplyFilter = false;
+
+      if (this.maybeBookmarkActive && hostFilter) {
+        // ✅ inferred bookmark: always wins
+        resolvedFilter = hostFilter;
+
+        console.debug("Rule chosen: HOST (bookmark)");
+      } else if (
+        this.state.settings.forceStartRange &&
+        !this.initialLoadComplete
+      ) {
+        // ✅ forced startup range overrides persisted
+        resolvedFilter = this.state.settings.startupFilter;
+        shouldApplyFilter = true;
+
+        console.debug("Rule chosen: FORCE (startup)");
+      } else if (hostFilter) {
+        // ✅ persisted filter (normal restore)
+        resolvedFilter = hostFilter;
+      } else if (this.state.settings.startupFilter) {
+        resolvedFilter = this.state.settings.startupFilter;
+        shouldApplyFilter = !this.initialLoadComplete;
+
+        console.debug("Rule chosen: STARTUP (no host)");
+      }
+
+      // ---------------------------------------------------------
+      // Apply filter if this debugic decided we should push one to host
+      // (e.g. forced startup or startup default on first load/settings-changed)
+      // ---------------------------------------------------------
+      if (shouldApplyFilter && resolvedFilter) {
+        this.applyDateFilter(resolvedFilter);
+        // treat it as pending until host echoes back
+        this.currentFilter = resolvedFilter;
+
+        // 🔥 Update the UI with the *new* filter state BEFORE returning
+        this.updateReactContainers({
+          ...this.state.settings,
+          dates: this.currentFilter,
+          landingOff: this.state.landingOff, // Pass the correct landing state
+        });
 
         this.initialLoadComplete = true;
         this.events.renderingFinished(options);
+        console.debug("Applied filter:", resolvedFilter);
+        return;
+      }
 
+      // update React UI
+      this.currentFilter = resolvedFilter ?? this.currentFilter;
+      this.updateReactContainers({
+        ...this.state.settings,
+        dates: this.currentFilter,
+        landingOff: this.state.landingOff,
+      });
+
+      this.initialLoadComplete = true;
+      this.events.renderingFinished(options);
     } catch (e) {
-        console.error("Update failed:", e);
-        this.events.renderingFailed(options);
+      console.error("Update failed:", e);
+      this.events.renderingFailed(options);
     }
-}
+  }
 
-/**
+  /**
    * A helper method to validate the data view.
    * @param options The visual update options.
    * @returns True if the data view is valid, false otherwise.

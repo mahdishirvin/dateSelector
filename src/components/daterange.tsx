@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import Remove from "@mui/icons-material/Remove";
+// import Remove from "@mui/icons-material/Remove";
 import { useTheme } from "@mui/material/styles";
 import { format, parse, isValid, isEqual } from "date-fns";
 
@@ -14,6 +14,8 @@ import RngeTooltip from "./rngetooltip";
 import { dateCardProps, dateRange } from "../interface";
 import { useDateFnsLocale } from "../localeutils";
 import { HorizontalRule, LinearScale } from "@mui/icons-material";
+import Badge from "@mui/material/Badge";
+import { styled } from "@mui/material/styles";
 
 // DateRange input with optional reset.
 // Uses the sync value if available; otherwise falls back to preset startup filter or scope.
@@ -88,13 +90,13 @@ export default function DateRange(props: dateCardProps) {
     [handleVal, singleDay]
   );
 
-const input = useInputParms();
+  const input = useInputParms();
 
-const dateSpan = React.useMemo(() => {
-  return input(dates, rangeScope);
-}, [input, dates, rangeScope]);
+  const dateSpan = React.useMemo(() => {
+    return input(dates, rangeScope);
+  }, [input, dates, rangeScope]);
 
-const topRow = showExtendedTooltip
+  const topRow = showExtendedTooltip
     ? localization.getDisplayName("dateRangeTopRow")
     : dateSpan.string;
 
@@ -185,10 +187,30 @@ const topRow = showExtendedTooltip
               ) : (
                 <IconButton size="small" disabled={!canReset}>
                   {canReset ? (
-                    <LinearScale
-                      style={{ fontSize: theme.typography.fontSize }}
-                      color={canReset ? "success" : "disabled"}
-                    ></LinearScale>
+                    <Badge
+                      color="warning"
+                      variant="dot"
+                      badgeContent=" "
+                      sx={{
+                        // Use a CSS selector to target the dot class
+                        "& .MuiBadge-dot": {
+                          width: "4px !important",
+                          height: "4px !important",
+                          borderRadius: "50% !important",
+                          right: 0,
+                          top: 0,
+                          // Optional: Remove any minimum size constraints that might be overriding
+                          minWidth: "2px !important",
+                          minHeight: "2px !important",
+                          padding: "0 !important",
+                        },
+                      }}
+                    >
+                      <LinearScale
+                        style={{ fontSize: theme.typography.fontSize }}
+                        color={canReset ? "success" : "disabled"}
+                      ></LinearScale>
+                    </Badge>
                   ) : (
                     <HorizontalRule
                       style={{ fontSize: theme.typography.fontSize }}

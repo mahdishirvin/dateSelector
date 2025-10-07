@@ -1,10 +1,10 @@
 {
     "visual": {
         "name": "dateSelector",
-        "displayName": "Date Selector 3.9.22",
+        "displayName": "Date Selector 3.10.7",
         "guid": "dateSel4A1A0033E6F54D1B809B6E51058D54E3",
         "visualClassName": "DateSelector",
-        "version": "3.2025.08.19",
+        "version": "3.2025.10.07",
         "description": "Date Range Selector",
         "supportUrl": "https://github.com/o221/dateSelector/issues",
         "gitHubUrl": "https://github.com/o221/dateSelector"
@@ -15,7 +15,7 @@
         "email": "josborn@oahi.com.au"
     },
     "assets": {
-        "icon": "assets/dateSelector1.svg"
+        "icon": "assets/timeline.png"
     },
     "capabilities": "capabilities.json",
     "dependencies": null,
