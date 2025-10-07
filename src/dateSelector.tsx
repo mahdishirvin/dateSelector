@@ -135,33 +135,33 @@ export class DateSelector extends ReactVisual implements IVisual {
         return;
       }
 
-         // 2. DATA VIEW AND SETTINGS LOAD (CRITICAL REORDERING)
-        // Check for data view change
-        const shouldGetSettings = !isEqual(options.dataViews[0], this.dataView);
-        this.dataView = options.dataViews[0];
+      // 2. DATA VIEW AND SETTINGS LOAD (CRITICAL REORDERING)
+      // Check for data view change
+      const shouldGetSettings = !isEqual(options.dataViews[0], this.dataView);
+      this.dataView = options.dataViews[0];
 
-        // Load settings FIRST if data view changed or if it's the very first time.
-        // This ensures this.state is always fresh.
-        if (shouldGetSettings || !this.dataView) {
-            this.loadVisualSettings(options);
-        }
+      // Load settings FIRST if data view changed or if it's the very first time.
+      // This ensures this.state is always fresh.
+      if (shouldGetSettings || !this.dataView) {
+        this.loadVisualSettings(options);
+      }
 
-        // 3. VALIDATION (Now that this.state exists)
-        if (!this.isValidDataView(options)) {
-            // Use this.initialiseVisualState() to set a default landingOff state
-            this.initialiseVisualState();
-            this.updateReactContainers({ landingOff: false }); // Show landing page
-            this.events.renderingFinished(options);
-            return;
-        }
+      // 3. VALIDATION (Now that this.state exists)
+      if (!this.isValidDataView(options)) {
+        // Use this.initialiseVisualState() to set a default landingOff state
+        this.initialiseVisualState();
+        this.updateReactContainers({ landingOff: false }); // Show landing page
+        this.events.renderingFinished(options);
+        return;
+      }
 
-        // 4. LANDING PAGE OFF (Now that this.state is guaranteed to exist and have data)
-        // If we reach here, we have a valid data view. Turn the landing page off.
-        if (!this.state.landingOff) {
-            this.state.landingOff = true;
-            // Immediate UI update to dismiss landing page (before long filter debugic)
-            this.updateReactContainers({ landingOff: true });
-        }
+      // 4. LANDING PAGE OFF (Now that this.state is guaranteed to exist and have data)
+      // If we reach here, we have a valid data view. Turn the landing page off.
+      if (!this.state.landingOff) {
+        this.state.landingOff = true;
+        // Immediate UI update to dismiss landing page (before long filter debugic)
+        this.updateReactContainers({ landingOff: true });
+      }
 
       const now = Date.now();
       const filterSignature = this.getFilterSignature(options);
@@ -184,7 +184,6 @@ export class DateSelector extends ReactVisual implements IVisual {
       console.debug("maybeBookmarkActive:", this.maybeBookmarkActive);
       // store signature for next pass
       this.lastKnownFilterSignature = filterSignature;
-
 
       // normalise host filter from options (may be null)
       const hostFilter = restoreRangeFilter(options);
