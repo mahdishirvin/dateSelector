@@ -48,13 +48,15 @@ The [**DateSelector** visual](https://github.com/o221/dateSelector/blob/main/dis
 * Filters reduce the scope on any level - Visual/Page/All Pages
 
  #### Start-up state
+  * Start-up state can be forced to override default persisted state.
+  * The range configured as start-up is accessible from the icon separating the range.
   * Slicer opens in configured *pre-set* state
      * *default* behaves like any typical visual.
      * Today, YTD, This Month, Last week, etc.
      * or ...
-Can be synced with last  page viewed
-     * With *pre-set* range there's *no sync respected* on the pre-set pages.
-     * Bookmarks are respected after pre-set ranges
+Can be synced with last page viewed
+     * With forced *pre-set* range there's *no sync respected* on the pre-set pages.
+     * Bookmarks are respected after forced pre-set ranges
  #### Short cut keys
   * when slider is active use fast shortcuts
  #### Help
