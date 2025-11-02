@@ -1,4 +1,4 @@
-"use strict";
+ "use strict";
 
 import powerbi from "powerbi-visuals-api";
 import IVisual = powerbi.extensibility.visual.IVisual;
