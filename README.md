@@ -1,16 +1,18 @@
-# Date Selector Visual
+# Date Selector Slicer Visual
 
 ## A compact rich functionality date range filter for Power BI
-The [**DateSelector** visual](https://github.com/o221/dateSelector/blob/main/dist/dateSel4A1A0033E6F54D1B809B6E51058D54E3.3.2025.10.07.pbiviz) is a date range selector designed to be used with Microsoft Power BI.
+The [**DateSelector** visual](https://github.com/o221/dateSelector/blob/main/dist/dateSel4A1A0033E6F54D1B809B6E51058D54E3.3.2025.11.03.pbiviz) is a user-friendly, feature-rich date range filter for Power BI that allows users to quickly and easily filter data based on specific dates or date ranges.
 
-## Features
-- Enables a forced start up range or a selectable (from the range date separator) start up range.
-- Allows users to select a range of dates with a compact user-friendly interface.
-- Enables users to filter data based on the selected date range.
-- Simple and intuitive design, easy to use.
-- Configurable to show or hide buttons with the simplest representation being a single date picker.
+## Key Capabilities of the Date Selector Visual ✨
 
-### Anatomy
+| Capability | Description |
+| :--- | :--- |
+| **Easy Range Selection** | Users can select a **single date** or a **range of dates** using a compact, intuitive interface. |
+| **Startup Flexibility** | Supports setting a default startup date range that can be configured in three ways: **Forced** (always applied, overriding external filters), **Synced** (reflecting filters from other visuals), or **Selectable** by the user. |
+| **Simple Design** | The visual is designed to be **simple and intuitive**. It can be configured down to a **single date picker** by easily hiding unnecessary buttons. |
+| **Core Function** | It effectively filters underlying Power BI data based on the chosen date range, working in conjunction with **DAX** to support advanced filtering logic (e.g., non-contiguous date ranges). |
+
+## Anatomy
 
 ![Date Range Selector Anatomy](https://github.com/o221/dateSelector/blob/main/readme_files/Date%20Selector1.png?raw=true "Date Range Selector Anatomy")
 
@@ -18,7 +20,7 @@ The [**DateSelector** visual](https://github.com/o221/dateSelector/blob/main/dis
 
 ![Date Range Selector with two level timeline](https://github.com/o221/dateSelector/blob/main/readme_files/Date%20Selector2.png?raw=true "Date Range Selector Timeline")
 
-### Advancd features
+### Advanced features
 
 ![Date Range Selector Advanced Features](https://github.com/o221/dateSelector/blob/main/readme_files/Date%20Selector3.png?raw=true "Date Range Selector Advanced Features")
 
@@ -32,35 +34,40 @@ The [**DateSelector** visual](https://github.com/o221/dateSelector/blob/main/dis
 
  ****
 
- ## Summary
+## Summary of Features
 
- #### Date Range Input
-  * Input via field, quick action buttons or slider
-     * The date entry is not limited to the filtered scope
-* Up to 6 levels of granularity on the slider(s)
-     * Granularity determines step size of the interactions
-     * Based on granularity - Top timeline is the primary granularity
-     * Shows selected range on two granularity levels (optional)
-     * Second timeline shows context - it is also active
-* Optional buttons for Today, This Week, etc. with optional YTD, etc.
-     * Today, etc. buttons, are hidden when the button's period is not in scope.
-* Range slider shows full scope of selected date field
-* Filters reduce the scope on any level - Visual/Page/All Pages
+### 📅 Date Range Input & Interaction
 
- #### Start-up state
-  * Start-up state can be forced to override default persisted state.
-  * The range configured as start-up is accessible from the icon separating the range.
-  * Slicer opens in configured *pre-set* state
-     * *default* behaves like any typical visual.
-     * Today, YTD, This Month, Last week, etc.
-     * or ...
-Can be synced with last page viewed
-     * With forced *pre-set* range there's *no sync respected* on the pre-set pages.
-     * Bookmarks are respected after forced pre-set ranges
- #### Short cut keys
-  * when slider is active use fast shortcuts
- #### Help
-  * Descriptive tooltip option
+* **Input Methods:** Dates can be entered via **field input**, **quick action buttons**, or the **range timeline slider**.
+    * Date entry is **not limited** to the currently filtered scope.
+
+* **Granularity:** Supports up to **six levels of granularity** on the slider(s), which determines the step size for moving or extending date ranges or for timeline interactions.
+* **Dual Timelines (Optional):**
+    * The timeline may be shown, hidden (default) or made unavailable to a user.
+    * The selected range is optionally shown across two granularity levels.
+    * The **Top timeline** is the primary view, set to the primary granularity level.
+    * A **Second timeline** shows context and is also an active control for date selection.
+* **Quick Action Buttons:** Provides optional buttons for common periods like **Today, This Week, YTD (Year-to-Date),** etc.
+    * These buttons are automatically hidden when their represented period falls outside the currently available date scope.
+* **Range Scope:**
+     * The timeline shows the **scope** of the available date range (which may be set using the Power BI filter panel).
+---
+
+### 🚀 Start-up & State Management
+
+* **Forced Startup:** The initial state can be **forced** to override the default persisted state or sync behavior.
+* **Pre-set Range Access:** The range configured as the start-up value is easily accessible from the **icon separating the range** (date inputs).
+* **Opening State (Pre-set vs. Default):** The slicer opens in its configured pre-set state:
+    * **Default:** Behaves like a typical Power BI visual, restoring the last known state.
+    * **Pre-sets:** Can be configured to specific relative dates (e.g., Today, YTD, This Month, Last Week).
+* **Sync Behavior:** The slicer can be synced with the last page viewed.
+    * **Conflict Resolution:** When a **forced pre-set range** is active, sync behavior is **not respected** on the pages where the pre-set is applied.
+    * **Bookmark Priority:** **Bookmarks are always respected** and override the forced pre-set ranges after the initial load.
+
+### ⌨️ Usability & Help
+
+* **Keyboard Shortcuts:** Enables fast shortcuts when the range slider is active.
+* **Help Tooltip:** Includes an optional descriptive tooltip feature.
 
 ## Installation
 To use the DateSelector visual, you can import it into your Power BI report by following these steps:
@@ -80,7 +87,7 @@ To use the DateSelector visual, add it to your report canvas and connect it to t
 A sample Power BI model with a detailed help page is provided [here.](https://github.com/o221/dateSelector/blob/main/dist/date%20selector%20doc.pbix) Download it and open with Power BI Desktop.
 
 ## Version
-The current version of the DateSelector visual is v3.2025.02.16.
+The current version of the DateSelector visual is v3.2025.11.03.
 
 ## Limitations
 The DateSelector visual currently supports only English language. Internationalisation is not yet planned.
