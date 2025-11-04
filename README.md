@@ -105,7 +105,7 @@ A sample Power BI model with a detailed help page is provided [here.](https://gi
 The current version of the DateSelector visual is v3.2025.11.03.
 
 ## Limitations
-The DateSelector visual currently supports only English language. Internationalisation is not yet planned.
+The DateSelector visual currently supports only English language. Translations for French, Spanish and Dutch are superficially done using copilot.
 
 ## Support
 If you encounter any issues while using the DateSelector visual, please visit the [support page](https://github.com/o221/dateSelector/issues) for assistance. Alternatively add any comments or feature requests on the [discussion page](https://github.com/o221/dateSelector/discussions)
