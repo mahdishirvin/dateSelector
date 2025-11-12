@@ -1,7 +1,7 @@
 # Date Selector Slicer Visual
 
 ## A compact rich functionality date range filter for Power BI
-The [**DateSelector** visual](https://github.com/o221/dateSelector/blob/main/dist/dateSel4A1A0033E6F54D1B809B6E51058D54E3.3.2025.11.03.pbiviz) is a user-friendly, feature-rich date range filter for Power BI that allows users to quickly and easily filter data based on specific dates or date ranges.
+The [**DateSelector** visual](https://github.com/o221/dateSelector/blob/main/dist/dateSel4A1A0033E6F54D1B809B6E51058D54E3.3.2025.11.12.pbiviz) is a user-friendly, feature-rich date range filter for Power BI that allows users to quickly and easily filter data based on specific dates or date ranges.
 
 ## Key Capabilities of the Date Selector Visual ✨
 
@@ -63,7 +63,7 @@ The [**DateSelector** visual](https://github.com/o221/dateSelector/blob/main/dis
 ### Start-up & State Management
 
 * **Forced Startup:** The initial state can be **forced** to override the default persisted state or sync behavior.
-* **Pre-set Range Access:** The range configured as the start-up value is easily accessible from the **icon separating the range** (date inputs).
+* **Pre-set Range Access:** The range configured as the start-up range is easily accessible from the **icon separating the range** (date inputs) unless you chose a single date.
 * **Opening State (Pre-set vs. Default):** The slicer opens in its configured pre-set state:
     * **Default:** Behaves like a typical Power BI visual, restoring the last known state.
     * **Pre-sets:** Can be configured to specific relative dates (e.g., Today, YTD, This Month, Last Week). Sync and bookmarks remain precedent.
@@ -88,7 +88,7 @@ Download the visual from [dist](https://github.com/o221/dateSelector/blob/main/d
 4. Select downloaded "DateSelector" file.
 5. Click on the visual and select "Add."
 
-## 🚀 Usage: Getting Started with the Date Selector 
+## 🚀 Usage: Getting Started with the Date Selector
 
 To begin, simply add the **Date Selector visual** to your report canvas and connect it to your relevant date field.
 
@@ -102,10 +102,13 @@ Once connected, the visual allows users to:
 A sample Power BI model with a detailed help page is provided [here.](https://github.com/o221/dateSelector/blob/main/dist/date%20selector%20doc.pbix) Download it and open with Power BI Desktop.
 
 ## Version
-The current version of the DateSelector visual is v3.2025.11.03.
+The current version of the DateSelector visual is v3.2025.11.12.
 
 ## Limitations
-The DateSelector visual currently supports only English language. Translations for French, Spanish and Dutch are superficially done using copilot.
+The DateSelector visual currently supports only English language. Translations for French, Spanish and Dutch are superficially done using copilot. To add languages:
+1. Download the repo and add your language [string resources](https://github.com/o221/dateSelector/blob/main/stringResources).
+2. Update [localeutils.tsx](https://github.com/o221/dateSelector/blob/main/src/localeutils.tsx) with the appropriate stings for date-fns.
+3. Run pbiviz package -certification-audit to compile the visual.
 
 ## Support
 If you encounter any issues while using the DateSelector visual, please visit the [support page](https://github.com/o221/dateSelector/issues) for assistance. Alternatively add any comments or feature requests on the [discussion page](https://github.com/o221/dateSelector/discussions)
