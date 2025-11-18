@@ -25,7 +25,7 @@ import { LocalizationContext, DateFnsLocaleProvider } from "./localeutils";
 import { ReactVisual } from "./reactUtils";
 import { HotkeysProvider } from "react-hotkeys-hook";
 import { equalRanges, toDateRange } from "./dateutils";
-
+import "../assets/visual.less";
 /**
  * The DateSelector class is the main entry point for the visual. It manages the
  * lifecycle of the visual and handles communication between Power BI and the React component.

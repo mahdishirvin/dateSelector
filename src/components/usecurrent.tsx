@@ -136,7 +136,7 @@ export default function UseCurrent(props: dateCardProps) {
                                 minWidth: item.thisPeriod.length * 0.21 + "rem",
                                 padding: "2px",
                                 right: "-2px",
-                                top: "-2px",
+                                top: "-3px",
                                 textTransform: "none",
                               }
                             : { minWidth: "24px", padding: "2px", top: "-3px" },
@@ -148,7 +148,7 @@ export default function UseCurrent(props: dateCardProps) {
                               variant="caption"
                               sx={{
                                 color: "text.primary",
-                                fontSize: "0.35rem",
+                                fontSize: "0.4rem",
                               }}
                             >
                               {item.thisPeriod}
