@@ -1,5 +1,5 @@
 {
-		"version": "3.2025.11.12",
+		"version": "3.2025.11.18",
 		"author": {"name":"jro","email":"josborn@oahi.com.au"},
 		"resources": [
 			{
@@ -8,7 +8,7 @@
 				"file": "resources/dateSel4A1A0033E6F54D1B809B6E51058D54E3.pbiviz.json"
 			}
 		],
-		"visual": {"name":"dateSelector","displayName":"Date Selector 3.11.12","guid":"dateSel4A1A0033E6F54D1B809B6E51058D54E3","visualClassName":"DateSelector","version":"3.2025.11.12","description":"Date Range Selector","supportUrl":"https://github.com/o221/dateSelector/issues","gitHubUrl":"https://github.com/o221/dateSelector"},
+		"visual": {"name":"dateSelector","displayName":"Date Selector 3.11.18","guid":"dateSel4A1A0033E6F54D1B809B6E51058D54E3","visualClassName":"DateSelector","version":"3.2025.11.18","description":"Date Range Selector","supportUrl":"https://github.com/o221/dateSelector/issues","gitHubUrl":"https://github.com/o221/dateSelector"},
 		"metadata": {
 			"pbivizjson": {
 				"resourceId": "rId0"

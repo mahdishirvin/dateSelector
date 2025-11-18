@@ -161,6 +161,7 @@ const DateIntervalPicker: React.FC<DateIntervalPickerProps> = ({
   const [isEditing, setIsEditing] = useState(false);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation()
     const isCorrectClick =
       (clickType === "right" && event.button === 2) ||
       (clickType === "left" && event.button === 0);
@@ -246,7 +247,7 @@ const DateIntervalPicker: React.FC<DateIntervalPickerProps> = ({
           </div>
         </ClickAwayListener>
       </Popover>
-      <div onClick={handleClick} onContextMenu={handleClick}>
+      <div onClick={handleClick} onContextMenu={handleClick} >
         {children}
       </div>
     </>
