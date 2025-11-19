@@ -119,8 +119,8 @@ export default function DateRangeCard(props: dateCardProps) {
     setContextMenu(
       contextMenu === null
         ? {
-            mouseX: 0, // event.clientX + 2,
-            mouseY: 0, // event.clientY - 6,
+            mouseX: event.clientX + 2,
+            mouseY: event.clientY - 6,
           }
         : // If the menu is already open, close it (useful for clicking outside to close)
           null,
