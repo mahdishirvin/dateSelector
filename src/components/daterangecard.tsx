@@ -137,6 +137,7 @@ export default function DateRangeCard(props: dateCardProps) {
       // ADDED: Prevent context menu on the MUI Menu itself
       event.preventDefault();
       event.stopPropagation();
+      handleClose();
   };
 
   // UI-only updates
