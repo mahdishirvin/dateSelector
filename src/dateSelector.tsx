@@ -81,6 +81,7 @@ export class DateSelector extends ReactVisual implements IVisual {
     super(options);
     this.initializeVisualProperties(options);
     this.initializeReact();
+    this.selectionManager= options.host.createSelectionManager();
     this.localizationManager = options.host.createLocalizationManager();
     this.formattingSettingsService = new FormattingSettingsService(
       this.localizationManager
