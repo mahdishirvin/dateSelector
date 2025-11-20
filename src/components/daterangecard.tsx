@@ -22,10 +22,9 @@ import { HelpProvider } from "./helpprovider";
 import LandingPage from "./landingpage";
 import { compareAsc, format } from "date-fns";
 import { useLocalization } from "../localeutils";
-import Menu from '@mui/material/Menu';      // <-- NEW MUI Menu
-import MenuItem from '@mui/material/MenuItem'; // <-- NEW MUI MenuItem
-import Divider from '@mui/material/Divider'; // <-- NEW MUI Divider
-
+import Menu from "@mui/material/Menu"; // <-- NEW MUI Menu
+import MenuItem from "@mui/material/MenuItem"; // <-- NEW MUI MenuItem
+import Divider from "@mui/material/Divider"; // <-- NEW MUI Divider
 
 export default function DateRangeCard(props: dateCardProps) {
   // If the landing page is not disabled, render it and exit early.
@@ -60,7 +59,6 @@ export default function DateRangeCard(props: dateCardProps) {
   const dateSpan = useMemo(() => {
     return input(props.dates, props.rangeScope);
   }, [input, props.dates, props.rangeScope]);
-
 
   // Memoize the theme creation to avoid re-calculating on every render.
   const theme = useMemo(
@@ -123,7 +121,7 @@ export default function DateRangeCard(props: dateCardProps) {
             mouseY: event.clientY - 6,
           }
         : // If the menu is already open, close it (useful for clicking outside to close)
-          null,
+          null
     );
   };
 
@@ -134,10 +132,10 @@ export default function DateRangeCard(props: dateCardProps) {
 
   // Handler to prevent context menu from appearing when the MUI menu is already open
   const handleMenuContextMenu = (event: React.MouseEvent) => {
-      // ADDED: Prevent context menu on the MUI Menu itself
-      event.preventDefault();
-      event.stopPropagation();
-      handleClose();
+    // ADDED: Prevent context menu on the MUI Menu itself
+    event.preventDefault();
+    event.stopPropagation();
+    handleClose();
   };
 
   // UI-only updates
@@ -201,26 +199,45 @@ export default function DateRangeCard(props: dateCardProps) {
         localization={localization}
         themeMode={props.themeMode}
       >
+        {/* Background layer that fills the entire iframe to allow context menu anywhere */}
+        <div
+          onContextMenu={handleContextMenu}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            zIndex: 0, // behind all UI, but still receives clicks
+            background: "transparent",
+          }}
+        />
+
         {/* ADD onContextMenu handler to the main container */}
-        <Grid container direction="column" onContextMenu={handleContextMenu}>
-            <TopRow
-              {...props}
-              dates={currentDates}
-              showMore={props.showMore}
-              showMove={props.showMove}
-              localization={localization}
-              showExpand={props.showExpand}
-              showSlider={props.showSlider}
-              openSlider={openSlider}
-              toggleSlider={toggleSlider}
-              stepOpen={stepOpen}
-              stepValue={stepValue}
-              handleVal={onChangeVal}
-              handleClick={toggleStepOpen}
-              setStepValue={setStepValue}
-              setStepOpen={setStepOpen}
-              current={current}
-            />
+        <Grid
+          container
+          direction="column"
+          onContextMenu={handleContextMenu}
+          style={{ position: "relative", zIndex: 1 }}
+        >
+          <TopRow
+            {...props}
+            dates={currentDates}
+            showMore={props.showMore}
+            showMove={props.showMove}
+            localization={localization}
+            showExpand={props.showExpand}
+            showSlider={props.showSlider}
+            openSlider={openSlider}
+            toggleSlider={toggleSlider}
+            stepOpen={stepOpen}
+            stepValue={stepValue}
+            handleVal={onChangeVal}
+            handleClick={toggleStepOpen}
+            setStepValue={setStepValue}
+            setStepOpen={setStepOpen}
+            current={current}
+          />
           <Zoom in={openSlider}>
             <Grid container spacing={0} size={12}>
               <Grid size="grow" sx={{ marginLeft: 1, paddingTop: 0.1 }}>
@@ -254,27 +271,27 @@ export default function DateRangeCard(props: dateCardProps) {
             : undefined
         }
         sx={{
-            '& .MuiPaper-root': {
-                maxHeight: '60px', // Fixed/Max height
-                '& .MuiList-root': {
-                    paddingTop: '2px',    // Reduced top padding
-                    paddingBottom: '2px', // Reduced bottom padding
-                }
-            }
+          "& .MuiPaper-root": {
+            maxHeight: "60px", // Fixed/Max height
+            "& .MuiList-root": {
+              paddingTop: "2px", // Reduced top padding
+              paddingBottom: "2px", // Reduced bottom padding
+            },
+          },
         }}
       >
         {/* Range Description (e.g., "Last 30 Days") */}
         <MenuItem
-        sx={{
-                minHeight: '20px',
-                paddingY: '2px', // Reduced vertical padding
-                fontSize: '0.55rem', // Small font size
-                color: theme.palette.text.primary
-            }}>
-            {rangeDescriptionLabel}: {dateSpan.string}
+          sx={{
+            minHeight: "20px",
+            paddingY: "2px", // Reduced vertical padding
+            fontSize: "0.55rem", // Small font size
+            color: theme.palette.text.primary,
+          }}
+        >
+          {rangeDescriptionLabel}: {dateSpan.string}
         </MenuItem>
         {/* Detailed Info (e.g., "From 2023-11-01 to 2023-11-30") */}
-
       </Menu>
     </ThemeProvider>
   );
