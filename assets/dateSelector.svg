@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="26.994501" height="26.908421" viewBox="0 0 26.994501 26.908421" version="1.1" id="svg1"
+   sodipodi:docname="dateSelector.svg" inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+   <defs id="defs1">
+      <linearGradient id="linearGradient130" inkscape:collect="always">
+         <stop style="stop-color:#26633a;stop-opacity:1;" offset="0" id="stop130" />
+         <stop style="stop-color:#26633a;stop-opacity:0;" offset="1" id="stop131" />
+      </linearGradient>
+      <linearGradient id="swatch122" inkscape:swatch="solid">
+         <stop style="stop-color:#26633a;stop-opacity:1;" offset="0" id="stop123" />
+      </linearGradient>
+      <linearGradient inkscape:collect="always" xlink:href="#linearGradient130" id="linearGradient131" x1="1107.1151"
+         y1="545.5" x2="1110" y2="545.5" gradientUnits="userSpaceOnUse" />
+      <linearGradient inkscape:collect="always" xlink:href="#linearGradient130" id="linearGradient132" x1="1103"
+         y1="532.92444" x2="1110" y2="532.92444" gradientUnits="userSpaceOnUse" />
+      <linearGradient inkscape:collect="always" xlink:href="#linearGradient130" id="linearGradient133" x1="1095"
+         y1="545.5" x2="1101.9137" y2="545.5" gradientUnits="userSpaceOnUse" />
+      <linearGradient inkscape:collect="always" xlink:href="#linearGradient130" id="linearGradient134" x1="0" y1="2.5"
+         x2="6" y2="2.5" gradientUnits="userSpaceOnUse" />
+      <linearGradient inkscape:collect="always" xlink:href="#linearGradient130" id="linearGradient135" x1="0" y1="2.5"
+         x2="7" y2="2.5" gradientUnits="userSpaceOnUse" />
+      <linearGradient inkscape:collect="always" xlink:href="#linearGradient130" id="linearGradient136" x1="0" y1="2.5"
+         x2="7" y2="2.5" gradientUnits="userSpaceOnUse" />
+      <linearGradient inkscape:collect="always" xlink:href="#linearGradient130" id="linearGradient137" x1="0" y1="2.5"
+         x2="7" y2="2.5" gradientUnits="userSpaceOnUse" />
+      <linearGradient inkscape:collect="always" xlink:href="#linearGradient130" id="linearGradient138" x1="0" y1="2.5"
+         x2="7" y2="2.5" gradientUnits="userSpaceOnUse" />
+   </defs>
+   <sodipodi:namedview id="namedview1" pagecolor="#ffffff" bordercolor="#000000" borderopacity="0.25"
+      inkscape:showpageshadow="2" inkscape:pageopacity="0.0" inkscape:pagecheckerboard="0" inkscape:deskcolor="#d1d1d1"
+      inkscape:zoom="34.75" inkscape:cx="13.510791" inkscape:cy="12.18705" inkscape:window-width="2400"
+      inkscape:window-height="1511" inkscape:window-x="788" inkscape:window-y="2151" inkscape:window-maximized="1"
+      inkscape:current-layer="DateSelector" />
+   <g id="DateSelector" transform="translate(-1085.0027,-523.49724)">
+      <g id="Group_2" data-name="Group 2" style="display:inline" inkscape:export-filename="dateSelector300.png"
+         inkscape:export-xdpi="1065.0566" inkscape:export-ydpi="1065.0566"
+         transform="matrix(0.99996296,0,0,1.0441965,-0.07423392,-23.417412)">
+         <rect id="Rectangle_3" data-name="Rectangle 3" width="7" height="5" transform="translate(1087,531)"
+            fill="#505b3ecc" x="0" y="0" style="fill:url(#linearGradient138);fill-rule:evenodd" />
+         <rect id="Rectangle_18" data-name="Rectangle 18" width="7" height="5" transform="translate(1087,537)"
+            fill="#505b3ecc" x="0" y="0" style="fill:url(#linearGradient137);fill-opacity:1;fill-rule:evenodd" />
+         <rect id="Rectangle_21" data-name="Rectangle 21" width="7" height="5" transform="translate(1087,543)"
+            fill="#505b3ecc" x="0" y="0" style="fill:url(#linearGradient136);fill-rule:evenodd" />
+         <rect id="Rectangle_15" data-name="Rectangle 15" width="7" height="5" transform="translate(1095,531)"
+            fill="#505b3ecc" x="0" y="0" style="fill:url(#linearGradient135);fill-rule:evenodd" />
+         <path id="Rectangle_19" d="M 0,0 V 5 H 3 4 5 6 V 4 H 5 V 3 H 4 V 2 H 3 V 0 Z" transform="translate(1095,537)"
+            style="fill:url(#linearGradient134);fill-rule:evenodd" />
+         <rect id="Rectangle_22" data-name="Rectangle 22" width="6.9136691" height="5" fill="#505b3ecc" x="1095" y="543"
+            style="fill:url(#linearGradient133);fill-rule:evenodd;stroke-width:0.993814" />
+         <rect id="Rectangle_17" data-name="Rectangle 17" width="7" height="3.8489208" fill="#505b3ecc" x="1103" y="531"
+            style="fill:url(#linearGradient132);fill-rule:evenodd;stroke-width:0.877373" />
+         <rect id="Rectangle_23" data-name="Rectangle 23" width="2.884892" height="5" fill="#505b3ecc" x="1107.1151"
+            y="543" style="fill:url(#linearGradient131);fill-rule:evenodd;stroke-width:0.980628" />
+      </g>
+      <g id="Group_1" data-name="Group 1" transform="matrix(1,0,0,1.0230215,-1,-12.287766)" sodipodi:insensitive="true"
+         style="display:inline">
+         <path id="Line_1"
+            style="baseline-shift:baseline;display:inline;overflow:visible;opacity:1;stroke-width:0.699988;stroke-linecap:round;stroke-dasharray:none;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
+            d="m 1098.5,535.11252 a 0.5,0.49624941 0 0 0 -0.5,0.49625 v 2.97749 a 0.5,0.49624941 0 0 0 0,0.0155 0.5,0.49624941 0 0 0 0,0.0407 0.5,0.49624941 0 0 0 0.01,0.0368 0.5,0.49624941 0 0 0 0.01,0.0252 0.5,0.49624941 0 0 0 0,0.01 0.5,0.49624941 0 0 0 0.016,0.0485 0.5,0.49624941 0 0 0 0.049,0.0969 0.5,0.49624941 0 0 0 0.02,0.0271 0.5,0.49624941 0 0 0 0,0.002 0.5,0.49624941 0 0 0 0.012,0.0136 0.5,0.49624941 0 0 0 0.029,0.031 0.5,0.49624941 0 0 0 0.018,0.0174 0.5,0.49624941 0 0 0 0.025,0.0233 0.5,0.49624941 0 0 0 0.01,0.006 l 4.8047,3.81491 v 6.70906 A 0.5,0.49624941 0 0 0 1103.5,550 h 4 a 0.5,0.49624941 0 0 0 0.064,-0.004 0.5,0.49624941 0 0 0 0.4355,-0.49238 v -6.70906 l 4.8047,-3.81492 a 0.5,0.49624941 0 0 0 0.01,-0.006 0.5,0.49624941 0 0 0 0.043,-0.0407 0.5,0.49624941 0 0 0 0.01,-0.004 0.5,0.49624941 0 0 0 0.037,-0.0426 0.5,0.49624941 0 0 0 0.01,-0.008 0.5,0.49624941 0 0 0 0.035,-0.0562 0.5,0.49624941 0 0 0 0.027,-0.0601 0.5,0.49624941 0 0 0 0.018,-0.0581 0.5,0.49624941 0 0 0 0,-0.006 0.5,0.49624941 0 0 0 0.01,-0.0562 0.5,0.49624941 0 0 0 0,-0.008 0.5,0.49624941 0 0 0 0,-0.0659 v -2.96005 a 0.5,0.49624941 0 0 0 -0.5002,-0.49625 z m 0.5,0.9925 h 13 v 2.24281 l -4.8125,3.82073 a 0.5,0.49624941 0 0 0 -0.025,0.0233 0.5,0.49624941 0 0 0 -0.018,0.0174 0.5,0.49624941 0 0 0 -0.029,0.031 0.5,0.49624941 0 0 0 -0.014,0.0155 0.5,0.49624941 0 0 0 -0.02,0.0271 0.5,0.49624941 0 0 0 -0.066,0.15508 0.5,0.49624941 0 0 0 -0.01,0.0252 0.5,0.49624941 0 0 0 -0.01,0.0368 0.5,0.49624941 0 0 0 0,0.0407 0.5,0.49624941 0 0 0 0,0.0155 v 6.45124 h -3 v -6.43379 a 0.5,0.49624941 0 0 0 0,-0.033 0.5,0.49624941 0 0 0 0,-0.033 0.5,0.49624941 0 0 0 -0.01,-0.0446 0.5,0.49624941 0 0 0 0,-0.0194 0.5,0.49624941 0 0 0 -0.02,-0.064 0.5,0.49624941 0 0 0 -0.027,-0.0601 0.5,0.49624941 0 0 0 -0.022,-0.0368 0.5,0.49624941 0 0 0 -0.014,-0.0194 0.5,0.49624941 0 0 0 -0.01,-0.01 0.5,0.49624941 0 0 0 -0.012,-0.0136 0.5,0.49624941 0 0 0 -0.024,-0.0271 0.5,0.49624941 0 0 0 -0.023,-0.0213 0.5,0.49624941 0 0 0 -0.025,-0.0233 L 1099,538.34783 Z" />
+      </g>
+      <g id="g8" style="display:inline" transform="matrix(0.99996296,0,0,1.0187225,0.0696741,-9.8039834)">
+         <line id="Line_10" data-name="Line 10" x1="15" transform="translate(1085.5,549.5)" fill="#707070"
+            stroke="#707070" stroke-linecap="round" stroke-width="1" y1="0" x2="0" y2="0" />
+         <line id="Line_11" data-name="Line 11" x1="26" transform="translate(1085.5,529.5)" fill="#707070"
+            stroke="#707070" stroke-linecap="round" stroke-width="1" y1="0" x2="0" y2="0" />
+         <line id="Line_14" data-name="Line 14" x1="4" y2="0.001" transform="translate(1085.5,525.5)" fill="#707070"
+            stroke="#707070" stroke-linecap="round" stroke-width="1" y1="0" x2="0" />
+         <line id="Line_22" data-name="Line 22" x1="10" y2="0.001" transform="translate(1093.5,525.5)" fill="#707070"
+            stroke="#707070" stroke-linecap="round" stroke-width="1" y1="0" x2="0" />
+         <line id="Line_21" data-name="Line 21" x1="4" y2="0.001" transform="translate(1089.5,527.5)" fill="#707070"
+            stroke="#707070" stroke-linecap="round" stroke-width="1" y1="0" x2="0" />
+         <line id="Line_19" data-name="Line 19" x1="4" y2="0.001" transform="translate(1107.5,525.502)" fill="#707070"
+            stroke="#707070" stroke-linecap="round" stroke-width="1" y1="0" x2="0" />
+         <line id="Line_20" data-name="Line 20" x1="4" y2="0.001" transform="translate(1103.5,527.5)" fill="#707070"
+            stroke="#707070" stroke-linecap="round" stroke-width="1" y1="0" x2="0" />
+         <line id="Line_15" data-name="Line 15" y1="1.998" transform="translate(1089.5,525.502)" fill="#707070"
+            stroke="#707070" stroke-linecap="round" stroke-width="1" x1="0" x2="0" y2="0" />
+         <line id="Line_16" data-name="Line 16" y1="1.998" transform="translate(1093.5,525.502)" fill="#707070"
+            stroke="#707070" stroke-linecap="round" stroke-width="1" x1="0" x2="0" y2="0" />
+         <line id="Line_17" data-name="Line 17" y1="1.998" transform="translate(1103.5,525.5)" fill="#707070"
+            stroke="#707070" stroke-linecap="round" stroke-width="1" x1="0" x2="0" y2="0" />
+         <line id="Line_18" data-name="Line 18" y1="1.998" transform="translate(1107.5,525.502)" fill="#707070"
+            stroke="#707070" stroke-linecap="round" stroke-width="1" x1="0" x2="0" y2="0" />
+         <line id="Line_13" data-name="Line 13" y1="8" transform="translate(1111.5,525.5)" fill="#707070"
+            stroke="#707070" stroke-linecap="round" stroke-width="1" x1="0" x2="0" y2="0" />
+         <line id="Line_12" data-name="Line 12" y1="24" transform="translate(1085.5,525.5)" fill="#707070"
+            stroke="#707070" stroke-linecap="round" stroke-width="1" x1="0" x2="0" y2="0" />
+         <line id="Line_23" data-name="Line 23" y1="3" transform="translate(1091.5,523.5)" fill="#707070"
+            stroke="#707070" stroke-width="2" x1="0" x2="0" y2="0" style="stroke:#3c3c3c;stroke-opacity:1" />
+         <line id="Line_24" data-name="Line 24" y1="3" transform="translate(1105.5,523.5)" fill="#707070"
+            stroke="#707070" stroke-width="2" x1="0" x2="0" y2="0" style="stroke:#3c3c3c;stroke-opacity:1" />
+      </g>
+      <g id="Group_1-8" data-name="Group 1" transform="matrix(1.0001667,0,0,1.0263569,-1.4246117,-14.234713)"
+         style="display:inline;fill:#000000;fill-opacity:1;stroke:#ffffff33;stroke-width:0.208612;stroke-dasharray:none;stroke-opacity:1">
+         <path id="Line_1-2"
+            style="baseline-shift:baseline;display:inline;overflow:visible;opacity:1;fill:#000000;fill-opacity:1;stroke:#ffffff33;stroke-width:0.208612;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
+            d="m 1098.5,535.11252 a 0.5,0.49624941 0 0 0 -0.5,0.49625 v 2.97749 a 0.5,0.49624941 0 0 0 0,0.0155 0.5,0.49624941 0 0 0 0,0.0407 0.5,0.49624941 0 0 0 0.01,0.0368 0.5,0.49624941 0 0 0 0.01,0.0252 0.5,0.49624941 0 0 0 0,0.01 0.5,0.49624941 0 0 0 0.016,0.0485 0.5,0.49624941 0 0 0 0.049,0.0969 0.5,0.49624941 0 0 0 0.02,0.0271 0.5,0.49624941 0 0 0 0,0.002 0.5,0.49624941 0 0 0 0.012,0.0136 0.5,0.49624941 0 0 0 0.029,0.031 0.5,0.49624941 0 0 0 0.018,0.0174 0.5,0.49624941 0 0 0 0.025,0.0233 0.5,0.49624941 0 0 0 0.01,0.006 l 4.8047,3.81491 v 6.70906 A 0.5,0.49624941 0 0 0 1103.5,550 h 4 a 0.5,0.49624941 0 0 0 0.064,-0.004 0.5,0.49624941 0 0 0 0.4355,-0.49238 v -6.70906 l 4.8047,-3.81492 a 0.5,0.49624941 0 0 0 0.01,-0.006 0.5,0.49624941 0 0 0 0.043,-0.0407 0.5,0.49624941 0 0 0 0.01,-0.004 0.5,0.49624941 0 0 0 0.037,-0.0426 0.5,0.49624941 0 0 0 0.01,-0.008 0.5,0.49624941 0 0 0 0.035,-0.0562 0.5,0.49624941 0 0 0 0.027,-0.0601 0.5,0.49624941 0 0 0 0.018,-0.0581 0.5,0.49624941 0 0 0 0,-0.006 0.5,0.49624941 0 0 0 0.01,-0.0562 0.5,0.49624941 0 0 0 0,-0.008 0.5,0.49624941 0 0 0 0,-0.0659 v -2.96005 a 0.5,0.49624941 0 0 0 -0.5002,-0.49625 z m 0.5,0.9925 h 13 v 2.24281 l -4.8125,3.82073 a 0.5,0.49624941 0 0 0 -0.025,0.0233 0.5,0.49624941 0 0 0 -0.018,0.0174 0.5,0.49624941 0 0 0 -0.029,0.031 0.5,0.49624941 0 0 0 -0.014,0.0155 0.5,0.49624941 0 0 0 -0.02,0.0271 0.5,0.49624941 0 0 0 -0.066,0.15508 0.5,0.49624941 0 0 0 -0.01,0.0252 0.5,0.49624941 0 0 0 -0.01,0.0368 0.5,0.49624941 0 0 0 0,0.0407 0.5,0.49624941 0 0 0 0,0.0155 v 6.45124 h -3 v -6.43379 a 0.5,0.49624941 0 0 0 0,-0.033 0.5,0.49624941 0 0 0 0,-0.033 0.5,0.49624941 0 0 0 -0.01,-0.0446 0.5,0.49624941 0 0 0 0,-0.0194 0.5,0.49624941 0 0 0 -0.02,-0.064 0.5,0.49624941 0 0 0 -0.027,-0.0601 0.5,0.49624941 0 0 0 -0.022,-0.0368 0.5,0.49624941 0 0 0 -0.014,-0.0194 0.5,0.49624941 0 0 0 -0.01,-0.01 0.5,0.49624941 0 0 0 -0.012,-0.0136 0.5,0.49624941 0 0 0 -0.024,-0.0271 0.5,0.49624941 0 0 0 -0.023,-0.0213 0.5,0.49624941 0 0 0 -0.025,-0.0233 L 1099,538.34783 Z" />
+      </g>
+   </g>
+</svg>
