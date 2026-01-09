@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography";
 import { dateCardProps, dateRange } from "../interface";
 import RngeTooltip from "./rngetooltip";
 import DateIntervalPicker from "./dateintervalpicker";
-import { Badge } from "@mui/material";
+import Badge from "@mui/material/Badge";
 
 export default function UseCurrent(props: dateCardProps) {
   const {

@@ -1,6 +1,7 @@
 import React, { useState, useContext, useMemo, useEffect } from "react";
 import IconButton from "@mui/material/IconButton";
-import { Chat, ChatBubbleOutlineOutlined } from "@mui/icons-material";
+import Chat from "@mui/icons-material/Chat";
+import ChatBubbleOutlineOutlined from "@mui/icons-material/ChatBubbleOutlineOutlined";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useTheme } from "@mui/material/styles";
 import RngeTooltip from "./rngetooltip";

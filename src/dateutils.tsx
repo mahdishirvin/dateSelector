@@ -1,22 +1,20 @@
 import * as React from "react";
-import {
-  Today,
-  DateRange,
-  Payment,
-  EventNote,
-  DynamicFeed,
-  LineStyle,
-  SwitchLeft,
-  PlayArrow,
-  SkipPrevious,
-  SkipNext,
-  KeyboardArrowLeft,
-  KeyboardDoubleArrowLeft,
-  KeyboardArrowRight,
-  KeyboardDoubleArrowRight,
-  SettingsEthernet,
-  MultipleStop,
-} from "@mui/icons-material";
+import Today from "@mui/icons-material/Today";
+import DateRange from "@mui/icons-material/DateRange";
+import Payment from "@mui/icons-material/Payment";
+import EventNote from "@mui/icons-material/EventNote";
+import DynamicFeed from "@mui/icons-material/DynamicFeed";
+import LineStyle from "@mui/icons-material/LineStyle";
+import SwitchLeft from "@mui/icons-material/SwitchLeft";
+import PlayArrow from "@mui/icons-material/PlayArrow";
+import SkipPrevious from "@mui/icons-material/SkipPrevious";
+import SkipNext from "@mui/icons-material/SkipNext";
+import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardDoubleArrowLeft from "@mui/icons-material/KeyboardDoubleArrowLeft";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import KeyboardDoubleArrowRight from "@mui/icons-material/KeyboardDoubleArrowRight";
+import SettingsEthernet from "@mui/icons-material/SettingsEthernet";
+import MultipleStop from "@mui/icons-material/MultipleStop";
 import {
   startOfDay,
   endOfDay,
