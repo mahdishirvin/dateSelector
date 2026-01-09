@@ -7,7 +7,7 @@
         "target": "es6",
         "sourceMap": true,
         "outDir": "./.tmp/build/",
-        "moduleResolution": "node",
+        "module": "nodenext",
         "declaration": true,
         "lib": [
             "es2015",

@@ -163,12 +163,12 @@ class calendarSettings extends FormattingSettingsCard {
     name: "forceStartRange",
     descriptionKey: "calendar_forceStartRange_description",
     displayNameKey: "calendar_forceStartRange_displayName",
-    value: defaultSettings.calendarSettings.limitToScope,
+    value: defaultSettings.calendarSettings.forceStartRange,
   });
 
   slices: Array<FormattingSettingsSlice> = [
     this.singleDay,
-    // this.limitToScope,
+    this.limitToScope,
     this.startRange,
     this.forceStartRange,
     this.stepInit,

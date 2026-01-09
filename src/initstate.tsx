@@ -26,6 +26,7 @@ export const defaultSettings: Settings = {
     payLength: 14,
     fmtDate: "EEE, d MMM yy",
     limitToScope: false,
+    forceStartRange: false,
   },
   layoutSettings: {
     timelineSettings: {
