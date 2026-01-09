@@ -13,7 +13,8 @@ import { useHelpContext } from "./helpprovider";
 import RngeTooltip from "./rngetooltip";
 import { dateCardProps, dateRange } from "../interface";
 import { useDateFnsLocale } from "../localeutils";
-import { HorizontalRule, LinearScale } from "@mui/icons-material";
+import HorizontalRule from "@mui/icons-material/HorizontalRule";
+import LinearScale from "@mui/icons-material/LinearScale";
 import Badge from "@mui/material/Badge";
 import { styled } from "@mui/material/styles";
 
