@@ -28,7 +28,7 @@ import { toDateRange } from "./dateutils";
 /**
  * The DateSelector class is the main entry point for the visual. It manages the
  * lifecycle of the visual and handles communication between Power BI and the React component.
- * It now inherits from ReactVisual to abstract away the React rendering debugic.
+ * It now inherits from ReactVisual to abstract away the React rendering logic.
  */
 export class DateSelector extends ReactVisual implements IVisual {
   private visualHost: IVisualHost;
@@ -42,7 +42,7 @@ export class DateSelector extends ReactVisual implements IVisual {
   private colorHelper: ColorHelper;
   private state: VisualState;
   private locale: string;
-  // We now use a single state variable to track the applied filter, simplifying the debugic.
+  // We now use a single state variable to track the applied filter, simplifying the logic.
   private currentFilter: dateRange | null = null;
   // private persistedFilter: dateRange | null = null;
   // private bookmarkFilter: dateRange | null = null;
@@ -120,11 +120,11 @@ export class DateSelector extends ReactVisual implements IVisual {
 
   /**
    * The update method is called whenever the visual's data or settings change.
-   * It handles the core debugic of the visual.
+   * It handles the core logic of the visual.
    * @param options The visual update options from Power BI.
    */
 
-  // In the following update function, bookmark always wins is nto happening on a page with forced start up value set..
+  // In the following update function, bookmark always wins is not happening on a page with forced start up value set.
   public update(options: VisualUpdateOptions) {
     try {
       this.events.renderingStarted(options);
@@ -159,7 +159,7 @@ export class DateSelector extends ReactVisual implements IVisual {
       // If we reach here, we have a valid data view. Turn the landing page off.
       if (!this.state.landingOff) {
         this.state.landingOff = true;
-        // Immediate UI update to dismiss landing page (before long filter debugic)
+        // Immediate UI update to dismiss landing page (before long filter logic)
         this.updateReactContainers({ landingOff: true });
       }
 
@@ -216,7 +216,7 @@ export class DateSelector extends ReactVisual implements IVisual {
       }
 
       // ---------------------------------------------------------
-      // Apply filter if this debugic decided we should push one to host
+      // Apply filter if this logic decided we should push one to host
       // (e.g. forced startup or startup default on first load/settings-changed)
       // ---------------------------------------------------------
       if (shouldApplyFilter && resolvedFilter) {
