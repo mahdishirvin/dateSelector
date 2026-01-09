@@ -309,6 +309,8 @@
                     }
                 },
                 "stepInit": {
+                    "displayName": "Initial step",
+                    "description": "Granularity used for the step controls when the visual loads",
                     "type": {
                         "enumeration": [
                             {
@@ -342,8 +344,7 @@
                                 "displayNameKey": "Step_Year"
                             }
                         ]
-                    },
-                    "filterState": true
+                    }
                 }
             }
         },
