@@ -338,6 +338,16 @@ class daySettings extends FormattingSettingsGroup {
     displayNameKey: "daySkip_displayName",
     descriptionKey: "daySkip_description",
     value: defaultSettings.period.daySettings.daySkip,
+            options: {
+            minValue: {
+                type: powerbi.visuals.ValidatorType.Min,
+                value: 0,
+            },
+            maxValue: {
+                type: powerbi.visuals.ValidatorType.Max,
+                value: 31
+            },
+        }
   });
 
   name: string = "day";
@@ -369,6 +379,16 @@ class weekSettings extends FormattingSettingsGroup {
     displayNameKey: "weekSkip_displayName",
     descriptionKey: "weekSkip_description",
     value: defaultSettings.period.weekSettings.weekSkip,
+            options: {
+            minValue: {
+                type: powerbi.visuals.ValidatorType.Min,
+                value: 0,
+            },
+            maxValue: {
+                type: powerbi.visuals.ValidatorType.Max,
+                value: 50,
+            },
+        }
   });
 
   weekStartDay = new formattingSettings.AutoDropdown({
@@ -412,6 +432,16 @@ class paySettings extends FormattingSettingsGroup {
     descriptionKey: "paySkip_description",
     displayNameKey: "paySkip_displayName",
     value: defaultSettings.period.paySettings.paySkip,
+            options: {
+            minValue: {
+                type: powerbi.visuals.ValidatorType.Min,
+                value: 0,
+            },
+            maxValue: {
+                type: powerbi.visuals.ValidatorType.Max,
+                value: 100,
+            },
+        }
   });
 
   payLength = new formattingSettings.NumUpDown({
@@ -500,6 +530,16 @@ class monthSettings extends FormattingSettingsGroup {
     displayNameKey: "monthSkip_displayName",
     descriptionKey: "monthSkip_description",
     value: defaultSettings.period.monthSettings.monthSkip,
+            options: {
+            minValue: {
+                type: powerbi.visuals.ValidatorType.Min,
+                value: 0,
+            },
+            maxValue: {
+                type: powerbi.visuals.ValidatorType.Max,
+                value: 24,
+            },
+        }
   });
 
   name: string = "month";
@@ -531,6 +571,16 @@ class quarterSettings extends FormattingSettingsGroup {
     displayNameKey: "quarterSkip_displayName",
     descriptionKey: "quarterSkip_description",
     value: defaultSettings.period.quarterSettings.quarterSkip,
+            options: {
+            minValue: {
+                type: powerbi.visuals.ValidatorType.Min,
+                value: 0,
+            },
+            maxValue: {
+                type: powerbi.visuals.ValidatorType.Max,
+                value: 12,
+            },
+        }
   });
 
   name: string = "quarter";
@@ -562,6 +612,16 @@ class yearSettings extends FormattingSettingsGroup {
     displayNameKey: "yearSkip_displayName",
     descriptionKey: "yearSkip_description",
     value: defaultSettings.period.yearSettings.yearSkip,
+            options: {
+            minValue: {
+                type: powerbi.visuals.ValidatorType.Min,
+                value: 0,
+            },
+            maxValue: {
+                type: powerbi.visuals.ValidatorType.Max,
+                value: 10,
+            },
+        }
   });
 
   yearStartMonth = new formattingSettings.AutoDropdown({
