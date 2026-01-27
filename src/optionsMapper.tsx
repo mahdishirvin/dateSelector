@@ -101,11 +101,11 @@ export const settingProps = (
     forceStartRange,
 
     stepSkip: {
-      day: day.daySkip.value,
-      week: week.weekSkip.value,
-      pay: pay.paySkip.value,
-      month: month.monthSkip.value,
-      quarter: quarter.quarterSkip.value,
+      day: nonNeg(day.daySkip.value),
+      week: nonNeg(week.weekSkip.value),
+      pay: nonNeg(pay.paySkip.value),
+      month: nonNeg(month.monthSkip.value),
+      quarter: nonNeg(quarter.quarterSkip.value),
       year: 1,
     },
     stepViz: {
@@ -127,7 +127,7 @@ export const settingProps = (
     payProps: {
       desc: String(pay.payCustomLabel.value),
       ref: pay.payRefDate.value,
-      len: pay.payLength.value,
+      len: nonNeg(pay.payLength.value),
     },
     showHelpIcon: help.showHelpIcon.value,
     showTooltip: help.showTooltip.value,
@@ -144,7 +144,7 @@ export const settingProps = (
     themeColor: style.themeColor.value.value.valueOf(),
     themeMode: style.themeMode.value,
     fontColor: style.fontColor.value.value.valueOf(),
-    fontSize: style.fontSize.value.valueOf(),
+    fontSize: nonNeg(style.fontSize.value),
     fontBold: style.font.bold.value,
     fontItalic: style.font.italic.value,
   };
@@ -155,6 +155,11 @@ const getDayNum = (n: number | string): 0 | 1 | 2 | 3 | 4 | 5 | 6 =>
 
 const getNum = (n: number | string): number =>
   typeof n === "number" ? n : parseInt(n, 10);
+
+const nonNeg = (n: number | string): number => {
+  const v = typeof n === "number" ? n : parseInt(String(n), 10);
+  return isNaN(v) ? 0 : Math.max(0, v);
+};
 
 const parseDate = (value: any): Date | null => {
   const date = new Date(value);
