@@ -345,7 +345,7 @@ class daySettings extends FormattingSettingsGroup {
             },
             maxValue: {
                 type: powerbi.visuals.ValidatorType.Max,
-                value: 31
+                value: 365
             },
         }
   });
