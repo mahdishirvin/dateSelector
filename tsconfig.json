@@ -7,7 +7,7 @@
         "target": "es6",
         "sourceMap": true,
         "outDir": "./.tmp/build",
-        "rootDir": "./src",
+        "rootDir": ".",
         "module": "nodenext",
         "declaration": true,
         "lib": [
@@ -38,6 +38,7 @@
     "exclude": [
         "node_modules",
         ".tmp",
+        ".tmp/**",
         ".tmp/build"
     ]
 }
