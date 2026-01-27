@@ -1,7 +1,7 @@
 # Date Selector Slicer Visual
 
 ## A compact rich functionality date range filter for Power BI
-The [**DateSelector** visual](https://github.com/o221/dateSelector/blob/main/dist/dateSel4A1A0033E6F54D1B809B6E51058D54E3.3.2026.01.09.pbiviz) is a user-friendly, feature-rich date range filter for Power BI that allows users to quickly and easily filter data based on specific dates or date ranges.
+The [**DateSelector** visual](https://marketplace.microsoft.com/en-us/product/power-bi-visuals/tamblalimited1689730323249.date_range_selector?tab=Overview) is a user-friendly, feature-rich date range filter for Power BI that allows users to quickly and easily filter data based on specific dates or date ranges.
 
 ## Key Capabilities of the Date Selector Visual ✨
 
@@ -80,7 +80,7 @@ The [**DateSelector** visual](https://github.com/o221/dateSelector/blob/main/dis
 ## Installation
 To use the DateSelector visual, you can import it into your Power BI report by following these steps:
 
-Download the visual from [dist](https://github.com/o221/dateSelector/blob/main/dist) and import it into Power BI using the "Import from file" option.
+Download the visual from [Microsoft Marketplace](https://marketplace.microsoft.com/en-us/product/power-bi-visuals/tamblalimited1689730323249.date_range_selector?tab=Overview) and import it into Power BI.
 
 1. Open the report in Power BI Desktop.
 2. In the Visualizations pane, select the ellipsis (...).
