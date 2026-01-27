@@ -6,7 +6,8 @@
         "experimentalDecorators": true,
         "target": "es6",
         "sourceMap": true,
-        "outDir": "./.tmp/build/",
+        "outDir": "./.tmp/build",
+        "rootDir": ".",
         "module": "nodenext",
         "declaration": true,
         "lib": [
@@ -33,5 +34,11 @@
         "src",
         "src/languages/enAU.ts",
         "src/types/images.d.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        ".tmp",
+        ".tmp/**",
+        ".tmp/build"
     ]
 }
