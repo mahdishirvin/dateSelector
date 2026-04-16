@@ -5,7 +5,7 @@ import IconButton from "@mui/material/IconButton";
 import RefreshIcon from "@mui/icons-material/Refresh";
 // import Remove from "@mui/icons-material/Remove";
 import { useTheme } from "@mui/material/styles";
-import { format, parse, isValid, isEqual } from "date-fns";
+import { format, parse, isValid, isEqual, isWithinInterval } from "date-fns";
 
 import { useInputParms } from "../dateutils";
 import { DateField } from "./datefield";
@@ -109,6 +109,12 @@ export default function DateRange(props: dateCardProps) {
   const doUpdate = (id: "start" | "end", value: string) => {
     const dte = parse(value, "yyyy-MM-dd", new Date());
     if (isValid(dte)) {
+      // When limitToScope is ON, reject dates that fall outside the scope entirely
+      if (props.limitToScope && !isWithinInterval(dte, safeRangeScope)) {
+        setStartText(format(safeDates.start, "yyyy-MM-dd", { locale }));
+        setEndText(format(safeDates.end, "yyyy-MM-dd", { locale }));
+        return;
+      }
       if (id === "start") handleVal?.([dte, safeDates.end]);
       else handleVal?.([safeDates.start, dte]);
     } else {
@@ -129,6 +135,11 @@ export default function DateRange(props: dateCardProps) {
 
   const showRefresh = hovered && canReset;
 
+  // Always enforce scope min/max on the native date pickers (blocks out-of-scope
+  // dates in the calendar overlay and constrains the day/month/year spinners).
+  const scopeMinDate = format(safeRangeScope.start, "yyyy-MM-dd", { locale });
+  const scopeMaxDate = format(safeRangeScope.end, "yyyy-MM-dd", { locale });
+
   return (
     <Grid container spacing={0.5} sx={{ paddingLeft: 0.3 }}>
       <Grid size="grow">
@@ -141,7 +152,14 @@ export default function DateRange(props: dateCardProps) {
           <DateField
             id="start"
             value={startText}
-            max={singleDay ? "" : endText}
+            min={scopeMinDate}
+            max={
+              singleDay
+                ? scopeMaxDate
+                : endText < scopeMaxDate
+                  ? endText
+                  : scopeMaxDate
+            }
             error={!dateSpan.toValid}
             onBlur={handleBlur}
             doUpdate={doUpdate}
@@ -236,7 +254,8 @@ export default function DateRange(props: dateCardProps) {
               <DateField
                 id="end"
                 value={endText}
-                min={startText}
+                min={startText > scopeMinDate ? startText : scopeMinDate}
+                max={scopeMaxDate}
                 error={!dateSpan.toValid}
                 onBlur={handleBlur}
                 doUpdate={doUpdate}

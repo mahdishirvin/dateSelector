@@ -41,9 +41,9 @@ export const getTopSliderStyles = (theme: Theme) => {
       TextAlignment: "left",
     },
     "& .MuiSlider-mark": {
-      top: "1.15rem",
+      top: "0.75rem",
       height: 5,
-      width: "0.1rem",
+      width: "1px",
       borderRadius: "0%",
       opacity: 0.3,
     },
@@ -103,7 +103,7 @@ export const getBottomSliderStyles = (theme: Theme) => {
       height: 1.1,
     },
     "& .MuiSlider-mark": {
-      top: 0,
+      top: -1,
       height: 10,
       width: 1.1,
       borderRadius: "0%",

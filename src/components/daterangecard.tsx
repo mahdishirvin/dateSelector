@@ -17,7 +17,12 @@ import TopRow from "./toprow";
 import RangeSlider from "./rangeslider";
 import { dateCardProps, dateRange } from "../interface";
 import { useDateMoveKeys } from "./datemovekeys";
-import { Increment, equalRanges, useInputParms } from "../dateutils"; // <-- ADD useInputParms import
+import {
+  Increment,
+  clampRangeToScope,
+  equalRanges,
+  useInputParms,
+} from "../dateutils"; // <-- ADD useInputParms import
 import { HelpProvider } from "./helpprovider";
 import LandingPage from "./landingpage";
 import { compareAsc, format } from "date-fns";
@@ -166,9 +171,15 @@ export default function DateRangeCard(props: dateCardProps) {
       const sorted = props.singleDay
         ? [range[0], range[0]]
         : [...range].sort((a, b) => a.getTime() - b.getTime());
-      setCurrentDates({ start: sorted[0], end: sorted[1] });
+
+      const nextRange = { start: sorted[0], end: sorted[1] };
+      const resolvedRange = props.limitToScope
+        ? clampRangeToScope(nextRange, safeRangeScope)
+        : nextRange;
+
+      setCurrentDates(resolvedRange);
     },
-    [props.singleDay],
+    [props.singleDay, props.limitToScope, safeRangeScope],
   );
 
   // This is the centralized handler. It updates the local state and then
@@ -180,19 +191,27 @@ export default function DateRangeCard(props: dateCardProps) {
         ? [filter[0], filter[0]]
         : filter.sort(compareAsc);
 
-      // Update local state first to trigger UI re-render
-      setCurrentDates({
+      const nextRange: dateRange = {
         start: sortedDates[0],
         end: sortedDates[1],
-      });
+      };
+
+      const resolvedRange = props.limitToScope
+        ? clampRangeToScope(nextRange, safeRangeScope)
+        : nextRange;
+
+      // Update local state first to trigger UI re-render
+      setCurrentDates(resolvedRange);
 
       // Then inform Power BI
-      props.onFilterChanged?.({
-        start: sortedDates[0],
-        end: sortedDates[1],
-      });
+      props.onFilterChanged?.(resolvedRange);
     },
-    [props.singleDay, props.onFilterChanged],
+    [
+      props.singleDay,
+      props.limitToScope,
+      props.onFilterChanged,
+      safeRangeScope,
+    ],
   );
 
   // This is the onChangeVal method that passes up a simple array of dates

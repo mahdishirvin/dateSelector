@@ -481,6 +481,26 @@ export const getRange = (fn: string, step: string, dates: dateRange) => {
   return [start, end];
 };
 
+export const clampRangeToScope = (
+  range: dateRange,
+  scope?: dateRange,
+): dateRange => {
+  if (!scope) {
+    return range;
+  }
+
+  const normalizedScope = isAfter(scope.start, scope.end)
+    ? { start: scope.end, end: scope.start }
+    : scope;
+
+  const clampedStart = clamp(range.start, normalizedScope);
+  const clampedEnd = clamp(range.end, normalizedScope);
+
+  return isAfter(clampedStart, clampedEnd)
+    ? { start: clampedEnd, end: clampedStart }
+    : { start: clampedStart, end: clampedEnd };
+};
+
 export type IncrementType = {
   menu: string;
   tip: string;

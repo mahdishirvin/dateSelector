@@ -2,7 +2,7 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import ButtonGroup from "@mui/material/ButtonGroup";
-import { areIntervalsOverlapping, format } from "date-fns";
+import { endOfDay, format, isWithinInterval, startOfDay } from "date-fns";
 import Typography from "@mui/material/Typography";
 import { dateCardProps, dateRange } from "../interface";
 import RngeTooltip from "./rngetooltip";
@@ -20,13 +20,19 @@ export default function UseCurrent(props: dateCardProps) {
     stepValue,
     singleDay,
     handleVal,
-    limitToScope,
     handleStep,
     localization,
   } = props;
   const fallbackLocalization = useLocalization();
   const i18n = localization ?? fallbackLocalization;
   const safeRangeScope = rangeScope ?? { start: new Date(), end: new Date() };
+  const normalizedScope = React.useMemo(
+    () => ({
+      start: startOfDay(safeRangeScope.start),
+      end: endOfDay(safeRangeScope.end),
+    }),
+    [safeRangeScope],
+  );
   const safeStepValue = stepValue ?? "day";
   const safeCurrent = current ?? [];
   const safeShowCurrent = showCurrent ?? false;
@@ -72,12 +78,11 @@ export default function UseCurrent(props: dateCardProps) {
               .filter((item: any) => {
                 if (item.thisRange !== null) {
                   const x = ttl ? item.menu !== "2" : item.menu === "2";
-                  const y =
-                    !limitToScope &&
-                    areIntervalsOverlapping(item.thisRange, safeRangeScope, {
-                      inclusive: true,
-                    });
-                  return item.show && x && y;
+                  // Only show buttons whose full period is contained in scope.
+                  const withinScope =
+                    isWithinInterval(item.thisRange.start, normalizedScope) &&
+                    isWithinInterval(item.thisRange.end, normalizedScope);
+                  return item.show && x && withinScope;
                 } else return showMore;
               })
               .map((item: any, index: number) => (
