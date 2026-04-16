@@ -1,24 +1,39 @@
 import * as React from "react";
-import {useMemo} from "react";
+import { useMemo } from "react";
 import IconButton from "@mui/material/IconButton";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import RngeTooltip from "./rngetooltip";
 import { ToggleSliderButtonProps } from "../interface";
+import { useLocalization } from "../localeutils";
 
- function ToggleSliderButton(props: ToggleSliderButtonProps) {
+function ToggleSliderButton(props: ToggleSliderButtonProps) {
+  const fallbackLocalization = useLocalization();
 
-  const {localization, openSlider, toggleSlider} = props;
+  const { openSlider, toggleSlider } = props;
+  const localization = props.localization ?? fallbackLocalization;
 
-    const { TopRowOpen, TopRowClosed, TopRowEnd, DetailRowOpen, DetailRowClosed } = useMemo(
-      () => ({
-        TopRowOpen: localization.getDisplayName("toggleSliderButtonTopRowOpen"),
-        TopRowClosed: localization.getDisplayName("toggleSliderButtonTopRowClosed"),
-        TopRowEnd: localization.getDisplayName("toggleSliderButtonTopRowEnd"),
-        DetailRowOpen: localization.getDisplayName("toggleSliderButtonDetailRowOpen"),
-        DetailRowClosed: localization.getDisplayName("toggleSliderButtonDetailRowClosed"),
-      }),
-      [localization]
-    );
+  const {
+    TopRowOpen,
+    TopRowClosed,
+    TopRowEnd,
+    DetailRowOpen,
+    DetailRowClosed,
+  } = useMemo(
+    () => ({
+      TopRowOpen: localization.getDisplayName("toggleSliderButtonTopRowOpen"),
+      TopRowClosed: localization.getDisplayName(
+        "toggleSliderButtonTopRowClosed",
+      ),
+      TopRowEnd: localization.getDisplayName("toggleSliderButtonTopRowEnd"),
+      DetailRowOpen: localization.getDisplayName(
+        "toggleSliderButtonDetailRowOpen",
+      ),
+      DetailRowClosed: localization.getDisplayName(
+        "toggleSliderButtonDetailRowClosed",
+      ),
+    }),
+    [localization],
+  );
 
   const topRow = (openSlider ? TopRowOpen : TopRowClosed) + TopRowEnd;
   const detailRow = openSlider ? DetailRowOpen : DetailRowClosed;

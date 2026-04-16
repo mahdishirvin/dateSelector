@@ -26,6 +26,8 @@
   "calendar_stepInit_displayName": "Stapniveau",
   "calendar_singleDay_description": "Alleen selectie van een enkele dag toestaan (of begin van periode waar dagstappen niet zijn geselecteerd).",
   "calendar_singleDay_displayName": "Alleen enkele dag",
+  "calendar_limitToScope_displayName": "Beperk tot bereik",
+  "calendar_limitToScope_description": "Beperk datumselecties tot het beschikbare bereik.",
   "timeline_description": "Tijdlijnzichtbaarheid en instellingen configureren.",
   "timeline_displayName": "Tijdlijn",
   "timeline_enableSlider_description": "Knop weergeven om tijdlijn te tonen of te verbergen",

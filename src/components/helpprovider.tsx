@@ -6,8 +6,28 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { useTheme } from "@mui/material/styles";
 import RngeTooltip from "./rngetooltip";
 
+type HelpContextState = {
+  showHelpIcon: boolean;
+  showTooltip: boolean;
+  showExtendedTooltip: boolean;
+  toggleHelp: () => void;
+  setShowHelpIcon: (val: boolean) => void;
+  setShowTooltip: (val: boolean) => void;
+  setShowExtendedTooltip: (val: boolean) => void;
+  setTooltipEnabled: (enabled: boolean) => void;
+};
+
+type HelpProviderProps = {
+  children: React.ReactNode;
+  showHelpIcon?: boolean;
+  showTooltip?: boolean;
+  showExtendedTooltip?: boolean;
+  localization: { getDisplayName: (key: string) => string };
+  themeMode?: "light" | "dark" | string;
+};
+
 // A single context to provide help-related state and functions.
-const HelpContext = React.createContext({
+const HelpContext = React.createContext<HelpContextState>({
   showHelpIcon: false,
   showTooltip: true,
   showExtendedTooltip: false,
@@ -20,14 +40,14 @@ const HelpContext = React.createContext({
 
 export const useHelpContext = () => useContext(HelpContext);
 
-export const HelpProvider  = ({
+export const HelpProvider = ({
   children,
   showHelpIcon,
   showTooltip,
   showExtendedTooltip,
   localization,
   themeMode, // Added themeMode prop
-}) => {
+}: HelpProviderProps) => {
   const theme = useTheme();
 
   // Consolidate state management into a single useState hook.
@@ -54,7 +74,7 @@ export const HelpProvider  = ({
       TopRowHelp: localization.getDisplayName("helpProviderTopRowHelp"),
       DetailRowHelp: localization.getDisplayName("helpProviderDetailRowHelp"),
     }),
-    [localization]
+    [localization],
   );
 
   // Use a useCallback hook to memoize the toggle function.
@@ -66,7 +86,7 @@ export const HelpProvider  = ({
 
   // Attach hotkey listeners.
   useHotkeys("escape", () =>
-    setHelpState((prev) => ({ ...prev, helpIcon: false }))
+    setHelpState((prev) => ({ ...prev, helpIcon: false })),
   );
   useHotkeys("h", toggleHelp, []);
 
@@ -77,16 +97,16 @@ export const HelpProvider  = ({
       showTooltip: helpState.tooltip,
       showExtendedTooltip: helpState.extendedTooltip,
       toggleHelp,
-      setShowHelpIcon: (val) =>
+      setShowHelpIcon: (val: boolean) =>
         setHelpState((prev) => ({ ...prev, helpIcon: val })),
-      setShowTooltip: (val) =>
+      setShowTooltip: (val: boolean) =>
         setHelpState((prev) => ({ ...prev, tooltip: val })),
-      setShowExtendedTooltip: (val) =>
+      setShowExtendedTooltip: (val: boolean) =>
         setHelpState((prev) => ({ ...prev, extendedTooltip: val })),
-      setTooltipEnabled: (enabled) =>
+      setTooltipEnabled: (enabled: boolean) =>
         setHelpState((prev) => ({ ...prev, tooltip: enabled })),
     }),
-    [helpState, toggleHelp]
+    [helpState, toggleHelp],
   );
 
   const tooltipBackgroundColor = helpState.extendedTooltip

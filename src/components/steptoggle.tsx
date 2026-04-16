@@ -9,7 +9,20 @@ import RngeTooltip from "./rngetooltip";
 import { useLocalization } from "../localeutils";
 
 export default function StepToggle(props: stepProps) {
-  const { stepViz, stepValue, viz, handleStep, handleClick, localization } = props;
+  const fallbackLocalization = useLocalization();
+  const { stepViz, stepValue, viz, handleStep, handleClick } = props;
+  const localization = props.localization ?? fallbackLocalization;
+  const safeStepValue = stepValue ?? "day";
+  const safeStepViz =
+    stepViz ??
+    ({
+      day: true,
+      week: true,
+      pay: false,
+      month: true,
+      quarter: false,
+      year: true,
+    } as const);
 
   const TopRow = localization.getDisplayName("stepToggleTopRow");
   const DetailRow = localization.getDisplayName("stepToggleDetailRow");
@@ -22,13 +35,15 @@ export default function StepToggle(props: stepProps) {
     year: localization.getDisplayName("Step_Year"),
   };
 
-  const keyHandler = (period) => {
-    if (handleStep && stepViz[period]) {
+  const keyHandler = (period: keyof typeof safeStepViz) => {
+    if (handleStep && safeStepViz[period]) {
       handleStep(period);
     }
   };
 
-  const trueKeys = Object.keys(stepViz).filter((key) => stepViz[key]);
+  const trueKeys = (
+    Object.keys(safeStepViz) as Array<keyof typeof safeStepViz>
+  ).filter((key) => safeStepViz[key]);
   const ShortCut = trueKeys
     .map((key) => key.charAt(0).toUpperCase())
     .join(", ");
@@ -50,14 +65,14 @@ export default function StepToggle(props: stepProps) {
               variant="overline"
               sx={{ fontSize: ".4rem", textTransform: "none" }}
             >
-              {stepValue.charAt(0).toUpperCase()}
+              {safeStepValue.charAt(0).toUpperCase()}
             </Typography>
           }
           anchorOrigin={{ vertical: "top", horizontal: "right" }}
         >
           <RngeTooltip
             title={undefined}
-            topRow={`${TopRow}${periodTitle[stepValue]} (${ShortCut})`}
+            topRow={`${TopRow}${periodTitle[safeStepValue as keyof typeof periodTitle]} (${ShortCut})`}
             detailRow={DetailRow}
             placement="bottom"
           >

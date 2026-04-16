@@ -22,9 +22,9 @@ const ReactContainer: React.FC<ReactContainerProps> = ({
   // Ensure handler is instance-scoped and stable
   const handleFilterChanged = React.useCallback(
     (interval: Interval) => {
-      onFilterChanged(interval);
+      onFilterChanged?.(interval);
     },
-    [onFilterChanged]
+    [onFilterChanged],
   );
 
   return <Component {...data} onFilterChanged={handleFilterChanged} />;
@@ -37,8 +37,8 @@ const ReactContainer: React.FC<ReactContainerProps> = ({
 export abstract class ReactVisual {
   protected reactTarget: HTMLElement;
   protected root: Root | null = null;
-  private mainComponent: React.ComponentType<any>;
-  private filterCallback: (data: Interval) => void;
+  private mainComponent!: React.ComponentType<any>;
+  private filterCallback!: (data: Interval) => void;
 
   constructor(options: VisualConstructorOptions) {
     this.reactTarget = options.element;
@@ -52,7 +52,7 @@ export abstract class ReactVisual {
    */
   protected initializeReact(
     component: React.ComponentType<any>,
-    onFilterChanged: (data: Interval) => void
+    onFilterChanged: (data: Interval) => void,
   ): void {
     if (!this.root) {
       this.root = createRoot(this.reactTarget);
@@ -78,7 +78,7 @@ export abstract class ReactVisual {
           component: this.mainComponent,
           data: stableData,
           onFilterChanged: this.filterCallback,
-        })
+        }),
       );
     }
   };

@@ -26,6 +26,8 @@
   "calendar_stepInit_displayName": "Nivel de paso",
   "calendar_singleDay_description": "Permitir solo selección de un día (o inicio del periodo cuando no se seleccionan pasos de día).",
   "calendar_singleDay_displayName": "Solo un día",
+  "calendar_limitToScope_displayName": "Limitar al rango",
+  "calendar_limitToScope_description": "Restringir la selección de fechas al rango disponible.",
   "timeline_description": "Configurar opciones y ajustes de visibilidad de la línea de tiempo.",
   "timeline_displayName": "Línea de tiempo",
   "timeline_enableSlider_description": "Mostrar el botón para mostrar u ocultar la línea de tiempo",

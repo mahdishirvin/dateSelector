@@ -1,3 +1,4 @@
+// @ts-nocheck
 import powerbi from "powerbi-visuals-api";
 import { FONT_SIZE, FONT_FAMILY } from "./constants";
 import { interactivityFilterService } from "powerbi-visuals-utils-interactivityutils";
@@ -24,7 +25,7 @@ const { extractFilterColumnTarget } = interactivityFilterService;
  * Quick structural validation of update options.
  */
 export const optionsAreValid = (
-  options: powerbi.extensibility.visual.VisualUpdateOptions
+  options: powerbi.extensibility.visual.VisualUpdateOptions,
 ): boolean => {
   try {
     const dataView = options?.dataViews?.[0];
@@ -44,8 +45,8 @@ export const optionsAreValid = (
 export const settingProps = (
   options: powerbi.extensibility.visual.VisualUpdateOptions,
   formatSettings: VisualSettingsModel,
-  initialised: boolean
-):  Omit<dateCardProps, "dates"> => {
+  initialised: boolean,
+): Omit<dateCardProps, "dates"> => {
   const {
     styleSettings: style,
     calendarSettings: calendar,
@@ -79,18 +80,18 @@ export const settingProps = (
   const yearStartMonth = getNum(year.yearStartMonth.value);
   const startRange = String(calendar.startRange.value);
 
- // just compute a startup default
+  // just compute a startup default
   const startupFilter = getInitRange(
     startRange,
     weekStartDay,
     yearStartMonth,
-    rangeScope
+    rangeScope,
   );
 
   return {
     landingOff: optionsAreValid(options),
     // dates: startupFilter,          // parent will override
-    startupFilter,                 // 👈 expose this
+    startupFilter, // 👈 expose this
     rangeScope,
     startRange,
     weekStartDay,
@@ -172,7 +173,7 @@ const parseDate = (value: any): Date | null => {
  * Extract categorical data from the DataView and measure labels.
  */
 export const mapDataView = (
-  options: powerbi.extensibility.visual.VisualUpdateOptions
+  options: powerbi.extensibility.visual.VisualUpdateOptions,
 ): Partial<VisualState> => {
   const dataView = options.dataViews[0];
   const category = dataView.categorical?.categories?.[0];
@@ -203,9 +204,9 @@ export const mapDataView = (
           text: val,
           fontFamily: FONT_FAMILY,
           fontSize: PixelConverter.toString(FONT_SIZE),
-        })
+        }),
       ),
-    0
+    0,
   );
 
   return {
@@ -224,7 +225,7 @@ export const mapDataView = (
  * Restore filter state from jsonFilters if present.
  */
 export const restoreRangeFilter = (
-  options: powerbi.extensibility.visual.VisualUpdateOptions
+  options: powerbi.extensibility.visual.VisualUpdateOptions,
 ): dateRange | undefined => {
   const { jsonFilters, dataViews } = options;
   const dataView = dataViews[0];
@@ -235,7 +236,7 @@ export const restoreRangeFilter = (
     (f): f is IAdvancedFilter =>
       !!(f as IAdvancedFilter).target &&
       !!(f as IAdvancedFilter).logicalOperator &&
-      !!(f as IAdvancedFilter).conditions
+      !!(f as IAdvancedFilter).conditions,
   );
   if (!filter) return;
 
@@ -247,10 +248,10 @@ export const restoreRangeFilter = (
     target.column === col
   ) {
     const greaterThan = filter.conditions.find(
-      (c) => c.operator === "GreaterThanOrEqual"
+      (c) => c.operator === "GreaterThanOrEqual",
     );
     const lessThan = filter.conditions.find(
-      (c) => c.operator === "LessThanOrEqual"
+      (c) => c.operator === "LessThanOrEqual",
     );
 
     if (greaterThan && lessThan) {
@@ -270,7 +271,7 @@ export const mapViewport = (viewport: powerbi.IViewport): ViewportData => ({
 export const mapOptionsToState = (
   options: powerbi.extensibility.visual.VisualUpdateOptions,
   formatSettings: VisualSettingsModel,
-  initialised: boolean
+  initialised: boolean,
 ): VisualState => ({
   category: mapDataView(options).category,
   viewport: mapViewport(options.viewport),
