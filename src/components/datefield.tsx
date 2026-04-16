@@ -28,7 +28,7 @@ interface DateFieldProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   onFocus?: () => void;
-  doUpdate: (id: string, value: string) => void;
+  doUpdate: (id: "start" | "end", value: string) => void;
 }
 
 export const DateField: React.FC<DateFieldProps> = (props) => {
@@ -55,8 +55,8 @@ export const DateField: React.FC<DateFieldProps> = (props) => {
   } = props;
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        // console.log("Enter key pressed:", e);
-  if (e.key === "Enter") {
+    // console.log("Enter key pressed:", e);
+    if (e.key === "Enter") {
       e.preventDefault();
       const inputElement = e.target as HTMLInputElement;
       if (inputElement && inputElement.value) {
@@ -68,7 +68,7 @@ export const DateField: React.FC<DateFieldProps> = (props) => {
   const theme = useTheme();
   const textProperties: TextProperties = {
     text: value,
-    fontFamily: theme.typography.fontFamily,
+    fontFamily: theme.typography.fontFamily ?? "Segoe UI",
     fontSize: pixelConverter.toString(theme.typography.fontSize),
   };
 
@@ -92,7 +92,7 @@ export const DateField: React.FC<DateFieldProps> = (props) => {
           fontWeight: fontBold
             ? theme.typography.fontWeightBold
             : theme.typography.fontWeightRegular,
-        fontStyle: fontItalic ? "italic" : "normal",
+          fontStyle: fontItalic ? "italic" : "normal",
         },
         paddingTop: "2px",
         width:

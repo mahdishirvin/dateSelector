@@ -9,12 +9,12 @@ import { dateCardProps } from "../interface";
 
 const TopRow: React.FC<dateCardProps> = ({
   enableSlider,
-  openSlider,
-  toggleSlider,
+  openSlider = false,
+  toggleSlider = () => undefined,
   dates,
-  setStepValue,
-  setStepOpen,
-  stepOpen,
+  setStepValue = () => undefined,
+  setStepOpen = () => undefined,
+  stepOpen = false,
   localization,
   showExpand,
   ...props

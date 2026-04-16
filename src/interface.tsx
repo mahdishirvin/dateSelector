@@ -6,7 +6,7 @@ export interface VisualState {
   viewport?: ViewportData;
   settings: dateCardProps;
   category?: CategoryData;
-  currentFilter?: dateRange | null
+  currentFilter?: dateRange | null;
   landingOff?: boolean;
 }
 
@@ -27,7 +27,7 @@ export interface CategoryData {
 export interface Settings {
   general?: {
     dates?: dateRange; // date range object representing the selected date range
-    rangeScope?: dateRange; // date range object representing the scope of available dates to choose from
+    rangeScope?: dateRange | { start: null; end: null }; // initial scope can be unset
     landingOff?: boolean; // boolean value indicating whether to display landing page
     filter?: dateRange; // date range object representing the initial filter state
     startupFilter?: dateRange; // date range object representing the initial filter state
@@ -236,7 +236,7 @@ export interface dateCardProps {
   handleViz?: (val: any) => void;
   handleClick?: () => void;
   handleStep?: (value: string) => void;
-  onFilterChanged?: (result:dateRange) => void,
+  onFilterChanged?: (result: dateRange) => void;
   setStepValue?: (value: string) => void;
   setStepOpen?: (value: boolean) => void;
 
@@ -257,7 +257,7 @@ export interface topRowProps {
   dates?: dateRange;
   rangeScope?: dateRange;
   payProps?: pay;
-  handleVal?: (val) => void;
+  handleVal?: (val: any) => void;
   stepViz?: step<boolean>;
   stepOpen: boolean;
   stepValue: string;
@@ -326,7 +326,7 @@ export interface UseCurrentProps {
 export interface DateRangeProps {
   dates: dateRange;
   rangeScope?: dateRange;
-  handleVal?: (val) => void;
+  handleVal?: (val: any) => void;
   fmtDate?: string;
   singleDay?: boolean;
   limitToScope?: boolean;
@@ -342,10 +342,10 @@ export interface SliderProps {
   stepFmt?: step<string>;
   stepSkip?: step<number>;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  handleVal?: (val) => void;
+  handleVal?: (val: any) => void;
   toggleSlider?: () => void;
   show2ndSlider?: boolean;
-  handleStep?: (val) => void;
+  handleStep?: (val: string) => void;
   singleDay?: boolean;
 }
 
@@ -396,9 +396,9 @@ export interface payProps {
 }
 
 interface stepPeriodVals {
-show?: boolean;
-skip?: number;
-format?: string;
+  show?: boolean;
+  skip?: number;
+  format?: string;
 }
 
 export interface stepPeriod {

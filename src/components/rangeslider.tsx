@@ -43,22 +43,25 @@ export default function RangeSlider(props: Props) {
     onCommit,
     localization,
   } = props;
+  const fallbackDate = React.useMemo(() => new Date(), []);
+  const safeDates = dates ?? { start: fallbackDate, end: fallbackDate };
+  const safeRangeScope = rangeScope ?? safeDates;
 
   // Get locale at the component level
   const locale = useDateFnsLocale();
 
   // Memoize the marks array to prevent unnecessary re-calculation on every render.
   const marks = React.useMemo(
-    () => mainMarks(props, locale).map((v) => v.value),
-    [props, locale]
+    () => mainMarks(props, locale).map((v: { value: number }) => v.value),
+    [props, locale],
   );
 
   // State for the slider's numerical values, synchronized with props.dates.
   const [sliderStart, setSliderStart] = React.useState<number>(
-    sliderMarkNumber(dates.start, rangeScope.start)
+    sliderMarkNumber(safeDates.start, safeRangeScope.start),
   );
   const [sliderEnd, setSliderEnd] = React.useState<number>(
-    sliderMarkNumber(dates.end, rangeScope.start)
+    sliderMarkNumber(safeDates.end, safeRangeScope.start),
   );
 
   // State to track if the Ctrl key is currently pressed
@@ -73,14 +76,14 @@ export default function RangeSlider(props: Props) {
 
   // Effect to keep the slider values in sync with changes to the dates prop.
   React.useEffect(() => {
-    setSliderStart(sliderMarkNumber(dates.start, rangeScope.start));
+    setSliderStart(sliderMarkNumber(safeDates.start, safeRangeScope.start));
     setSliderEnd(
       Math.min(
-        sliderMarkNumber(dates.end, rangeScope.start),
-        sliderMarkNumber(rangeScope.end, rangeScope.start)
-      )
+        sliderMarkNumber(safeDates.end, safeRangeScope.start),
+        sliderMarkNumber(safeRangeScope.end, safeRangeScope.start),
+      ),
     );
-  }, [dates, rangeScope]);
+  }, [safeDates, safeRangeScope]);
 
   /**
    * Finds the closest valid mark value to the given slider value(s).
@@ -103,20 +106,26 @@ export default function RangeSlider(props: Props) {
         return closestValue;
       });
     },
-    [marks]
+    [marks],
   );
 
   /**
    * Handles the live drag/change event of the slider.
    * Updates the local state to show the user the new position and calls the onPreview prop.
    */
-  const handleOnChange = (event: Event, val: number[], thumb: number) => {
-    let newValues = [...val];
+  const handleOnChange = (
+    event: Event | React.SyntheticEvent,
+    val: number | number[],
+    thumb = 0,
+  ) => {
+    const values = Array.isArray(val) ? val : [val, val];
+    let newValues = [...values];
     const isStepped = stepValue === "day";
 
     const isKeyboard = event.type === "keydown"; // ← detect keyboard events
     const isCtrlPressed =
-      (event as KeyboardEvent).ctrlKey ?? (event as any).ctrlKey;
+      (event as KeyboardEvent).ctrlKey ??
+      (event as { ctrlKey?: boolean }).ctrlKey;
 
     if (!isKeyboard && isCtrlPressed) {
       if (!dragStartRef.current) {
@@ -129,7 +138,7 @@ export default function RangeSlider(props: Props) {
       }
 
       // Calculate the new positions based on the drag and the original range length
-      const delta = val[thumb] - dragStartRef.current.start;
+      const delta = values[thumb] - dragStartRef.current.start;
       newValues[0] = dragStartRef.current.start + delta;
       newValues[1] = newValues[0] + dragStartRef.current.length;
 
@@ -137,7 +146,8 @@ export default function RangeSlider(props: Props) {
     } else {
       // Normal drag behavior
       if (singleDay) {
-        newValues = thumb === 1 ? [val[1], val[1]] : [val[0], val[0]];
+        newValues =
+          thumb === 1 ? [values[1], values[1]] : [values[0], values[0]];
       }
     }
 
@@ -151,8 +161,8 @@ export default function RangeSlider(props: Props) {
 
     // Preview the change to the parent component
     onPreview([
-      sliderMarkDate(newValues[0], rangeScope.start),
-      sliderMarkDate(newValues[1], rangeScope.start),
+      sliderMarkDate(newValues[0], safeRangeScope.start),
+      sliderMarkDate(newValues[1], safeRangeScope.start),
     ]);
   };
 
@@ -160,16 +170,20 @@ export default function RangeSlider(props: Props) {
    * Handles the commit event when the user releases a slider thumb or clicks the track.
    * This function sends the new date range to the parent component via the onCommit prop.
    */
-  const handleOnCommit = (_: MouseEvent, val: number[]) => {
-    let newStart = sliderStart;
-    let newEnd = sliderEnd;
+  const handleOnCommit = (
+    _: Event | React.SyntheticEvent,
+    val: number | number[],
+  ) => {
+    const values = Array.isArray(val) ? val : [val, val];
+    const newStart = values[0] ?? sliderStart;
+    const newEnd = values[1] ?? sliderEnd;
 
     // Reset the drag state
     dragStartRef.current = null;
 
     onCommit([
-      sliderMarkDate(newStart, rangeScope.start),
-      sliderMarkDate(newEnd, rangeScope.start),
+      sliderMarkDate(newStart, safeRangeScope.start),
+      sliderMarkDate(newEnd, safeRangeScope.start),
     ]);
   };
 
@@ -179,13 +193,15 @@ export default function RangeSlider(props: Props) {
       value={[sliderStart, sliderEnd]}
       step={stepValue === "day" ? 1 : null}
       stepValue={stepValue}
-      showBottomSlider={show2ndSlider}
+      showBottomSlider={show2ndSlider ?? false}
       handleTopCommit={handleOnCommit}
       handleBottomCommit={handleOnCommit}
       mainMarks={mainMarks(props, locale)}
       superMarks={superMarks(props, locale)}
-      valueLabelFormat={(val) => sliderMarkText(val, rangeScope.start, locale)}
-      max={sliderMarkNumber(rangeScope.end, rangeScope.start)}
+      valueLabelFormat={(val) =>
+        sliderMarkText(val, safeRangeScope.start, locale)
+      }
+      max={sliderMarkNumber(safeRangeScope.end, safeRangeScope.start)}
       onChange={handleOnChange}
       localization={localization}
       {...props}

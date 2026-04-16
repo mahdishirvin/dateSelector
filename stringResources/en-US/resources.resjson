@@ -26,6 +26,8 @@
   "calendar_stepInit_displayName": "Step Level",
   "calendar_singleDay_description": "Allow only single day selection (or beginning of period where day steps are not selected).",
   "calendar_singleDay_displayName": "Single Day Only",
+  "calendar_limitToScope_displayName": "Limit to Scope",
+  "calendar_limitToScope_description": "Restrict date selections to the available range scope.",
   "timeline_description": "Configure timeline visibility options and settings.",
   "timeline_displayName": "Timeline",
   "timeline_enableSlider_description": "Show the button to show or hide timeline",

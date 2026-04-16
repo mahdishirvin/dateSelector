@@ -1,4 +1,4 @@
- "use strict";
+"use strict";
 
 import powerbi from "powerbi-visuals-api";
 import IVisual = powerbi.extensibility.visual.IVisual;
@@ -31,17 +31,17 @@ import { toDateRange } from "./dateutils";
  * It now inherits from ReactVisual to abstract away the React rendering logic.
  */
 export class DateSelector extends ReactVisual implements IVisual {
-  private visualHost: IVisualHost;
-  private events: IVisualEventService;
+  private visualHost!: IVisualHost;
+  private events!: IVisualEventService;
   // private selectionManager: powerbi.extensibility.ISelectionManager;
-  private localizationManager: ILocalizationManager;
-  private formattingSettings: VisualSettingsModel;
-  private formattingSettingsService: FormattingSettingsService;
-  private dataView: DataView;
-  private colorPalette: IColorPalette;
-  private colorHelper: ColorHelper;
-  private state: VisualState;
-  private locale: string;
+  private localizationManager!: ILocalizationManager;
+  private formattingSettings!: VisualSettingsModel;
+  private formattingSettingsService!: FormattingSettingsService;
+  private dataView: DataView | null = null;
+  private colorPalette!: IColorPalette;
+  private colorHelper!: ColorHelper;
+  private state: VisualState = { settings: {} as dateCardProps };
+  private locale = "en-US";
   // We now use a single state variable to track the applied filter, simplifying the logic.
   private currentFilter: dateRange | null = null;
   // private persistedFilter: dateRange | null = null;
@@ -75,7 +75,9 @@ export class DateSelector extends ReactVisual implements IVisual {
    * The constructor initializes visual properties and the React root.
    * @param options The visual constructor options from Power BI.
    */
-  constructor(options: VisualConstructorOptions) {
+  constructor(
+    options: VisualConstructorOptions = {} as VisualConstructorOptions,
+  ) {
     // Call the parent constructor from ReactVisual to initialize the React component and root
     super(options);
     this.initializeVisualProperties(options);
@@ -83,7 +85,7 @@ export class DateSelector extends ReactVisual implements IVisual {
     // this.selectionManager= options.host.createSelectionManager();
     this.localizationManager = options.host.createLocalizationManager();
     this.formattingSettingsService = new FormattingSettingsService(
-      this.localizationManager
+      this.localizationManager,
     );
   }
 
@@ -92,7 +94,7 @@ export class DateSelector extends ReactVisual implements IVisual {
    * @param options The visual constructor options.
    */
   protected initializeVisualProperties(
-    options: VisualConstructorOptions
+    options: VisualConstructorOptions,
   ): void {
     this.visualHost = options.host;
     this.locale = options.host.locale;
@@ -115,7 +117,9 @@ export class DateSelector extends ReactVisual implements IVisual {
         </DateFnsLocaleProvider>
       </LocalizationContext.Provider>
     );
-    super.initializeReact(VisualComponent, this.applyDateFilter);
+    super.initializeReact(VisualComponent, (interval) =>
+      this.applyDateFilter(interval),
+    );
   }
 
   /**
@@ -201,7 +205,7 @@ export class DateSelector extends ReactVisual implements IVisual {
         !this.initialLoadComplete
       ) {
         // ✅ forced startup range overrides persisted
-        resolvedFilter = this.state.settings.startupFilter;
+        resolvedFilter = this.state.settings.startupFilter ?? null;
         shouldApplyFilter = true;
 
         // console.debug("Rule chosen: FORCE (startup)");
@@ -286,14 +290,14 @@ export class DateSelector extends ReactVisual implements IVisual {
     this.formattingSettings =
       this.formattingSettingsService.populateFormattingSettingsModel(
         VisualSettingsModel,
-        options.dataViews[0]
+        options.dataViews[0],
       );
 
     // Correcting the mapOptionsToState call to match the provided signature.
     const newVisualState = mapOptionsToState(
       options,
       this.formattingSettings,
-      this.initialLoadComplete
+      this.initialLoadComplete,
     );
 
     this.state = {
@@ -320,7 +324,7 @@ export class DateSelector extends ReactVisual implements IVisual {
    * @param options The enumeration options.
    */
   public enumerateObjectInstances(
-    options: EnumerateVisualObjectInstancesOptions
+    options: EnumerateVisualObjectInstancesOptions,
   ): VisualObjectInstanceEnumeration {
     let objectEnumeration: VisualObjectInstance[] = [];
 
@@ -331,7 +335,7 @@ export class DateSelector extends ReactVisual implements IVisual {
       const instance: VisualObjectInstance = {
         objectName: DateSelector.BOOKMARK_OBJECT,
         displayName: "Bookmark Filter",
-        selector: null,
+        selector: {} as any,
         properties: {
           [DateSelector.BOOKMARK_PROPERTY]: JSON.stringify(bookmarkState),
         },
@@ -347,7 +351,10 @@ export class DateSelector extends ReactVisual implements IVisual {
    * This method is a public arrow function to ensure `this` context is preserved.
    * @param dates The date range to filter by.
    */
-  public applyDateFilter = (dates: dateRange): void => {
+  public applyDateFilter = (dates: {
+    start: Date | string | number;
+    end: Date | string | number;
+  }): void => {
     if (!this.state?.category) return;
 
     const dtes = toDateRange(dates);
@@ -365,7 +372,7 @@ export class DateSelector extends ReactVisual implements IVisual {
       DateSelector.filterObjectProperty.propertyName,
       dates.start && dates.end
         ? powerbi.FilterAction.merge
-        : powerbi.FilterAction.remove
+        : powerbi.FilterAction.remove,
     );
   };
 
@@ -379,7 +386,7 @@ export class DateSelector extends ReactVisual implements IVisual {
   public createFilter(
     startDate: Date,
     endDate: Date,
-    filterTarget: IFilterColumnTarget
+    filterTarget: IFilterColumnTarget,
   ): AdvancedFilter {
     // The dates are already Date objects, so we can directly use toJSON().
     return new AdvancedFilter(
@@ -387,12 +394,12 @@ export class DateSelector extends ReactVisual implements IVisual {
       "And",
       {
         operator: "GreaterThanOrEqual",
-        value: startDate ? startDate.toJSON() : null,
+        value: startDate.toJSON(),
       },
       {
         operator: "LessThanOrEqual",
-        value: endDate ? endDate.toJSON() : null,
-      }
+        value: endDate.toJSON(),
+      },
     );
   }
 
@@ -401,7 +408,7 @@ export class DateSelector extends ReactVisual implements IVisual {
    */
   public getFormattingModel(): powerbi.visuals.FormattingModel {
     return this.formattingSettingsService.buildFormattingModel(
-      this.formattingSettings
+      this.formattingSettings,
     );
   }
 }

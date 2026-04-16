@@ -12,11 +12,17 @@ import RngeTooltip from "./rngetooltip";
 import { getIntervalFunction } from "../dateutils";
 import { Interval, subDays, format, startOfDay, endOfDay } from "date-fns";
 import { useLocalization } from "../localeutils";
+import { dateRange } from "../interface";
+
+type EditableInterval = {
+  start: Date | null;
+  end: Date | null;
+};
 
 interface IntervalParmsProps {
   intervalValue: number;
   item: any;
-  interval: Interval;
+  interval: EditableInterval;
   setIntervalValue: React.Dispatch<React.SetStateAction<number>>;
   handleClose: () => void;
   localization?: any; // Optional localization prop
@@ -36,7 +42,7 @@ const IntervalParms: React.FC<IntervalParmsProps> = ({
   };
 
   return (
-    <Grid container spacing={1} alignItems="center" direction="row" p={0.5}>
+    <Grid container spacing={1} direction="row">
       <Grid>
         <IconButton
           size="small"
@@ -54,10 +60,10 @@ const IntervalParms: React.FC<IntervalParmsProps> = ({
         >
           <TextField
             helperText={
-              interval.end
+              interval.start && interval.end
                 ? `${format(interval.start, "yy-MM-dd")} | ${format(
                     interval.end,
-                    "yy-MM-dd"
+                    "yy-MM-dd",
                   )}`
                 : `${useLocalization().getDisplayName("dateIntervalToday")} ${item.plural}.`
             }
@@ -135,7 +141,7 @@ interface DateIntervalPickerProps {
   children: React.ReactNode;
   baseDate?: Date;
   item: any;
-  handleVal?: (interval: Interval) => void;
+  handleVal?: (interval: dateRange) => void;
   clickType?: ClickType;
   localization?: any; // Optional localization prop
 }
@@ -151,7 +157,7 @@ const DateIntervalPicker: React.FC<DateIntervalPickerProps> = ({
   // FIX: Use useState to ensure baseDate is stable and only created once
   const [currentBaseDate] = useState(baseDate || new Date());
   const [intervalValue, setIntervalValue] = useState<number>(0);
-  const [interval, setInterval] = useState<Interval>({
+  const [interval, setInterval] = useState<EditableInterval>({
     start: currentBaseDate,
     end: null,
   });
@@ -159,7 +165,7 @@ const DateIntervalPicker: React.FC<DateIntervalPickerProps> = ({
   const [isEditing, setIsEditing] = useState(false);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation()
+    event.stopPropagation();
     const isCorrectClick =
       (clickType === "right" && event.button === 2) ||
       (clickType === "left" && event.button === 0);
@@ -177,9 +183,13 @@ const DateIntervalPicker: React.FC<DateIntervalPickerProps> = ({
       return;
     }
     const intervalFn = getIntervalFunction(item.step);
+    if (!intervalFn) {
+      setInterval({ start: null, end: null });
+      return;
+    }
     const newDate = subDays(
       intervalFn(currentBaseDate, intervalValue),
-      item.step === "day" ? 0 : intervalValue < 0 ? -1 : 1
+      item.step === "day" ? 0 : intervalValue < 0 ? -1 : 1,
     );
 
     setInterval({
@@ -200,7 +210,9 @@ const DateIntervalPicker: React.FC<DateIntervalPickerProps> = ({
     }
 
     if (handleVal) {
-      handleVal(interval);
+      if (interval.start && interval.end) {
+        handleVal({ start: interval.start, end: interval.end });
+      }
     }
 
     // Reset value after passing to parent to avoid state "leak"
@@ -245,7 +257,7 @@ const DateIntervalPicker: React.FC<DateIntervalPickerProps> = ({
           </div>
         </ClickAwayListener>
       </Popover>
-      <div onClick={handleClick} onContextMenu={handleClick} >
+      <div onClick={handleClick} onContextMenu={handleClick}>
         {children}
       </div>
     </>

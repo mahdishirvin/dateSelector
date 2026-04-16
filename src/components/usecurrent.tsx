@@ -8,6 +8,7 @@ import { dateCardProps, dateRange } from "../interface";
 import RngeTooltip from "./rngetooltip";
 import DateIntervalPicker from "./dateintervalpicker";
 import Badge from "@mui/material/Badge";
+import { useLocalization } from "../localeutils";
 
 export default function UseCurrent(props: dateCardProps) {
   const {
@@ -23,6 +24,12 @@ export default function UseCurrent(props: dateCardProps) {
     handleStep,
     localization,
   } = props;
+  const fallbackLocalization = useLocalization();
+  const i18n = localization ?? fallbackLocalization;
+  const safeRangeScope = rangeScope ?? { start: new Date(), end: new Date() };
+  const safeStepValue = stepValue ?? "day";
+  const safeCurrent = current ?? [];
+  const safeShowCurrent = showCurrent ?? false;
 
   const [ttl, setTtl] = React.useState(true);
 
@@ -39,17 +46,17 @@ export default function UseCurrent(props: dateCardProps) {
         val.start,
         singleDay ? val.start : val.end,
       ];
-      handleVal(newDates);
+      handleVal?.(newDates);
     },
-    [handleVal, singleDay]
+    [handleVal, singleDay],
   );
 
   const handleStepChange = React.useCallback(
     (val: string) => {
       const _val = val === "today" ? "day" : val;
-      handleStep(_val);
+      handleStep?.(_val);
     },
-    [handleStep]
+    [handleStep],
   );
 
   const toggleTtl = React.useCallback(() => {
@@ -58,42 +65,42 @@ export default function UseCurrent(props: dateCardProps) {
 
   return (
     <>
-      {showCurrent && (
+      {safeShowCurrent && (
         <Box sx={{ pl: 0 }}>
           <ButtonGroup size="small" aria-label="outlined button group">
-            {current
-              .filter((item) => {
+            {safeCurrent
+              .filter((item: any) => {
                 if (item.thisRange !== null) {
                   const x = ttl ? item.menu !== "2" : item.menu === "2";
                   const y =
                     !limitToScope &&
-                    areIntervalsOverlapping(item.thisRange, rangeScope, {
+                    areIntervalsOverlapping(item.thisRange, safeRangeScope, {
                       inclusive: true,
                     });
                   return item.show && x && y;
                 } else return showMore;
               })
-              .map((item, index) => (
+              .map((item: any, index: number) => (
                 <DateIntervalPicker
                   handleVal={handleDate}
                   item={item}
                   key={`dip${item.thisRange}${index}`}
-                  localization={localization}
+                  localization={i18n}
                 >
                   <RngeTooltip
                     title={undefined}
                     key={`rtt${item.thisRange}${index}`}
                     detailRow={
                       item.menu !== "2" && item.menu !== "12"
-                        ? `${localization.getDisplayName(
-                            "useCurrentRightClick"
+                        ? `${i18n.getDisplayName(
+                            "useCurrentRightClick",
                           )} [${item.plural}]`
                         : ``
                     }
                     placement="bottom"
                     topRow={
                       item.tip +
-                      (item.step === stepValue && item.menu !== "2"
+                      (item.step === safeStepValue && item.menu !== "2"
                         ? " (T)"
                         : "")
                     }

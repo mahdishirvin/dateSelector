@@ -4,7 +4,7 @@ import Zoom from "@mui/material/Zoom";
 import Grid from "@mui/material/Grid";
 
 // The style objects are assumed to be imported from a separate file.
-import {  getBottomSliderStyles,getTopSliderStyles } from "./sliderstyles";
+import { getBottomSliderStyles, getTopSliderStyles } from "./sliderstyles";
 import RngeTooltip from "./rngetooltip";
 
 /**
@@ -14,22 +14,24 @@ import RngeTooltip from "./rngetooltip";
  * @param {SliderValueLabelProps & { granularity?: string; sliderId?: string }} props - The props from the Slider component, extended with granularity and sliderId.
  * @returns {React.ReactElement} A Tooltip-wrapped component.
  */
-const ValueLabelComponent = React.memo(({ children, value, index }: SliderValueLabelProps) => {
-  // Determine the placement of the tooltip based on the thumb index.
-  const loc = index === 0 ? "top-end" : "top-start";
-  return (
-    <RngeTooltip
-      enterTouchDelay={10}
-      placement={loc}
-      topRow={value.toString()}
-      detailRow={index === 0 ? "▶▶▶▶▶" : "◀◀◀◀◀"}
-      enterDelay={1000}
-      arrow
-    >
-      {children}
-    </RngeTooltip>
-  );
-});
+const ValueLabelComponent = React.memo(
+  ({ children, value, index }: SliderValueLabelProps) => {
+    // Determine the placement of the tooltip based on the thumb index.
+    const loc = index === 0 ? "top-end" : "top-start";
+    return (
+      <RngeTooltip
+        enterTouchDelay={10}
+        placement={loc}
+        topRow={String(value)}
+        detailRow={index === 0 ? "▶▶▶▶▶" : "◀◀◀◀◀"}
+        enterDelay={1000}
+        arrow
+      >
+        {children}
+      </RngeTooltip>
+    );
+  },
+);
 
 ValueLabelComponent.displayName = "ValueLabelComponent";
 
@@ -41,9 +43,19 @@ interface DualSliderProps {
   superMarks: Array<{ value: number; label: string }>;
   max: number;
   valueLabelFormat: (value: number) => string;
-  handleTopCommit: (e: Event, val: number[]) => void;
-  handleBottomCommit: (e: Event, val: number[]) => void;
-  onChange: (event: Event, value: number | number[], activeThumb?: number) => void;
+  handleTopCommit: (
+    event: Event | React.SyntheticEvent,
+    val: number | number[],
+  ) => void;
+  handleBottomCommit: (
+    event: Event | React.SyntheticEvent,
+    val: number | number[],
+  ) => void;
+  onChange: (
+    event: Event | React.SyntheticEvent,
+    value: number | number[],
+    activeThumb?: number,
+  ) => void;
   localization?: {
     getDisplayName: (key: string) => string;
   };
@@ -65,7 +77,7 @@ function DualSlider(props: DualSliderProps): React.ReactElement {
     onChange,
   } = props;
 
-   // Use a common set of props for both sliders to reduce duplication.
+  // Use a common set of props for both sliders to reduce duplication.
   const commonSliderProps = {
     value,
     min: 0,
@@ -74,7 +86,6 @@ function DualSlider(props: DualSliderProps): React.ReactElement {
     valueLabelFormat,
     slots: { valueLabel: ValueLabelComponent },
   };
-
 
   return (
     <Grid container size={12}>
@@ -90,7 +101,7 @@ function DualSlider(props: DualSliderProps): React.ReactElement {
           valueLabelDisplay="auto"
           marks={mainMarks}
           sx={getTopSliderStyles}
-            aria-labelledby="range-slider11"
+          aria-labelledby="range-slider11"
           {...commonSliderProps}
         />
       </Grid>

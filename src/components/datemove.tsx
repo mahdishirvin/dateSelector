@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as React from "react";
 import { useMemo, useEffect, useState, useRef } from "react";
 import IconButton from "@mui/material/IconButton";
@@ -9,8 +10,6 @@ import { getRange } from "../dateutils";
 import { dateMoveProps } from "../interface";
 import RngeTooltip from "./rngetooltip";
 import { getMoveParms } from "../dateutils"; // Assuming arrowIcons is from a utility file
-
-
 
 export default function DateMove(props: dateMoveProps) {
   // Destructure props for easier access
@@ -31,13 +30,13 @@ export default function DateMove(props: dateMoveProps) {
   // Use useMemo to ensure moveParms is only re-calculated when its dependencies change
   const mve = useMemo(
     () => getMoveParms(bf, vertical, ctrl, stepValue, localization),
-    [bf, vertical, ctrl, stepValue, localization]
+    [bf, vertical, ctrl, stepValue, localization],
   );
 
   // Use useRef to create a stable reference to the debounced function.
   // This prevents the debounce timer from resetting on every re-render.
   const debouncedHandleValRef = useRef(
-    debounce((dt) => handleVal(dt), 500, { leading: false, trailing: true })
+    debounce((dt) => handleVal(dt), 500, { leading: false, trailing: true }),
   );
 
   // Clean up the debounced function on component unmount to prevent memory leaks

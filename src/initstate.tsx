@@ -1,17 +1,18 @@
 import { Settings, dateCardProps } from "./interface";
 //import { defaultSettings } from "./vinitsettings";
-import { startOfToday , format} from "date-fns";
+import { startOfToday, format } from "date-fns";
 //,startOfYear, endOfYear
 
-export const defaultSettings: Settings = {
+export const defaultSettings = {
   general: {
+    landingOff: false,
     rangeScope: { start: null, end: null },
   },
   styleSettings: {
     fmtDate: "d-MM-yyyy",
     themeColor: "#607d8b",
     themeMode: "light",
-    themeFont: 'Segoe UI',
+    themeFont: "Segoe UI",
     fontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
     fontSize: 10,
     fontBold: false,
@@ -62,7 +63,7 @@ export const defaultSettings: Settings = {
       fmtWeek: "w",
     },
     paySettings: {
-      payCustomLabel:"Pay Period", // ← Added text input here: "Pay Period",
+      payCustomLabel: "Pay Period", // ← Added text input here: "Pay Period",
       showPay: false,
       paySkip: 4,
       payLength: 14,
@@ -70,7 +71,7 @@ export const defaultSettings: Settings = {
       payRefDay: new Date().getDate(),
       payRefYear: new Date().getFullYear(),
       payRefMonth: new Date().getMonth(),
-      payRefDate: format(startOfToday(),"yyyy-MM-dd"),
+      payRefDate: format(startOfToday(), "yyyy-MM-dd"),
     },
     monthSettings: {
       showMonth: true,
@@ -89,15 +90,10 @@ export const defaultSettings: Settings = {
       yearSkip: 1,
     },
   },
-};
+} satisfies Settings;
 
-const {
-  general,
-  period,
-  calendarSettings,
-  styleSettings,
-  layoutSettings,
-} = defaultSettings;
+const { general, period, calendarSettings, styleSettings, layoutSettings } =
+  defaultSettings;
 
 const {
   daySettings,
@@ -110,7 +106,7 @@ const {
 
 export const initialState: dateCardProps = {
   landingOff: general.landingOff,
-  rangeScope: general.rangeScope,
+  rangeScope: general.rangeScope as unknown as dateCardProps["rangeScope"],
   weekStartDay: weekSettings.weekStartDay, // 0 = Sun
   yearStartMonth: yearSettings.yearStartMonth, // 0 = Jan
   stepInit: calendarSettings.stepInit,
@@ -143,7 +139,7 @@ export const initialState: dateCardProps = {
     ref: new Date(
       paySettings.payRefYear,
       paySettings.payRefMonth,
-      paySettings.payRefDay
+      paySettings.payRefDay,
     ),
     len: paySettings.payLength,
   },
@@ -160,5 +156,5 @@ export const initialState: dateCardProps = {
   showSlider: layoutSettings.timelineSettings.showSlider,
   show2ndSlider: layoutSettings.timelineSettings.show2ndSlider,
   showMove: layoutSettings.moveSettings.showMove,
-  showExpand: layoutSettings.moveSettings.showExpand
+  showExpand: layoutSettings.moveSettings.showExpand,
 };

@@ -8,9 +8,17 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default [
+  {
+    ignores: [
+      "node_modules/**",
+      "dist/**",
+      ".vscode/**",
+      ".tmp/**",
+      "webpack.statistics.*.html",
+    ],
+  },
   powerbiVisualsConfigs.configs.recommended,
   {
-    ignores: ["node_modules/**", "dist/**", ".vscode/**", ".tmp/**"],
     languageOptions: {
       parserOptions: {
         project: ["./tsconfig.json"], // Path relative to tsconfigRootDir

@@ -12,7 +12,7 @@ import { DateField } from "./datefield";
 import { useHelpContext } from "./helpprovider";
 import RngeTooltip from "./rngetooltip";
 import { dateCardProps, dateRange } from "../interface";
-import { useDateFnsLocale } from "../localeutils";
+import { useDateFnsLocale, useLocalization } from "../localeutils";
 import HorizontalRule from "@mui/icons-material/HorizontalRule";
 import LinearScale from "@mui/icons-material/LinearScale";
 import Badge from "@mui/material/Badge";
@@ -32,6 +32,12 @@ export default function DateRange(props: dateCardProps) {
     startRange,
     localization,
   } = props;
+  const fallbackLocalization = useLocalization();
+  const i18n = localization ?? fallbackLocalization;
+  const safeDates = dates ??
+    startupFilter ??
+    rangeScope ?? { start: new Date(), end: new Date() };
+  const safeRangeScope = rangeScope ?? safeDates;
 
   const locale = useDateFnsLocale();
 
@@ -40,24 +46,23 @@ export default function DateRange(props: dateCardProps) {
 
   const tipDesc = `startRange_${startRange ?? ""}`;
   const tipDescription =
-    localization.getDisplayName(tipDesc) &&
-    localization.getDisplayName(tipDesc) !== tipDesc
-      ? localization.getDisplayName(tipDesc)
+    i18n.getDisplayName(tipDesc) && i18n.getDisplayName(tipDesc) !== tipDesc
+      ? i18n.getDisplayName(tipDesc)
       : "Start Range";
 
   const [startText, setStartText] = useState(() =>
-    format(dates.start, "yyyy-MM-dd", { locale })
+    format(safeDates.start, "yyyy-MM-dd", { locale }),
   );
   const [endText, setEndText] = useState(() =>
-    format(dates.end, "yyyy-MM-dd", { locale })
+    format(safeDates.end, "yyyy-MM-dd", { locale }),
   );
 
   const [hovered, setHovered] = useState(false);
 
   useEffect(() => {
-    setStartText(format(dates.start, "yyyy-MM-dd", { locale }));
-    setEndText(format(dates.end, "yyyy-MM-dd", { locale }));
-  }, [dates, locale]);
+    setStartText(format(safeDates.start, "yyyy-MM-dd", { locale }));
+    setEndText(format(safeDates.end, "yyyy-MM-dd", { locale }));
+  }, [safeDates, locale]);
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -86,29 +91,29 @@ export default function DateRange(props: dateCardProps) {
       setStartText(format(newDates[0], "yyyy-MM-dd", { locale }));
       setEndText(format(newDates[1], "yyyy-MM-dd", { locale }));
 
-      handleVal(newDates);
+      handleVal?.(newDates);
     },
-    [handleVal, singleDay, locale]
+    [handleVal, singleDay, locale],
   );
 
   const input = useInputParms();
 
   const dateSpan = React.useMemo(() => {
-    return input(dates, rangeScope);
-  }, [input, dates, rangeScope]);
+    return input(safeDates, safeRangeScope);
+  }, [input, safeDates, safeRangeScope]);
 
   const topRow = showExtendedTooltip
-    ? localization.getDisplayName("dateRangeTopRow")
+    ? i18n.getDisplayName("dateRangeTopRow")
     : dateSpan.string;
 
   const doUpdate = (id: "start" | "end", value: string) => {
     const dte = parse(value, "yyyy-MM-dd", new Date());
     if (isValid(dte)) {
-      if (id === "start") handleVal([dte, dates.end]);
-      else handleVal([dates.start, dte]);
+      if (id === "start") handleVal?.([dte, safeDates.end]);
+      else handleVal?.([safeDates.start, dte]);
     } else {
-      setStartText(format(dates.start, "yyyy-MM-dd", { locale }));
-      setEndText(format(dates.end, "yyyy-MM-dd", { locale }));
+      setStartText(format(safeDates.start, "yyyy-MM-dd", { locale }));
+      setEndText(format(safeDates.end, "yyyy-MM-dd", { locale }));
     }
   };
 
@@ -119,8 +124,8 @@ export default function DateRange(props: dateCardProps) {
   // 🔑 determine if reset is available
   const canReset =
     startupFilter &&
-    (!isEqual(dates.start, startupFilter.start) ||
-      !isEqual(dates.end, startupFilter.end));
+    (!isEqual(safeDates.start, startupFilter.start) ||
+      !isEqual(safeDates.end, startupFilter.end));
 
   const showRefresh = hovered && canReset;
 
@@ -151,9 +156,7 @@ export default function DateRange(props: dateCardProps) {
           <RngeTooltip
             topRow={
               canReset
-                ? `${localization.getDisplayName(
-                    "dateRangeResetTo"
-                  )} ${tipDescription}`
+                ? `${i18n.getDisplayName("dateRangeResetTo")} ${tipDescription}`
                 : tipDescription
             }
             infoRow={

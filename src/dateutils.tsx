@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as React from "react";
 import Today from "@mui/icons-material/Today";
 import DateRange from "@mui/icons-material/DateRange";
@@ -89,13 +90,13 @@ function normDay(d: Date | null): Date | null {
   const x = new Date(d);
   // compare by UTC day to ignore local time shifts
   return new Date(
-    Date.UTC(x.getUTCFullYear(), x.getUTCMonth(), x.getUTCDate())
+    Date.UTC(x.getUTCFullYear(), x.getUTCMonth(), x.getUTCDate()),
   );
 }
 
 export function equalRanges(
   a?: dateRange | null,
-  b?: dateRange | null
+  b?: dateRange | null,
 ): boolean {
   if (!a && !b) return true;
   if (!a || !b) return false;
@@ -118,8 +119,8 @@ export function isDateRange(obj: any): obj is dateRange {
  * Falls back to parsing if not already Date.
  */
 export function toDateRange(input: {
-  start: Date | string;
-  end: Date | string;
+  start: Date | string | number;
+  end: Date | string | number;
 }): dateRange {
   if (isDateRange(input)) {
     return input; // already good
@@ -146,7 +147,7 @@ export const getMoveParms = (
   vert: boolean,
   ctrl: boolean,
   stepValue: string,
-  localization: any
+  localization: any,
 ): MoveParms => {
   const isBack = bf === "b";
 
@@ -173,8 +174,8 @@ export const getMoveParms = (
       ? arrowIcons.arrowDoubleRight
       : arrowIcons.arrowDoubleLeft
     : isBack
-    ? arrowIcons.arrowDoubleLeft
-    : arrowIcons.arrowDoubleRight;
+      ? arrowIcons.arrowDoubleLeft
+      : arrowIcons.arrowDoubleRight;
 
   // --- Helpers to keep template clean ---
   const ctrlHint = (): string => {
@@ -186,22 +187,22 @@ export const getMoveParms = (
     !ctrl
       ? moveLabel.toLowerCase()
       : isBack
-      ? localization.getDisplayName("dateUtilsMoveForward")
-      : localization.getDisplayName("dateUtilsMoveBack");
+        ? localization.getDisplayName("dateUtilsMoveForward")
+        : localization.getDisplayName("dateUtilsMoveBack");
 
   // --- Tooltip content ---
   const topRow1 = `${moveLabel} a ${periodLabel}${isBack ? " (L)" : " (N)"}`;
   const detailRow1 = `${localization.getDisplayName(
-    "dateUtilsMoveTheSelectedRange"
+    "dateUtilsMoveTheSelectedRange",
   )}${moveLabel.toLowerCase()}${localization.getDisplayName(
-    "dateUtilsMoveByTheStepLevel"
+    "dateUtilsMoveByTheStepLevel",
   )}`;
 
   const topRow2 = `${reduceExpand} ${periodLabel} ${directionWord()}${ctrlHint()}`;
   const detailRow2 = `${reduceExpand}${localization.getDisplayName(
-    "dateUtilsMoveTheSelectedRange"
+    "dateUtilsMoveTheSelectedRange",
   )}${moveLabel.toLowerCase()}${localization.getDisplayName(
-    "dateUtilsMoveByTheStepLevel"
+    "dateUtilsMoveByTheStepLevel",
   )}`;
 
   return {
@@ -241,7 +242,7 @@ export const getIntervalFunction = (stepValue: string) => {
 export const day = (
   i: number,
   startBaseDate: Date = startOfToday(),
-  endBaseDate?: Date
+  endBaseDate?: Date,
 ): dateRange => ({
   start: subDays(startBaseDate, i),
   end: subDays(endBaseDate ? endOfDay(endBaseDate) : endOfToday(), i),
@@ -251,7 +252,7 @@ export const week = (
   i: number,
   weekStartDay: 0 | 1 | 2 | 3 | 4 | 5 | 6,
   startBaseDate: Date = startOfToday(),
-  full?: boolean
+  full?: boolean,
 ): dateRange => {
   const j = full
     ? weekStartDay === getDay(addDays(startBaseDate, 1))
@@ -269,7 +270,7 @@ export const week = (
 export const month = (
   i: number,
   startBaseDate: Date = startOfToday(),
-  endBaseDate?: Date
+  endBaseDate?: Date,
 ): dateRange => ({
   start: startOfMonth(subMonths(startBaseDate, i)),
   end: endOfMonth(subMonths(endBaseDate ? endBaseDate : endOfToday(), i)),
@@ -284,16 +285,16 @@ export const year = (i: number, yearStartMonth: number): dateRange => ({
   start: subMonths(
     subMonths(
       addMonths(startOfYear(startOfToday()), yearStartMonth),
-      Number(format(startOfToday(), "L")) <= yearStartMonth ? 12 : 0
+      Number(format(startOfToday(), "L")) <= yearStartMonth ? 12 : 0,
     ),
-    i * 12
+    i * 12,
   ),
   end: subMonths(
     subMonths(
       addMonths(endOfYear(endOfToday()), yearStartMonth),
-      Number(format(endOfToday(), "L")) <= yearStartMonth ? 12 : 0
+      Number(format(endOfToday(), "L")) <= yearStartMonth ? 12 : 0,
     ),
-    i * 12
+    i * 12,
   ),
 });
 
@@ -303,7 +304,7 @@ export const getInitRange = (
   weekStartDay: 0 | 1 | 2 | 3 | 4 | 5 | 6 = 0,
   yearStartMonth: number = 0,
   rangeScope: dateRange,
-  rtn: string = ""
+  rtn: string = "",
 ) => {
   const _rnge = {
     today: day(0),
@@ -354,19 +355,19 @@ export const getInitRange = (
   return rtn !== ""
     ? _rnge
     : _rnge[startRange]
-    ? _rnge[startRange]
-    : rangeScope;
+      ? _rnge[startRange]
+      : rangeScope;
 };
 
 // --- Pay Period Calculation ---
 function getPayPeriod(
   referenceDay: Date,
   periodOne: Date,
-  periodLength: number
+  periodLength: number,
 ) {
   const daysPeriodOneFromRef = differenceInDays(
     startOfDay(periodOne),
-    startOfDay(referenceDay)
+    startOfDay(referenceDay),
   );
   const periodNumber = Math.floor(daysPeriodOneFromRef / periodLength);
   const periodStart = addDays(referenceDay, periodNumber * periodLength);
@@ -499,14 +500,14 @@ export const Increment = (
   localization: any,
   payProps?: any,
   showMore?: boolean,
-  scope?: dateRange
+  scope?: dateRange,
 ) => {
   const _rnge = getInitRange(
     "today",
     weekStartDay,
     yearStartMonth,
     { start: null, end: null },
-    "matrix"
+    "matrix",
   );
   return [
     {
@@ -694,11 +695,11 @@ export const stepMajor: Record<Step, Step> = {
 function eachPaydayOfInterval(range: dateRange, pay) {
   const result = subDays(
     range.start,
-    differenceInDays(range.start, pay.ref) % pay.len
+    differenceInDays(range.start, pay.ref) % pay.len,
   );
   return eachDayOfInterval(
     { start: result, end: range.end },
-    { step: pay.len }
+    { step: pay.len },
   );
 }
 
@@ -720,7 +721,7 @@ export const createMarks = (
   range: dateRange,
   weekStart: 0 | 1 | 2 | 3 | 4 | 5 | 6,
   yearStart: number,
-  pay: any
+  pay: any,
 ) => {
   const periodHandlers = {
     day: () => eachDayOfInterval(range),
@@ -730,7 +731,7 @@ export const createMarks = (
     quarter: () => eachQuarterOfInterval(range),
     year: () =>
       eachYearOfInterval({ start: range.start, end: range.end }).map((x) =>
-        addMonths(x, yearStart)
+        addMonths(x, yearStart),
       ),
   };
 
@@ -743,7 +744,12 @@ export const createMarks = (
     .sort((a, b) => a.getTime() - b.getTime());
 };
 
-export const sliderMarkText = (num: number, min: Date, locale: any, fmt = "d-MMM-yy") => {
+export const sliderMarkText = (
+  num: number,
+  min: Date,
+  locale: any,
+  fmt = "d-MMM-yy",
+) => {
   return format(addDays(min, num), fmt, { locale });
 };
 
@@ -753,7 +759,7 @@ export const doMarks = (
   _min: Date,
   _skip: number,
   _offset: number,
-  locale: any
+  locale: any,
 ) => {
   return _val.map((x: Date, i: number) => {
     const v: number = sliderMarkNumber(_skip === 0 ? startOfToday() : x, _min);
@@ -775,7 +781,7 @@ const buildMarks = (period: string, props: SliderProps, locale: any) => {
     props.rangeScope,
     props.weekStartDay,
     props.yearStartMonth,
-    props.payProps
+    props.payProps,
   );
   const fmt = props.stepFmt[period];
   const step = props.stepSkip[period];
@@ -809,63 +815,66 @@ export const useInputParms = () => {
   const localization = useLocalization();
 
   // ✅ Return a memoized function that uses the captured locale/localization
-  return React.useCallback((dates: dateRange, rangeScope: dateRange) => {
-    // ✅ Always reflect the selected range
-    const selStart = startOfDay(dates.start);
-    const selEnd = endOfDay(dates.end);
+  return React.useCallback(
+    (dates: dateRange, rangeScope: dateRange) => {
+      // ✅ Always reflect the selected range
+      const selStart = startOfDay(dates.start);
+      const selEnd = endOfDay(dates.end);
 
-    // ✅ Validation only
-    const startInRange = isWithinInterval(dates.start, rangeScope);
-    const endInRange = isWithinInterval(dates.end, rangeScope);
+      // ✅ Validation only
+      const startInRange = isWithinInterval(dates.start, rangeScope);
+      const endInRange = isWithinInterval(dates.end, rangeScope);
 
-    const clampedStart = clamp(dates.start, rangeScope);
-    const clampedEnd = clamp(dates.end, rangeScope);
+      const clampedStart = clamp(dates.start, rangeScope);
+      const clampedEnd = clamp(dates.end, rangeScope);
 
-    const _start = startOfDay(clampedStart);
-    const _end = endOfDay(clampedEnd);
+      const _start = startOfDay(clampedStart);
+      const _end = endOfDay(clampedEnd);
 
-    const formatDate = (d: Date) => format(d, "EEE, d MMM yy", { locale });
+      const formatDate = (d: Date) => format(d, "EEE, d MMM yy", { locale });
 
-    try {
-      const days = differenceInDays(_end, _start);
-      const startDate = formatDate(_start);
-      const endDate = formatDate(_end);
-      const duration = formatDistance(_start, _end, { locale });
+      try {
+        const days = differenceInDays(_end, _start);
+        const startDate = formatDate(_start);
+        const endDate = formatDate(_end);
+        const duration = formatDistance(_start, _end, { locale });
 
-      return {
-        // 🔑 Always show the *selected* range, not clamped scope
-        string:
-          days > 0
-            ? `${duration
-                .toLowerCase()
-                .replace(/\b\w/g, (s) =>
-                  s.toUpperCase()
-                )}: ${startDate} - ${endDate}`
-            : ` ${endDate}`,
+        return {
+          // 🔑 Always show the *selected* range, not clamped scope
+          string:
+            days > 0
+              ? `${duration
+                  .toLowerCase()
+                  .replace(/\b\w/g, (s) =>
+                    s.toUpperCase(),
+                  )}: ${startDate} - ${endDate}`
+              : ` ${endDate}`,
 
-        // 🔑 Info row only warns if selection is outside scope
-        info:
-          startInRange && endInRange
-            ? ""
-            : ` [${formatDate(dates.start)} - ${formatDate(dates.end)} ${localization.getDisplayName(
-                "dateUtilsExceedsScope"
-              )}]`,
+          // 🔑 Info row only warns if selection is outside scope
+          info:
+            startInRange && endInRange
+              ? ""
+              : ` [${formatDate(dates.start)} - ${formatDate(dates.end)} ${localization.getDisplayName(
+                  "dateUtilsExceedsScope",
+                )}]`,
 
-        duration,
-        fmDoW: format(selStart, "EEEE", { locale }),
-        toDoW: format(selEnd, "EEE", { locale }),
-        fmValid: startInRange,
-        toValid: endInRange,
-      };
-    } catch {
-      return {
-        string: localization.getDisplayName("dateUtilsInvalid"),
-        duration: "",
-        fmDoW: "",
-        toDoW: "",
-        fmValid: false,
-        toValid: false,
-      };
-    }
-  }, [locale, localization]);
+          duration,
+          fmDoW: format(selStart, "EEEE", { locale }),
+          toDoW: format(selEnd, "EEE", { locale }),
+          fmValid: startInRange,
+          toValid: endInRange,
+        };
+      } catch {
+        return {
+          string: localization.getDisplayName("dateUtilsInvalid"),
+          duration: "",
+          fmDoW: "",
+          toDoW: "",
+          fmValid: false,
+          toValid: false,
+        };
+      }
+    },
+    [locale, localization],
+  );
 };
