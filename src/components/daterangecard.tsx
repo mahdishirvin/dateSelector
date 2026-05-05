@@ -50,11 +50,6 @@ export default function DateRangeCard(props: dateCardProps) {
       year: true,
     } as const);
 
-  // If the landing page is not disabled, render it and exit early.
-  if (!props.landingOff) {
-    return <LandingPage />;
-  }
-
   // Use useState to manage the UI's date state, initialized from props.
   const [currentDates, setCurrentDates] = useState<dateRange>(safeDates);
 
@@ -227,6 +222,11 @@ export default function DateRangeCard(props: dateCardProps) {
   // Use the custom hook for keyboard shortcuts.
   useDateMoveKeys(onChangeVal, stepValue, currentDates, current);
   useHotkeys("s", toggleSlider, [openSlider]);
+
+  // Render landing page only after all hooks have been called.
+  if (!props.landingOff) {
+    return <LandingPage />;
+  }
 
   const rangeDescriptionLabel = localization.getDisplayName("Range");
 
