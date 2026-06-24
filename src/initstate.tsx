@@ -8,7 +8,7 @@ export const defaultSettings = {
     landingOff: false,
     rangeScope: { start: null, end: null },
   },
-  styleSettings: {
+  style: {
     fmtDate: "d-MM-yyyy",
     themeColor: "#607d8b",
     themeMode: "light",
@@ -20,7 +20,7 @@ export const defaultSettings = {
     fontItalic: false,
     fontColor: "#000000",
   },
-  calendarSettings: {
+  calendar: {
     singleDay: false,
     startRange: "sync",
     stepInit: "day",
@@ -29,7 +29,7 @@ export const defaultSettings = {
     limitToScope: false,
     forceStartRange: false,
   },
-  layoutSettings: {
+  layout: {
     timelineSettings: {
       enableSlider: true,
       showSlider: false,
@@ -92,8 +92,7 @@ export const defaultSettings = {
   },
 } satisfies Settings;
 
-const { general, period, calendarSettings, styleSettings, layoutSettings } =
-  defaultSettings;
+const { general, period, calendar, style, layout } = defaultSettings;
 
 const {
   daySettings,
@@ -109,7 +108,7 @@ export const initialState: dateCardProps = {
   rangeScope: general.rangeScope as unknown as dateCardProps["rangeScope"],
   weekStartDay: weekSettings.weekStartDay, // 0 = Sun
   yearStartMonth: yearSettings.yearStartMonth, // 0 = Jan
-  stepInit: calendarSettings.stepInit,
+  stepInit: calendar.stepInit,
   stepSkip: {
     day: daySettings.daySkip,
     week: weekSettings.weekSkip,
@@ -143,18 +142,18 @@ export const initialState: dateCardProps = {
     ),
     len: paySettings.payLength,
   },
-  themeColor: styleSettings.themeColor,
-  themeFont: styleSettings.themeFont,
-  themeMode: styleSettings.themeMode,
-  fontSize: styleSettings.fontSize,
-  showCurrent: layoutSettings.currentSettings.showCurrent,
-  showHelpIcon: layoutSettings.helpSettings.showHelpIcon,
-  showMore: layoutSettings.currentSettings.showMore,
-  showIconText: layoutSettings.currentSettings.showIconText,
-  singleDay: calendarSettings.singleDay,
-  enableSlider: layoutSettings.timelineSettings.enableSlider,
-  showSlider: layoutSettings.timelineSettings.showSlider,
-  show2ndSlider: layoutSettings.timelineSettings.show2ndSlider,
-  showMove: layoutSettings.moveSettings.showMove,
-  showExpand: layoutSettings.moveSettings.showExpand,
+  themeColor: style.themeColor,
+  themeFont: style.themeFont,
+  themeMode: style.themeMode,
+  fontSize: style.fontSize,
+  showCurrent: layout.currentSettings.showCurrent,
+  showHelpIcon: layout.helpSettings.showHelpIcon,
+  showMore: layout.currentSettings.showMore,
+  showIconText: layout.currentSettings.showIconText,
+  singleDay: calendar.singleDay,
+  enableSlider: layout.timelineSettings.enableSlider,
+  showSlider: layout.timelineSettings.showSlider,
+  show2ndSlider: layout.timelineSettings.show2ndSlider,
+  showMove: layout.moveSettings.showMove,
+  showExpand: layout.moveSettings.showExpand,
 };

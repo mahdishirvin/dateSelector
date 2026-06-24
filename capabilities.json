@@ -115,7 +115,6 @@
                     }
                 },
                 "fontSize": {
-                    "displayName": "Font Size",
                     "type": {
                         "formatting": {
                             "fontSize": true
@@ -129,17 +128,17 @@
                         }
                     }
                 },
-                "fontBold": {
+                "bold": {
                     "type": {
                         "bool": true
                     }
                 },
-                "fontUnderline": {
+                "underline": {
                     "type": {
                         "bool": true
                     }
                 },
-                "fontItalic": {
+                "italic": {
                     "type": {
                         "bool": true
                     }

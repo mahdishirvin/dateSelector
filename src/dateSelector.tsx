@@ -25,6 +25,7 @@ import { LocalizationContext, DateFnsLocaleProvider } from "./localeutils";
 import { ReactVisual } from "./reactUtils";
 import { HotkeysProvider } from "react-hotkeys-hook";
 import { toDateRange } from "./dateutils";
+import "../assets/visual.less";
 /**
  * The DateSelector class is the main entry point for the visual. It manages the
  * lifecycle of the visual and handles communication between Power BI and the React component.
@@ -128,44 +129,63 @@ export class DateSelector extends ReactVisual implements IVisual {
    * @param options The visual update options from Power BI.
    */
 
-  // In the following update function, bookmark always wins is not happening on a page with forced start up value set.
   public update(options: VisualUpdateOptions) {
     try {
       this.events.renderingStarted(options);
-      // prevent infinite loops when the visual itself applies a filter
+
+      // Prevent infinite loops when the visual itself applies a filter
       if (this.isUpdatingFromVisual) {
         this.isUpdatingFromVisual = false;
         this.events.renderingFinished(options);
         return;
       }
 
-      // 2. DATA VIEW AND SETTINGS LOAD (CRITICAL REORDERING)
-      // Check for data view change
-      const shouldGetSettings = !isEqual(options.dataViews[0], this.dataView);
-      this.dataView = options.dataViews[0];
-
-      // Load settings FIRST if data view changed or if it's the very first time.
-      // This ensures this.state is always fresh.
-      if (shouldGetSettings || !this.dataView) {
-        this.loadVisualSettings(options);
-      }
-
-      // 3. VALIDATION (Now that this.state exists)
+      // 1. HARD GATE FOR INVALID/UNMAPPED DATA VIEWS
       if (!this.isValidDataView(options)) {
-        // Use this.initialiseVisualState() to set a default landingOff state
         this.initialiseVisualState();
-        this.updateReactContainers({ landingOff: false }); // Show landing page
+
+        // 1. Instantiate the real model matching your class structure
+        const freshSettings = new VisualSettingsModel();
+        this.formattingSettings = freshSettings;
+
+        // 2. Destructure and format properties from your actual cards
+        // to maintain the exact layout contract your components expect.
+        const defaultCardProps = {
+          // Flatten property cards if your mapOptionsToState flattens them,
+          // or pass them down cleanly as sub-objects matching your component design:
+          style: freshSettings.style,
+          calendar: freshSettings.calendar,
+          layout: freshSettings.layout,
+          period: freshSettings.period,
+
+          // Fallback global configurations
+          themeMode: "light",
+        };
+
+        // Assign the clean structured properties to your visual state wrapper
+        this.state.settings = defaultCardProps as any;
+
+        // 3. Update React Containers with the exact structure it demands
+        this.updateReactContainers({
+          ...defaultCardProps,
+          landingOff: false,
+          dates: { start: null, end: null },
+        });
+
         this.events.renderingFinished(options);
         return;
       }
 
-      // 4. LANDING PAGE OFF (Now that this.state is guaranteed to exist and have data)
-      // If we reach here, we have a valid data view. Turn the landing page off.
-      if (!this.state.landingOff) {
-        this.state.landingOff = true;
-        // Immediate UI update to dismiss landing page (before long filter logic)
-        this.updateReactContainers({ landingOff: true });
+      // 2. DATA VIEW AND SETTINGS LOAD (Only execute if fields are verified)
+      const shouldGetSettings = !isEqual(options.dataViews[0], this.dataView);
+      this.dataView = options.dataViews[0];
+
+      if (shouldGetSettings || !this.dataView) {
+        this.loadVisualSettings(options);
       }
+
+      // 3. SET LANDING PAGE SWITCH
+      this.state.landingOff = true;
 
       const now = Date.now();
       const filterSignature = this.getFilterSignature(options);
@@ -173,9 +193,6 @@ export class DateSelector extends ReactVisual implements IVisual {
       const elapsed = now - this.lastUpdateTime;
       this.lastUpdateTime = now;
 
-      // console.debug("Update called. isFilterChange:", isFilterChange);
-
-      // 👇 detect bookmark-like condition
       if (
         isFilterChange &&
         elapsed < this.bookmarkDetectionWindow &&
@@ -185,94 +202,75 @@ export class DateSelector extends ReactVisual implements IVisual {
       } else {
         this.maybeBookmarkActive = false;
       }
-      // console.debug("maybeBookmarkActive:", this.maybeBookmarkActive);
-      // store signature for next pass
       this.lastKnownFilterSignature = filterSignature;
 
-      // normalise host filter from options (may be null)
+      // Normalise host filter from options
       const hostFilter = restoreRangeFilter(options);
 
       let resolvedFilter: dateRange | null = null;
       let shouldApplyFilter = false;
 
       if (this.maybeBookmarkActive && hostFilter) {
-        // ✅ inferred bookmark: always wins
         resolvedFilter = hostFilter;
-
-        // console.debug("Rule chosen: HOST (bookmark)");
       } else if (
         this.state.settings.forceStartRange &&
         !this.initialLoadComplete
       ) {
-        // ✅ forced startup range overrides persisted
         resolvedFilter = this.state.settings.startupFilter ?? null;
         shouldApplyFilter = true;
-
-        // console.debug("Rule chosen: FORCE (startup)");
       } else if (hostFilter) {
-        // ✅ persisted filter (normal restore)
         resolvedFilter = hostFilter;
       } else if (this.state.settings.startupFilter) {
         resolvedFilter = this.state.settings.startupFilter;
         shouldApplyFilter = !this.initialLoadComplete;
-
-        // console.debug("Rule chosen: STARTUP (no host)");
       }
 
-      // ---------------------------------------------------------
-      // Apply filter if this logic decided we should push one to host
-      // (e.g. forced startup or startup default on first load/settings-changed)
-      // ---------------------------------------------------------
       if (shouldApplyFilter && resolvedFilter) {
         this.applyDateFilter(resolvedFilter);
-        // treat it as pending until host echoes back
         this.currentFilter = resolvedFilter;
 
-        // 🔥 Update the UI with the *new* filter state BEFORE returning
         this.updateReactContainers({
           ...this.state.settings,
           dates: this.currentFilter,
-          landingOff: this.state.landingOff, // Pass the correct landing state
+          landingOff: true,
         });
 
         this.initialLoadComplete = true;
         this.events.renderingFinished(options);
-        // console.debug("Applied filter:", resolvedFilter);
         return;
       }
 
-      // update React UI
+      // Update React UI
       this.currentFilter = resolvedFilter ?? this.currentFilter;
       this.updateReactContainers({
         ...this.state.settings,
         dates: this.currentFilter,
-        landingOff: this.state.landingOff,
+        landingOff: true,
       });
 
       this.initialLoadComplete = true;
       this.events.renderingFinished(options);
     } catch (e) {
-      // console.error("Update failed:", e);
+      console.error("Update failed:", e);
       this.events.renderingFailed(options);
     }
   }
 
   /**
-   * A helper method to validate the data view.
-   * @param options The visual update options.
-   * @returns True if the data view is valid, false otherwise.
+   * Verified Data View structure check. Assures actual fields are bound to query buckets.
    */
   private isValidDataView(options: VisualUpdateOptions): boolean {
-    return (
+    return !!(
       options &&
       options.dataViews &&
-      options.dataViews.length > 0 &&
-      options.dataViews[0].metadata &&
-      options.dataViews[0].metadata.columns &&
-      options.dataViews[0].metadata.columns.length > 0
+      options.dataViews[0] &&
+      options.dataViews[0].categorical &&
+      options.dataViews[0].categorical.categories &&
+      options.dataViews[0].categorical.categories[0] &&
+      options.dataViews[0].categorical.categories[0].values &&
+      options.dataViews[0].categorical.categories[0].values.length > 0
     );
   }
-
   /**
    * A helper method to initialize the visual state.
    */
@@ -286,36 +284,61 @@ export class DateSelector extends ReactVisual implements IVisual {
    * Loads the visual settings from the data view.
    * @param options The visual update options.
    */
+  /**
+   * Loads the visual settings from the data view with defensive error isolation.
+   * @param options The visual update options.
+   */
   private loadVisualSettings(options: VisualUpdateOptions): void {
-    this.formattingSettings =
-      this.formattingSettingsService.populateFormattingSettingsModel(
-        VisualSettingsModel,
-        options.dataViews[0],
+    try {
+      // Attempt to populate using the utils formatting service
+      this.formattingSettings =
+        this.formattingSettingsService.populateFormattingSettingsModel(
+          VisualSettingsModel,
+          options.dataViews?.[0],
+        );
+      // console.log("Loaded formatting settings:", this.formattingSettings);
+    } catch (e) {
+      console.warn(
+        "FormattingSettingsService failed to parse dataView properties safely. Falling back to defaults.",
+        e,
+      );
+      // Fallback completely to avoid crashing the entire visual update cycle
+      this.formattingSettings = new VisualSettingsModel();
+    }
+
+    // Wrap the mapper call in case it expects properties that failed to populate
+    try {
+      const newVisualState = mapOptionsToState(
+        options,
+        this.formattingSettings,
+        this.initialLoadComplete,
       );
 
-    // Correcting the mapOptionsToState call to match the provided signature.
-    const newVisualState = mapOptionsToState(
-      options,
-      this.formattingSettings,
-      this.initialLoadComplete,
-    );
+      this.state = {
+        ...this.state,
+        ...newVisualState,
+      };
+    } catch (mapperError) {
+      console.warn(
+        "Failed to map visual options to state cleanly:",
+        mapperError,
+      );
+    }
 
-    this.state = {
-      ...this.state,
-      ...newVisualState,
-    };
-
-    if (this.colorHelper.isHighContrast) {
+    if (this.colorHelper?.isHighContrast) {
       const foregroundColor =
         this.colorHelper.getHighContrastColor("foreground");
       const backgroundColor =
         this.colorHelper.getHighContrastColor("background");
       const themeMode = tinycolor(backgroundColor).isDark() ? "dark" : "light";
-      Object.assign(this.state.settings, {
-        fontColor: foregroundColor,
-        themeColor: foregroundColor,
-        themeMode,
-      });
+
+      if (this.state?.settings) {
+        Object.assign(this.state.settings, {
+          fontColor: foregroundColor,
+          themeColor: foregroundColor,
+          themeMode,
+        });
+      }
     }
   }
 
@@ -407,6 +430,9 @@ export class DateSelector extends ReactVisual implements IVisual {
    * Returns the formatting model for the properties pane.
    */
   public getFormattingModel(): powerbi.visuals.FormattingModel {
+    if (!this.formattingSettings) {
+      this.formattingSettings = new VisualSettingsModel();
+    }
     return this.formattingSettingsService.buildFormattingModel(
       this.formattingSettings,
     );

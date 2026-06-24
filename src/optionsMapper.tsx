@@ -1,3 +1,4 @@
+// Options mapper - extract and transform data and settings from the update options into a strongly-typed state object for the visual.
 // @ts-nocheck
 import powerbi from "powerbi-visuals-api";
 import { FONT_SIZE, FONT_FAMILY } from "./constants";
@@ -47,12 +48,8 @@ export const settingProps = (
   formatSettings: VisualSettingsModel,
   initialised: boolean,
 ): Omit<dateCardProps, "dates"> => {
-  const {
-    styleSettings: style,
-    calendarSettings: calendar,
-    layoutSettings: layout,
-    periodSettings: period,
-  } = formatSettings;
+  // 🟢 CORRECT: Destructure matching your exact class property definitions
+  const { style, calendar, layout, period } = formatSettings;
 
   const {
     periodDay: day,
@@ -145,9 +142,14 @@ export const settingProps = (
     themeColor: style.themeColor.value.value.valueOf(),
     themeMode: style.themeMode.value,
     fontColor: style.fontColor.value.value.valueOf(),
+    // fontSize: nonNeg(style.fontSize.value),
+
+    // Point directly to the flat card slices instead of through .font
+    // fontBold: style.fontBold.value,
+    // fontItalic: style.fontItalic.value,
     fontSize: nonNeg(style.fontSize.value),
-    fontBold: style.font.bold.value,
-    fontItalic: style.font.italic.value,
+    fontBold: style.bold.value,
+    fontItalic: style.italic.value,
   };
 };
 

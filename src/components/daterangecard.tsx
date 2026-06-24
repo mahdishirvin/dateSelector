@@ -1,5 +1,3 @@
-// daterangecard.tsx
-
 /*
 This component represents a date range card that displays a timeline of dates.
 It receives several props to customize its behavior and appearance.
@@ -7,7 +5,7 @@ It receives several props to customize its behavior and appearance.
 @returns {JSX.Element} A JSX element that renders the date range card.
 */
 import * as React from "react";
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import Grid from "@mui/material/Grid";
 import Zoom from "@mui/material/Zoom";
 import { ThemeProvider } from "@mui/material/styles";
@@ -22,36 +20,74 @@ import {
   clampRangeToScope,
   equalRanges,
   useInputParms,
-} from "../dateutils"; // <-- ADD useInputParms import
+} from "../dateutils";
 import { HelpProvider } from "./helpprovider";
 import LandingPage from "./landingpage";
 import { compareAsc, format } from "date-fns";
 import { useLocalization } from "../localeutils";
-import Menu from "@mui/material/Menu"; // <-- NEW MUI Menu
-import MenuItem from "@mui/material/MenuItem"; // <-- NEW MUI MenuItem
-import Divider from "@mui/material/Divider"; // <-- NEW MUI Divider
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 
 export default function DateRangeCard(props: dateCardProps) {
   const fallbackRange: dateRange = React.useMemo(
     () => ({ start: new Date(), end: new Date() }),
     [],
   );
-  const safeDates = props.dates ?? props.rangeScope ?? fallbackRange;
-  const safeRangeScope = props.rangeScope ?? safeDates;
-  const safeStepInit = props.stepInit ?? "day";
-  const safeStepViz =
-    props.stepViz ??
-    ({
-      day: true,
-      week: true,
-      pay: false,
-      month: true,
-      quarter: false,
-      year: true,
-    } as const);
+  // console.log("DateRangeCard rendered with props:", props); // Debug log to trace renders and prop values
+
+  // Validate that the dates are not uninitialized or legacy epoch values
+  const hasValidDates = !!(
+    props.dates &&
+    props.dates.start &&
+    new Date(props.dates.start).getFullYear() > 1970
+  );
+  const hasValidScope = !!(
+    props.rangeScope &&
+    props.rangeScope.start &&
+    new Date(props.rangeScope.start).getFullYear() > 1970
+  );
+
+  const safeDates = useMemo(
+    () =>
+      hasValidDates
+        ? props.dates!
+        : hasValidScope
+          ? props.rangeScope!
+          : fallbackRange,
+    [
+      hasValidDates,
+      props.dates,
+      hasValidScope,
+      props.rangeScope,
+      fallbackRange,
+    ],
+  );
+  const safeRangeScope = useMemo(
+    () => (hasValidScope ? props.rangeScope! : safeDates),
+    [hasValidScope, props.rangeScope, safeDates],
+  );
+  const safeStepInit = useMemo(() => props.stepInit ?? "day", [props.stepInit]);
+  const safeStepViz = useMemo(
+    () =>
+      props.stepViz ??
+      ({
+        day: true,
+        week: true,
+        pay: false,
+        month: true,
+        quarter: false,
+        year: true,
+      } as const),
+    [props.stepViz],
+  );
 
   // Use useState to manage the UI's date state, initialized from props.
   const [currentDates, setCurrentDates] = useState<dateRange>(safeDates);
+  const [previewDates, setPreviewDates] = useState<dateRange | null>(null);
+  const previewFrameRef = useRef<number | null>(null);
+  const pendingPreviewRef = useRef<dateRange | null>(null);
+  const suppressPropSyncRef = useRef(false);
+  const propSyncTimeoutRef = useRef<number | null>(null);
 
   // State for the context menu: tracks the mouse coordinates when open
   const [contextMenu, setContextMenu] = useState<{
@@ -61,22 +97,64 @@ export default function DateRangeCard(props: dateCardProps) {
 
   // keep UI in sync if the Power BI changes dates externally
   useEffect(() => {
-    // only replace if it actually changed, to avoid extra renders
-    if (props.dates && !equalRanges(props.dates, currentDates)) {
-      setCurrentDates(props.dates);
+    if (suppressPropSyncRef.current) {
+      return;
     }
-  }, [props.dates, currentDates]);
+
+    if (hasValidDates && !equalRanges(props.dates!, currentDates)) {
+      setCurrentDates(props.dates!);
+      setPreviewDates(null);
+      pendingPreviewRef.current = null;
+      if (previewFrameRef.current !== null) {
+        if (
+          typeof window !== "undefined" &&
+          typeof window.cancelAnimationFrame === "function"
+        ) {
+          window.cancelAnimationFrame(previewFrameRef.current);
+        } else {
+          window.clearTimeout(previewFrameRef.current);
+        }
+        previewFrameRef.current = null;
+      }
+    }
+  }, [props.dates, currentDates, hasValidDates]);
+
+  useEffect(() => {
+    return () => {
+      if (previewFrameRef.current !== null) {
+        if (
+          typeof window !== "undefined" &&
+          typeof window.cancelAnimationFrame === "function"
+        ) {
+          window.cancelAnimationFrame(previewFrameRef.current);
+        } else {
+          window.clearTimeout(previewFrameRef.current);
+        }
+        previewFrameRef.current = null;
+      }
+    };
+  }, []);
 
   // Use the localization hook to get the localization manager.
   const localization = useLocalization();
 
-  // Hook to get date utilities for calculation (Needed for context menu content)
+  // Hook to get date utilities for calculation
   const input = useInputParms();
 
-  // Memoize date span calculation (used for context menu content)
+  // CRITICAL GUARD: Added try/catch and baseline string fallback to prevent calculation crashes
+  const visibleDates = previewDates ?? currentDates;
+
   const dateSpan = useMemo(() => {
-    return input(currentDates, safeRangeScope);
-  }, [input, currentDates, safeRangeScope]);
+    if (!props.landingOff || !visibleDates?.start || !safeRangeScope?.start) {
+      return { string: "" };
+    }
+    try {
+      return input(visibleDates, safeRangeScope) ?? { string: "" };
+    } catch (e) {
+      console.warn("Failed to calculate dateSpan safely:", e);
+      return { string: "" };
+    }
+  }, [input, visibleDates, safeRangeScope, props.landingOff]);
 
   // Memoize the theme creation to avoid re-calculating on every render.
   const theme = useMemo(
@@ -88,7 +166,13 @@ export default function DateRangeCard(props: dateCardProps) {
         fontSize: String(props.fontSize ?? 10),
         fontColor: props.fontColor ?? "#000000",
       }),
-    [props.themeMode, props.themeColor, props.themeFont, props.fontSize],
+    [
+      props.themeMode,
+      props.themeColor,
+      props.themeFont,
+      props.fontSize,
+      props.fontColor,
+    ],
   );
 
   // Use useState to manage component-level state, initialized from props.
@@ -98,10 +182,11 @@ export default function DateRangeCard(props: dateCardProps) {
   const [stepValue, setStepValue] = useState<string>(safeStepInit);
   const [stepOpen, setStepOpen] = useState<boolean>(false);
 
-  // Memoize the current value to avoid unnecessary recalculations.
-  const current = useMemo(
-    () =>
-      Increment(
+  // SAFETY GUARD: Short circuit Increment loop checks if dates are missing
+  const current = useMemo(() => {
+    if (!props.landingOff || !hasValidScope) return [];
+    try {
+      return Increment(
         safeStepViz,
         props.weekStartDay ?? 0,
         props.yearStartMonth ?? 0,
@@ -109,17 +194,21 @@ export default function DateRangeCard(props: dateCardProps) {
         props.payProps,
         props.showMore ?? false,
         safeRangeScope,
-      ),
-    [
-      safeStepViz,
-      props.weekStartDay,
-      props.yearStartMonth,
-      localization,
-      props.payProps,
-      props.showMore,
-      safeRangeScope,
-    ],
-  );
+      );
+    } catch {
+      return [];
+    }
+  }, [
+    safeStepViz,
+    props.weekStartDay,
+    props.yearStartMonth,
+    localization,
+    props.payProps,
+    props.showMore,
+    safeRangeScope,
+    props.landingOff,
+    hasValidScope,
+  ]);
 
   // Use a single useEffect to handle prop changes for initial state.
   useEffect(() => {
@@ -127,13 +216,13 @@ export default function DateRangeCard(props: dateCardProps) {
     setStepValue(props.stepInit ?? "day");
   }, [props.showSlider, props.stepInit]);
 
-  // Use useCallback to memoize the toggle functions, preventing them from
-  // being recreated on every render. This optimizes child component rendering.
+  // Use useCallback to memoize the toggle functions
   const toggleSlider = useCallback(() => setOpenSlider((prev) => !prev), []);
   const toggleStepOpen = useCallback(() => setStepOpen((prev) => !prev), []);
 
   // Handler for opening the context menu
   const handleContextMenu = (event: React.MouseEvent) => {
+    if (!props.landingOff) return; // Block interactions if fields are missing
     event.preventDefault();
     event.stopPropagation();
     setContextMenu(
@@ -142,8 +231,7 @@ export default function DateRangeCard(props: dateCardProps) {
             mouseX: event.clientX + 2,
             mouseY: event.clientY - 6,
           }
-        : // If the menu is already open, close it (useful for clicking outside to close)
-          null,
+        : null,
     );
   };
 
@@ -154,7 +242,6 @@ export default function DateRangeCard(props: dateCardProps) {
 
   // Handler to prevent context menu from appearing when the MUI menu is already open
   const handleMenuContextMenu = (event: React.MouseEvent) => {
-    // ADDED: Prevent context menu on the MUI Menu itself
     event.preventDefault();
     event.stopPropagation();
     handleClose();
@@ -172,16 +259,31 @@ export default function DateRangeCard(props: dateCardProps) {
         ? clampRangeToScope(nextRange, safeRangeScope)
         : nextRange;
 
-      setCurrentDates(resolvedRange);
+      pendingPreviewRef.current = resolvedRange;
+      if (previewFrameRef.current !== null) {
+        return;
+      }
+
+      const applyPreview = () => {
+        setPreviewDates(pendingPreviewRef.current);
+        previewFrameRef.current = null;
+      };
+
+      if (
+        typeof window !== "undefined" &&
+        typeof window.requestAnimationFrame === "function"
+      ) {
+        previewFrameRef.current = window.requestAnimationFrame(applyPreview);
+      } else {
+        previewFrameRef.current = window.setTimeout(applyPreview, 0);
+      }
     },
     [props.singleDay, props.limitToScope, safeRangeScope],
   );
 
-  // This is the centralized handler. It updates the local state and then
-  // calls the prop function to inform Power BI.
+  // This is the centralized handler.
   const handleDateChange = useCallback(
     (filter: [Date, Date]) => {
-      // Sort dates to ensure the start is always before the end.
       const sortedDates = props.singleDay
         ? [filter[0], filter[0]]
         : filter.sort(compareAsc);
@@ -195,10 +297,29 @@ export default function DateRangeCard(props: dateCardProps) {
         ? clampRangeToScope(nextRange, safeRangeScope)
         : nextRange;
 
-      // Update local state first to trigger UI re-render
-      setCurrentDates(resolvedRange);
+      suppressPropSyncRef.current = true;
+      if (propSyncTimeoutRef.current !== null) {
+        window.clearTimeout(propSyncTimeoutRef.current);
+      }
+      propSyncTimeoutRef.current = window.setTimeout(() => {
+        suppressPropSyncRef.current = false;
+        propSyncTimeoutRef.current = null;
+      }, 0);
 
-      // Then inform Power BI
+      setCurrentDates(resolvedRange);
+      setPreviewDates(null);
+      pendingPreviewRef.current = null;
+      if (previewFrameRef.current !== null) {
+        if (
+          typeof window !== "undefined" &&
+          typeof window.cancelAnimationFrame === "function"
+        ) {
+          window.cancelAnimationFrame(previewFrameRef.current);
+        } else {
+          window.clearTimeout(previewFrameRef.current);
+        }
+        previewFrameRef.current = null;
+      }
       props.onFilterChanged?.(resolvedRange);
     },
     [
@@ -209,8 +330,6 @@ export default function DateRangeCard(props: dateCardProps) {
     ],
   );
 
-  // This is the onChangeVal method that passes up a simple array of dates
-  // to the main handler.
   const onChangeVal = useCallback(
     (filter: Date[]) => {
       if (filter.length < 2) return;
@@ -220,16 +339,12 @@ export default function DateRangeCard(props: dateCardProps) {
   );
 
   // Use the custom hook for keyboard shortcuts.
-  useDateMoveKeys(onChangeVal, stepValue, currentDates, current);
+  useDateMoveKeys(onChangeVal, stepValue, visibleDates, current);
   useHotkeys("s", toggleSlider, [openSlider]);
-
-  // Render landing page only after all hooks have been called.
-  if (!props.landingOff) {
-    return <LandingPage />;
-  }
 
   const rangeDescriptionLabel = localization.getDisplayName("Range");
 
+  // RENDER CONTAINER CRITICAL CHANGE: Always render the outer wrapper framework
   return (
     <ThemeProvider theme={theme}>
       <HelpProvider
@@ -239,71 +354,74 @@ export default function DateRangeCard(props: dateCardProps) {
         localization={localization}
         themeMode={props.themeMode}
       >
-        {/* Background layer that fills the entire iframe to allow context menu anywhere */}
-        <div
-          onContextMenu={handleContextMenu}
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            zIndex: 0, // behind all UI, but still receives clicks
-            background: "transparent",
-          }}
-        />
+        {!props.landingOff ? (
+          // Renders inside the wrapper tree so settings panel properties register properly
+          <LandingPage />
+        ) : (
+          <>
+            <div
+              onContextMenu={handleContextMenu}
+              style={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                width: "100vw",
+                height: "100vh",
+                zIndex: 0,
+                background: "transparent",
+              }}
+            />
 
-        {/* ADD onContextMenu handler to the main container */}
-        <Grid
-          container
-          sx={{ display: "flex", flexDirection: "column" }}
-          onContextMenu={handleContextMenu}
-          style={{ position: "relative", zIndex: 1 }}
-        >
-          <TopRow
-            {...props}
-            dates={currentDates}
-            showMore={props.showMore}
-            showMove={props.showMove}
-            localization={localization}
-            showExpand={props.showExpand}
-            showSlider={props.showSlider ?? false}
-            openSlider={openSlider}
-            toggleSlider={toggleSlider}
-            stepOpen={stepOpen}
-            stepValue={stepValue}
-            handleVal={onChangeVal}
-            handleClick={toggleStepOpen}
-            setStepValue={setStepValue}
-            setStepOpen={setStepOpen}
-            current={current}
-          />
-          <Zoom in={openSlider}>
-            <Grid container spacing={0} size={12}>
-              <Grid size="grow" sx={{ marginLeft: 1, paddingTop: 0.1 }}>
-                <RangeSlider
-                  {...props}
-                  dates={currentDates}
-                  stepValue={stepValue}
-                  stepFmt={props.stepFmt}
-                  rangeScope={safeRangeScope}
-                  localization={localization}
-                  // During drag: preview only
-                  onPreview={handlePreviewChange}
-                  // On release: commit to host
-                  onCommit={onChangeVal}
-                />
-              </Grid>
+            <Grid
+              container
+              sx={{ display: "flex", flexDirection: "column" }}
+              onContextMenu={handleContextMenu}
+              style={{ position: "relative", zIndex: 1 }}
+            >
+              <TopRow
+                {...props}
+                dates={visibleDates}
+                showMore={props.showMore}
+                showMove={props.showMove}
+                localization={localization}
+                showExpand={props.showExpand}
+                showSlider={props.showSlider ?? false}
+                openSlider={openSlider}
+                toggleSlider={toggleSlider}
+                stepOpen={stepOpen}
+                stepValue={stepValue}
+                handleVal={onChangeVal}
+                handleClick={toggleStepOpen}
+                setStepValue={setStepValue}
+                setStepOpen={setStepOpen}
+                current={current}
+              />
+              <Zoom in={openSlider}>
+                <Grid container spacing={0} size={12}>
+                  <Grid size="grow" sx={{ marginLeft: 1, paddingTop: 0.1 }}>
+                    <RangeSlider
+                      {...props}
+                      dates={visibleDates}
+                      stepValue={stepValue}
+                      stepFmt={props.stepFmt}
+                      rangeScope={safeRangeScope}
+                      localization={localization}
+                      onPreview={handlePreviewChange}
+                      onCommit={onChangeVal}
+                    />
+                  </Grid>
+                </Grid>
+              </Zoom>
             </Grid>
-          </Zoom>
-        </Grid>
+          </>
+        )}
       </HelpProvider>
-      {/* NEW: MUI Context Menu Implementation */}
+
       <Menu
         open={contextMenu !== null}
         onClose={handleClose}
         onClick={handleClose}
-        onContextMenu={handleMenuContextMenu} // <-- Prevent context menu on the MUI Menu itself
+        onContextMenu={handleMenuContextMenu}
         anchorReference="anchorPosition"
         anchorPosition={
           contextMenu !== null
@@ -312,26 +430,24 @@ export default function DateRangeCard(props: dateCardProps) {
         }
         sx={{
           "& .MuiPaper-root": {
-            maxHeight: "60px", // Fixed/Max height
+            maxHeight: "60px",
             "& .MuiList-root": {
-              paddingTop: "2px", // Reduced top padding
-              paddingBottom: "2px", // Reduced bottom padding
+              paddingTop: "2px",
+              paddingBottom: "2px",
             },
           },
         }}
       >
-        {/* Range Description (e.g., "Last 30 Days") */}
         <MenuItem
           sx={{
             minHeight: "20px",
-            paddingY: "2px", // Reduced vertical padding
-            fontSize: "0.55rem", // Small font size
+            paddingY: "2px",
+            fontSize: "0.55rem",
             color: theme.palette.text.primary,
           }}
         >
-          {rangeDescriptionLabel}: {dateSpan.string}
+          {rangeDescriptionLabel}: {dateSpan?.string ?? ""}
         </MenuItem>
-        {/* Detailed Info (e.g., "From 2023-11-01 to 2023-11-30") */}
       </Menu>
     </ThemeProvider>
   );
