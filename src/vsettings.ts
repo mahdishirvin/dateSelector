@@ -41,21 +41,21 @@ class StyleSettings extends FormattingSettingsCompositeCard {
   themeFont = new formattingSettings.FontPicker({
     name: "themeFont",
     descriptionKey: "style_themeFont_description",
-    displayNameKey: "style_themeFont_displayName",
+    // displayNameKey: "style_themeFont_displayName",
     value: defaultSettings.style.themeFont,
   } as unknown as formattingSettings.FontPicker);
 
   fontFamily = new formattingSettings.FontPicker({
     name: "fontFamily",
     descriptionKey: "style_fontFamily_description",
-    displayNameKey: "style_fontFamily_displayName",
+    //  displayNameKey: "style_fontFamily_displayName",
     value: defaultSettings.style.fontFamily,
   } as unknown as formattingSettings.FontPicker);
 
   fontSize = new formattingSettings.NumUpDown({
     name: "fontSize",
     descriptionKey: "style_fontSize_description",
-    displayNameKey: "style_fontSize_displayName",
+    // displayNameKey: "style_fontSize_displayName",
     value: defaultSettings.style.fontSize,
   } as unknown as formattingSettings.NumUpDown);
 
@@ -118,7 +118,8 @@ class StyleSettings extends FormattingSettingsCompositeCard {
   // 2. Define your inline groups following the layout pattern
   public textGroup: FormattingSettingsGroup = new formattingSettings.Group({
     name: "textGroup",
-    displayName: "Text Properties",
+    displayNameKey: "style_font_displayName",
+    descriptionKey: "style_font_description",
     slices: [
       this.themeFont,
       // this.fontFamily,
@@ -131,7 +132,8 @@ class StyleSettings extends FormattingSettingsCompositeCard {
 
   public designGroup: FormattingSettingsGroup = new formattingSettings.Group({
     name: "designGroup",
-    displayName: "Theme & Design",
+    displayNameKey: "style_theme_displayName",
+    descriptionKey: "style_theme_description",
     slices: [
       this.themeColor,
       this.themeMode,

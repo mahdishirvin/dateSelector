@@ -14,6 +14,14 @@ import {
   sliderMarkText,
 } from "../dateutils";
 import { useDateFnsLocale } from "../localeutils";
+import {
+  endOfMonth,
+  endOfQuarter,
+  endOfYear,
+  subMonths,
+  subQuarters,
+  subYears,
+} from "date-fns";
 
 type Props = dateCardProps & {
   onPreview: (range: [Date, Date]) => void;
@@ -22,16 +30,7 @@ type Props = dateCardProps & {
 
 /**
  * A component that renders a dual-thumb slider for selecting a date range.
- * The component handles state for the slider values and translates them
- * to and from date objects based on the provided props.
- * Dual-thumb slider for selecting a date range.
- * - Drag → preview only (UI updates)
- * - Release / click → commit to host
- *
- * @param {dateCardProps} props - The props for the component, including dates, range scope, and various handlers.
- * @returns {React.FC} The RangeSlider component.
  */
-
 export default function RangeSlider(props: Props) {
   const {
     rangeScope,
@@ -67,15 +66,10 @@ export default function RangeSlider(props: Props) {
     new Date(rangeScope.start).getFullYear() > 1970
   );
 
-  const safeDates = React.useMemo(
-    () => (hasValidDates ? dates! : { start: fallbackDate, end: fallbackDate }),
-    [hasValidDates, dates, fallbackDate],
-  );
-
-  const safeRangeScope = React.useMemo(
-    () => (hasValidRange ? rangeScope! : safeDates),
-    [hasValidRange, rangeScope, safeDates],
-  );
+  const safeDates = hasValidDates
+    ? dates!
+    : { start: fallbackDate, end: fallbackDate };
+  const safeRangeScope = hasValidRange ? rangeScope! : safeDates;
 
   // Get locale at the component level
   const locale = useDateFnsLocale();
@@ -121,12 +115,13 @@ export default function RangeSlider(props: Props) {
     end: number;
     length: number;
   } | null>(null);
-  const isDraggingRef = React.useRef(false);
 
   // Effect to keep the slider values in sync with changes to the dates prop.
   React.useEffect(() => {
     // If we shouldn't process or if parameters are blank, clear to zero state safely
-    if (softBail || isDraggingRef.current) {
+    if (softBail) {
+      setSliderStart(0);
+      setSliderEnd(1);
       return;
     }
 
@@ -144,122 +139,125 @@ export default function RangeSlider(props: Props) {
   const closestMark = React.useCallback(
     (val: number[]) => {
       if (!marks || marks.length === 0) return val;
-
       return val.map((x) => {
-        let low = 0;
-        let high = marks.length - 1;
+        let closestValue = marks[0];
+        let minDiff = Math.abs(x - closestValue);
 
-        if (x <= marks[low]) return marks[low];
-        if (x >= marks[high]) return marks[high];
-
-        while (low <= high) {
-          const mid = Math.floor((low + high) / 2);
-          const midVal = marks[mid];
-
-          if (midVal === x) {
-            return x;
-          } else if (midVal < x) {
-            low = mid + 1;
-          } else {
-            high = mid - 1;
+        for (let i = 1; i < marks.length; i++) {
+          const currentDiff = Math.abs(x - marks[i]);
+          if (currentDiff < minDiff) {
+            minDiff = currentDiff;
+            closestValue = marks[i];
           }
         }
-
-        // After the loop, 'low' is the insertion point.
-        // The closest value is either marks[high] or marks[low].
-        const diffHigh = Math.abs(x - marks[high]);
-        const diffLow = Math.abs(x - marks[low]);
-
-        return diffLow < diffHigh ? marks[low] : marks[high];
+        return closestValue;
       });
     },
     [marks],
   );
 
+  const adjustEndValue = React.useCallback(
+    (value: number) => {
+      const shouldEndAtPeriodBoundary =
+        stepValue === "month" ||
+        stepValue === "quarter" ||
+        stepValue === "year";
+
+      if (!shouldEndAtPeriodBoundary) return value;
+      if (!marks || marks.length === 0) return value;
+      if (!marks.includes(value)) return value;
+
+      return Math.max(0, value - 1);
+    },
+    [marks, stepValue],
+  );
+
+  const toRangeDates = React.useCallback(
+    (values: [number, number]) => {
+      const [startValue, endValue] = [...values].sort((a, b) => a - b);
+      return [
+        sliderMarkDate(startValue, safeRangeScope.start),
+        sliderMarkDate(adjustEndValue(endValue), safeRangeScope.start),
+      ] as [Date, Date];
+    },
+    [adjustEndValue, safeRangeScope.start],
+  );
+
   /**
    * Handles the live drag/change event of the slider.
    */
-  const handleOnChange = React.useCallback(
-    (
-      event: Event | React.SyntheticEvent,
-      val: number | number[],
-      thumb = 0,
-    ) => {
-      if (softBail) return;
-      isDraggingRef.current = true;
-      const values = Array.isArray(val) ? val : [val, val];
-      let newValues = [...values];
-      const isStepped = stepValue === "day";
+  const handleOnChange = (
+    event: Event | React.SyntheticEvent,
+    val: number | number[],
+    thumb = 0,
+  ) => {
+    if (softBail) return;
+    const values = Array.isArray(val) ? val : [val, val];
+    let newValues = [...values];
+    const isStepped = stepValue === "day";
 
-      const isKeyboard = event.type === "keydown";
-      const isCtrlPressed =
-        (event as KeyboardEvent).ctrlKey ??
-        (event as { ctrlKey?: boolean }).ctrlKey;
+    const isKeyboard = event.type === "keydown";
+    const isCtrlPressed =
+      (event as KeyboardEvent).ctrlKey ??
+      (event as { ctrlKey?: boolean }).ctrlKey;
 
-      if (!isKeyboard && isCtrlPressed) {
-        if (!dragStartRef.current) {
-          dragStartRef.current = {
-            start: sliderStart,
-            end: sliderEnd,
-            length: sliderEnd - sliderStart,
-          };
-        }
+    if (!isKeyboard && isCtrlPressed) {
+      if (!dragStartRef.current) {
+        dragStartRef.current = {
+          start: sliderStart,
+          end: sliderEnd,
+          length: sliderEnd - sliderStart,
+        };
+      }
 
-        const delta = values[thumb] - dragStartRef.current.start;
-        newValues[0] = dragStartRef.current.start + delta;
-        newValues[1] = newValues[0] + dragStartRef.current.length;
+      const delta = values[thumb] - dragStartRef.current.start;
+      newValues[0] = dragStartRef.current.start + delta;
+      newValues[1] = newValues[0] + dragStartRef.current.length;
+    } else {
+      if (singleDay) {
+        newValues =
+          thumb === 1 ? [values[1], values[1]] : [values[0], values[0]];
       } else {
-        if (singleDay) {
-          newValues =
-            thumb === 1 ? [values[1], values[1]] : [values[0], values[0]];
-        }
+        newValues =
+          thumb === 0 ? [values[0], sliderEnd] : [sliderStart, values[1]];
       }
+    }
 
-      if (!isStepped) {
-        newValues = closestMark(newValues);
-        newValues[1] = newValues[1] - 1;
+    if (!isStepped) {
+      if (isCtrlPressed && !isKeyboard) {
+        newValues = [
+          closestMark([newValues[0]])[0],
+          closestMark([newValues[1]])[0],
+        ];
+      } else if (thumb === 0) {
+        newValues[0] = closestMark([newValues[0]])[0];
+      } else {
+        newValues[1] = closestMark([newValues[1]])[0];
       }
+    }
 
-      setSliderStart(newValues[0]);
-      setSliderEnd(newValues[1]);
+    setSliderStart(newValues[0]);
+    setSliderEnd(newValues[1]);
 
-      onPreview([
-        sliderMarkDate(newValues[0], safeRangeScope.start),
-        sliderMarkDate(newValues[1], safeRangeScope.start),
-      ]);
-    },
-    [
-      softBail,
-      stepValue,
-      singleDay,
-      closestMark,
-      onPreview,
-      safeRangeScope.start,
-      sliderStart,
-      sliderEnd,
-    ],
-  );
+    onPreview(toRangeDates([newValues[0], newValues[1]]));
+  };
 
   /**
    * Handles the commit event when the user releases a slider thumb or clicks the track.
    */
-  const handleOnCommit = React.useCallback(
-    (_: Event | React.SyntheticEvent, val: number | number[]) => {
-      if (softBail) return;
-      isDraggingRef.current = false;
-      const values = Array.isArray(val) ? val : [val, val];
-      const newStart = values[0] ?? sliderStart;
-      const newEnd = values[1] ?? sliderEnd;
+  const handleOnCommit = (
+    _: Event | React.SyntheticEvent,
+    val: number | number[],
+  ) => {
+    if (softBail) return;
+    const values = Array.isArray(val) ? val : [val, val];
+    const newStart = values[0] ?? sliderStart;
+    const newEnd = values[1] ?? sliderEnd;
 
-      dragStartRef.current = null;
+    dragStartRef.current = null;
 
-      onCommit([
-        sliderMarkDate(newStart, safeRangeScope.start),
-        sliderMarkDate(newEnd, safeRangeScope.start),
-      ]);
-    },
-    [softBail, onCommit, safeRangeScope.start, sliderStart, sliderEnd],
-  );
+    onCommit(toRangeDates([newStart, newEnd]));
+  };
 
   // Safely resolve the mark definitions for the child layout
   const derivedMainMarks = React.useMemo(() => {

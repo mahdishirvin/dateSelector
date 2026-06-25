@@ -4,6 +4,8 @@
   "style_displayName": "Stijl",
   "style_themeFont_description": "Lettertype voor tekst in deze slicer",
   "style_themeFont_displayName": "Lettertype",
+  "style_theme_displayName": "Thema",
+  "style_theme_description": "Kleur en donkere modus",
   "style_fontSize_description": "Lettergrootte voor datums in deze slicer",
   "style_fontSize_displayName": "Lettergrootte",
   "style_fontBold_description": "Vet lettertype voor deze slicer",

@@ -84,8 +84,9 @@ export const getBottomSliderStyles = (theme: Theme) => {
     marginTop: -20,
     "& .MuiSlider-thumb": {
       // marginTop: 0.8,
+      top: "1rem",
       width: 2,
-      height: 16,
+      height: 12,
       borderRadius: "0%",
       "&:hover": {
         boxShadow: theme.shadows[6],
@@ -117,8 +118,8 @@ export const getBottomSliderStyles = (theme: Theme) => {
       opacity: 0.2,
     },
     "& .MuiSlider-track": {
-      top: 27,
-      height: 13,
+      top: 20,
+      height: 5,
       opacity: 0.05,
       borderRadius: "0%",
       "&:hover": {

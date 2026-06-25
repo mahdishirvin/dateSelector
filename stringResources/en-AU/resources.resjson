@@ -4,6 +4,8 @@
   "style_displayName": "Style",
   "style_themeFont_description": "Font for text on this slicer",
   "style_themeFont_displayName": "Font",
+  "style_theme_displayName": "Theme",
+  "style_theme_description": "Visual colour and dark mode",
   "style_fontSize_description": "Font size for dates on this slicer",
   "style_fontSize_displayName": "Font Size",
   "style_fontBold_description": "Bold font on this slicer",

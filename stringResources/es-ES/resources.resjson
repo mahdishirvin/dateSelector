@@ -4,6 +4,8 @@
   "style_displayName": "Estilo",
   "style_themeFont_description": "Fuente para el texto de este segmentador",
   "style_themeFont_displayName": "Fuente",
+  "style_theme_displayName": "Tema",
+  "style_theme_description": "Color y modo oscuro",
   "style_fontSize_description": "Tamaño de fuente para las fechas en este segmentador",
   "style_fontSize_displayName": "Tamaño de fuente",
   "style_fontBold_description": "Fuente en negrita para este segmentador",
