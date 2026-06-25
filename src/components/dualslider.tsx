@@ -2,6 +2,8 @@ import * as React from "react";
 import Slider, { SliderValueLabelProps } from "@mui/material/Slider";
 import Zoom from "@mui/material/Zoom";
 import Grid from "@mui/material/Grid";
+// import { LocalizationContext } from "../localeutils";
+// import { dateCardProps } from "../interface";
 
 // The style objects are assumed to be imported from a separate file.
 import { getBottomSliderStyles, getTopSliderStyles } from "./sliderstyles";
@@ -17,13 +19,13 @@ import RngeTooltip from "./rngetooltip";
 const ValueLabelComponent = React.memo(
   ({ children, value, index }: SliderValueLabelProps) => {
     // Determine the placement of the tooltip based on the thumb index.
-    const loc = index === 0 ? "top-end" : "top-start";
+    const loc = index === 0 ? "left-end" : "right-start";
     return (
       <RngeTooltip
         enterTouchDelay={10}
         placement={loc}
         topRow={String(value)}
-        detailRow={index === 0 ? "▶▶▶▶▶" : "◀◀◀◀◀"}
+        detailRow={index === 0 ? "●▶———" : "———◀●"}
         enterDelay={1000}
         arrow
       >
@@ -69,7 +71,7 @@ function DualSlider(props: DualSliderProps): React.ReactElement {
     mainMarks,
     superMarks,
     valueLabelFormat,
-    localization, // Extract localization to prevent it from spreading to DOM
+    // localization, // Extract localization to prevent it from spreading to DOM
     // Extracting props meant for the top slider.
     value,
     step,
@@ -128,4 +130,4 @@ function DualSlider(props: DualSliderProps): React.ReactElement {
   );
 }
 
-export default DualSlider;
+export default React.memo(DualSlider);

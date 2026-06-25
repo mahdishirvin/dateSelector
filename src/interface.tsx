@@ -32,7 +32,7 @@ export interface Settings {
     filter?: dateRange; // date range object representing the initial filter state
     startupFilter?: dateRange; // date range object representing the initial filter state
   };
-  styleSettings?: {
+  style?: {
     fmtDate?: string;
     themeColor?: string;
     themeMode?: any;
@@ -44,7 +44,7 @@ export interface Settings {
     fontItalic?: boolean;
     fontColor?: string;
   };
-  calendarSettings?: {
+  calendar?: {
     singleDay?: boolean;
     limitToScope?: boolean;
     startRange?: string;
@@ -53,7 +53,7 @@ export interface Settings {
     fmtDate?: string;
     forceStartRange?: boolean;
   };
-  layoutSettings?: {
+  layout?: {
     timelineSettings: {
       enableSlider?: boolean;
       showSlider?: boolean;

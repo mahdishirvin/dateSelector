@@ -3,7 +3,8 @@
  * This file contains two functions that return the style objects for the DualSlider component.
  * This refactoring makes the styles more modular and reusable.
  */
-import type { Theme } from "@mui/material/styles";
+import theme, { Theme } from "@mui/material/styles";
+import { TextAlignment } from "powerbi-models";
 /**
  * Returns the style object for the top slider.
  * This function encapsulates the styles that position the marks and labels
@@ -14,15 +15,15 @@ export const getTopSliderStyles = (theme: Theme) => {
   return {
     width: "98%",
     zIndex: 999,
-    marginTop: "0px",
+    marginTop: "-3px",
     "& .MuiSlider-thumb": {
-      top: "0.9rem",
-      width: 11,
-      height: 11,
-      backgroundColor: theme.palette.background.paper,
+      top: "1.15rem",
+      width: 8,
+      height: 8,
+      backgroundColor: theme.palette.primary.main,
       transition: "0.3s cubic-bezier(.47,1.64,.41,.8)",
       "&:focus, &:hover, &.Mui-active": {
-        boxShadow: theme.shadows[5],
+        boxShadow: theme.shadows[2],
         "@media (hover: none)": {
           boxShadow: theme.shadows[0],
         },
@@ -35,15 +36,15 @@ export const getTopSliderStyles = (theme: Theme) => {
       paddingTop: 0.5,
       fontSize: "0.5rem",
       fontWeight: 400,
-      top: "-0.15rem",
+      top: "0.05rem",
       transform: "translateX(0%)",
       left: "calc(-50% + 5px)",
-      TextAlignment: "left",
+      textAlign: "left",
     },
     "& .MuiSlider-mark": {
-      top: "0.75rem",
+      top: "1.15rem",
       height: 5,
-      width: "1px",
+      width: "0.1rem",
       borderRadius: "0%",
       opacity: 0.3,
     },
@@ -80,12 +81,12 @@ export const getTopSliderStyles = (theme: Theme) => {
 export const getBottomSliderStyles = (theme: Theme) => {
   return {
     width: "98%",
-    marginTop: -16,
+    marginTop: -20,
     "& .MuiSlider-thumb": {
       // marginTop: 0.8,
-      top: "0",
+      top: "1rem",
       width: 2,
-      height: 16,
+      height: 12,
       borderRadius: "0%",
       "&:hover": {
         boxShadow: theme.shadows[6],
@@ -93,7 +94,7 @@ export const getBottomSliderStyles = (theme: Theme) => {
     },
     "& .MuiSlider-markLabel": {
       fontSize: "0.5rem",
-      top: 2,
+      top: 12,
       transform: "translateX(0%)",
       left: "calc(-50% + 5px)",
       TextAlignment: "left",
@@ -103,22 +104,22 @@ export const getBottomSliderStyles = (theme: Theme) => {
       height: 1.1,
     },
     "& .MuiSlider-mark": {
-      top: -1,
+      top: 18,
       height: 10,
       width: 1.1,
       borderRadius: "0%",
       opacity: 0.3,
     },
     "& .MuiSlider-markActive": {
-      top: 7,
+      top: 27,
       height: 10,
       width: 1.1,
       borderRadius: "0%",
       opacity: 0.2,
     },
     "& .MuiSlider-track": {
-      top: 7,
-      height: 13,
+      top: 20,
+      height: 5,
       opacity: 0.05,
       borderRadius: "0%",
       "&:hover": {

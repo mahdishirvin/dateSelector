@@ -22,7 +22,7 @@ import { styled } from "@mui/material/styles";
 // Uses the sync value if available; otherwise falls back to preset startup filter or scope.
 // The reset button appears on the separator only when a startup value exists.
 
-export default function DateRange(props: dateCardProps) {
+const DateRange = (props: dateCardProps) => {
   const {
     dates,
     rangeScope,
@@ -268,4 +268,6 @@ export default function DateRange(props: dateCardProps) {
       )}
     </Grid>
   );
-}
+};
+
+export default React.memo(DateRange);

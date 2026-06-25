@@ -148,10 +148,10 @@ export default function UseCurrent(props: dateCardProps) {
                                 minWidth: item.thisPeriod.length * 0.21 + "rem",
                                 padding: "2px",
                                 right: "-2px",
-                                top: "-3px",
+                                top: "-2px",
                                 textTransform: "none",
                               }
-                            : { minWidth: "24px", padding: "2px", top: "-3px" },
+                            : { minWidth: "24px", padding: "2px", top: "-2px" },
                         }}
                         badgeContent={
                           showIconText && (
