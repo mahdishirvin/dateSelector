@@ -70,13 +70,10 @@ export abstract class ReactVisual {
   // in your visual class
   protected updateReactContainers = (data: any): void => {
     if (this.root && this.mainComponent) {
-      // 👇 ensure "data" is stable unless something truly changed
-      const stableData = JSON.parse(JSON.stringify(data));
-
       this.root.render(
         React.createElement(ReactContainer, {
           component: this.mainComponent,
-          data: stableData,
+          data: data,
           onFilterChanged: this.filterCallback,
         }),
       );
