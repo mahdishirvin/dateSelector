@@ -389,6 +389,8 @@ export class DateSelector extends ReactVisual implements IVisual {
       end: new Date(dtes.end),
     };
 
+    // Prevent the filter-triggered update() call from overwriting the user's selection.
+    this.isUpdatingFromVisual = true;
     this.visualHost.applyJsonFilter(
       this.createFilter(dtes.start, dtes.end, this.state.category.filterTarget),
       DateSelector.filterObjectProperty.objectName,

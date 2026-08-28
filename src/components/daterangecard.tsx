@@ -301,10 +301,11 @@ export default function DateRangeCard(props: dateCardProps) {
       if (propSyncTimeoutRef.current !== null) {
         window.clearTimeout(propSyncTimeoutRef.current);
       }
+      // 500ms covers PBI's async update() cycle; 0ms cleared before it ran.
       propSyncTimeoutRef.current = window.setTimeout(() => {
         suppressPropSyncRef.current = false;
         propSyncTimeoutRef.current = null;
-      }, 0);
+      }, 500);
 
       setCurrentDates(resolvedRange);
       setPreviewDates(null);
