@@ -142,36 +142,35 @@ export class DateSelector extends ReactVisual implements IVisual {
 
       // 1. HARD GATE FOR INVALID/UNMAPPED DATA VIEWS
       if (!this.isValidDataView(options)) {
-        this.initialiseVisualState();
+        if (this.initialLoadComplete) {
+          // A cross-filter or temporary empty update — keep showing the visual
+          // with the last valid state rather than blanking it.
+          this.updateReactContainers({
+            ...this.state.settings,
+            dates: this.currentFilter,
+            landingOff: true,
+          });
+          this.events.renderingFinished(options);
+          return;
+        }
 
-        // 1. Instantiate the real model matching your class structure
+        // No valid data has ever been loaded — show the landing page.
+        this.initialiseVisualState();
         const freshSettings = new VisualSettingsModel();
         this.formattingSettings = freshSettings;
-
-        // 2. Destructure and format properties from your actual cards
-        // to maintain the exact layout contract your components expect.
         const defaultCardProps = {
-          // Flatten property cards if your mapOptionsToState flattens them,
-          // or pass them down cleanly as sub-objects matching your component design:
           style: freshSettings.style,
           calendar: freshSettings.calendar,
           layout: freshSettings.layout,
           period: freshSettings.period,
-
-          // Fallback global configurations
           themeMode: "light",
         };
-
-        // Assign the clean structured properties to your visual state wrapper
         this.state.settings = defaultCardProps as any;
-
-        // 3. Update React Containers with the exact structure it demands
         this.updateReactContainers({
           ...defaultCardProps,
           landingOff: false,
           dates: { start: null, end: null },
         });
-
         this.events.renderingFinished(options);
         return;
       }
