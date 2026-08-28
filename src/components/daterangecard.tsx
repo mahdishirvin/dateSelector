@@ -88,6 +88,7 @@ export default function DateRangeCard(props: dateCardProps) {
   const pendingPreviewRef = useRef<dateRange | null>(null);
   const suppressPropSyncRef = useRef(false);
   const propSyncTimeoutRef = useRef<number | null>(null);
+  const prevScopeRef = useRef<dateRange | null>(null);
 
   // State for the context menu: tracks the mouse coordinates when open
   const [contextMenu, setContextMenu] = useState<{
@@ -118,6 +119,38 @@ export default function DateRangeCard(props: dateCardProps) {
       }
     }
   }, [props.dates, currentDates, hasValidDates]);
+
+  // When an external filter changes the data scope, adjust selection to stay within it.
+  // If the current selection is completely outside the new scope, reset to the full scope.
+  // If it partially overlaps, clamp the edges.
+  useEffect(() => {
+    if (!hasValidScope) return;
+    const prevScope = prevScopeRef.current;
+    prevScopeRef.current = safeRangeScope;
+    if (!prevScope || equalRanges(prevScope, safeRangeScope)) return;
+
+    const isCompletelyOutside =
+      currentDates.end.getTime() < safeRangeScope.start.getTime() ||
+      currentDates.start.getTime() > safeRangeScope.end.getTime();
+
+    const adjusted = isCompletelyOutside
+      ? safeRangeScope
+      : clampRangeToScope(currentDates, safeRangeScope);
+
+    if (!equalRanges(adjusted, currentDates)) {
+      suppressPropSyncRef.current = true;
+      if (propSyncTimeoutRef.current !== null) window.clearTimeout(propSyncTimeoutRef.current);
+      propSyncTimeoutRef.current = window.setTimeout(() => {
+        suppressPropSyncRef.current = false;
+        propSyncTimeoutRef.current = null;
+      }, 500);
+      setCurrentDates(adjusted);
+      setPreviewDates(null);
+      props.onFilterChanged?.(adjusted);
+    }
+    // currentDates intentionally excluded — we only want to run when scope changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [safeRangeScope, hasValidScope]);
 
   useEffect(() => {
     return () => {
