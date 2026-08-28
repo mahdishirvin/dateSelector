@@ -403,6 +403,66 @@
                     "type": {
                         "bool": true
                     }
+                },
+                "showPresetPanel": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "showYesterday": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "showToday": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "showMinDate": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "showThisWeek": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "showLastWeek": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "showThisMonth": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "showLastMonth": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "showLast3Months": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "showLast6Months": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "daysUpToToday": {
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "daysStartingToday": {
+                    "type": {
+                        "numeric": true
+                    }
                 }
             }
         },

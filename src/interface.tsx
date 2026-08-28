@@ -73,6 +73,20 @@ export interface Settings {
       showHelpIcon?: boolean;
       showExtendedTooltip?: boolean;
     };
+    presetSettings: {
+      showPresetPanel?: boolean;
+      showYesterday?: boolean;
+      showToday?: boolean;
+      showMinDate?: boolean;
+      showThisWeek?: boolean;
+      showLastWeek?: boolean;
+      showThisMonth?: boolean;
+      showLastMonth?: boolean;
+      showLast3Months?: boolean;
+      showLast6Months?: boolean;
+      daysUpToToday?: number;
+      daysStartingToday?: number;
+    };
   };
   period?: {
     daySettings?: {
@@ -227,6 +241,20 @@ export interface dateCardProps {
 
   // boolean value indicating whether to show timeline toggle button
   enableSlider?: boolean;
+
+  // Preset panel settings
+  showPresetPanel?: boolean;
+  showYesterday?: boolean;
+  showToday?: boolean;
+  showMinDate?: boolean;
+  showThisWeek?: boolean;
+  showLastWeek?: boolean;
+  showThisMonth?: boolean;
+  showLastMonth?: boolean;
+  showLast3Months?: boolean;
+  showLast6Months?: boolean;
+  daysUpToToday?: number;
+  daysStartingToday?: number;
 
   stepOpen?: boolean;
   stepValue?: string;

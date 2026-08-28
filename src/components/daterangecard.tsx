@@ -25,8 +25,10 @@ import { HelpProvider } from "./helpprovider";
 import LandingPage from "./landingpage";
 import { compareAsc, format } from "date-fns";
 import { useLocalization } from "../localeutils";
+import Box from "@mui/material/Box";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import PresetPanel from "./presetpanel";
 
 export default function DateRangeCard(props: dateCardProps) {
   const fallbackRange: dateRange = React.useMemo(
@@ -372,47 +374,70 @@ export default function DateRangeCard(props: dateCardProps) {
               }}
             />
 
-            <Grid
-              container
-              sx={{ display: "flex", flexDirection: "column" }}
+            <Box
               onContextMenu={handleContextMenu}
-              style={{ position: "relative", zIndex: 1 }}
+              style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "row", alignItems: "flex-start" }}
             >
-              <TopRow
-                {...props}
-                dates={visibleDates}
-                showMore={props.showMore}
-                showMove={props.showMove}
-                localization={localization}
-                showExpand={props.showExpand}
-                showSlider={props.showSlider ?? false}
-                openSlider={openSlider}
-                toggleSlider={toggleSlider}
-                stepOpen={stepOpen}
-                stepValue={stepValue}
-                handleVal={onChangeVal}
-                handleClick={toggleStepOpen}
-                setStepValue={setStepValue}
-                setStepOpen={setStepOpen}
-                current={current}
-              />
-              <Zoom in={openSlider}>
-                <Grid container spacing={0} size={12}>
-                  <Grid size="grow" sx={{ marginLeft: 1, paddingTop: 0.1 }}>
-                    <RangeSlider
-                      {...props}
-                      dates={visibleDates}
-                      stepValue={stepValue}
-                      stepFmt={props.stepFmt}
-                      rangeScope={safeRangeScope}
-                      localization={localization}
-                      onPreview={handlePreviewChange}
-                      onCommit={onChangeVal}
-                    />
+              {props.showPresetPanel && (
+                <PresetPanel
+                  rangeScope={safeRangeScope}
+                  weekStartDay={props.weekStartDay}
+                  activeDates={currentDates}
+                  onPresetSelect={(range) => handleDateChange([range.start as Date, range.end as Date])}
+                  showYesterday={props.showYesterday}
+                  showToday={props.showToday}
+                  showMinDate={props.showMinDate}
+                  showThisWeek={props.showThisWeek}
+                  showLastWeek={props.showLastWeek}
+                  showThisMonth={props.showThisMonth}
+                  showLastMonth={props.showLastMonth}
+                  showLast3Months={props.showLast3Months}
+                  showLast6Months={props.showLast6Months}
+                  daysUpToToday={props.daysUpToToday}
+                  daysStartingToday={props.daysStartingToday}
+                />
+              )}
+              <Grid
+                container
+                sx={{ display: "flex", flexDirection: "column", flex: 1 }}
+                onContextMenu={handleContextMenu}
+              >
+                <TopRow
+                  {...props}
+                  dates={visibleDates}
+                  showMore={props.showMore}
+                  showMove={props.showMove}
+                  localization={localization}
+                  showExpand={props.showExpand}
+                  showSlider={props.showSlider ?? false}
+                  openSlider={openSlider}
+                  toggleSlider={toggleSlider}
+                  stepOpen={stepOpen}
+                  stepValue={stepValue}
+                  handleVal={onChangeVal}
+                  handleClick={toggleStepOpen}
+                  setStepValue={setStepValue}
+                  setStepOpen={setStepOpen}
+                  current={current}
+                />
+                <Zoom in={openSlider}>
+                  <Grid container spacing={0} size={12}>
+                    <Grid size="grow" sx={{ marginLeft: 1, paddingTop: 0.1 }}>
+                      <RangeSlider
+                        {...props}
+                        dates={visibleDates}
+                        stepValue={stepValue}
+                        stepFmt={props.stepFmt}
+                        rangeScope={safeRangeScope}
+                        localization={localization}
+                        onPreview={handlePreviewChange}
+                        onCommit={onChangeVal}
+                      />
+                    </Grid>
                   </Grid>
-                </Grid>
-              </Zoom>
-            </Grid>
+                </Zoom>
+              </Grid>
+            </Box>
           </>
         )}
       </HelpProvider>

@@ -324,6 +324,109 @@ class HelpSettings extends FormattingSettingsGroup {
   ];
 }
 
+class PresetGroup extends FormattingSettingsGroup {
+  name: string = "presets";
+  displayName: string = "Preset Panel";
+  description: string = "Quick-select date range presets";
+  analyticsPane: boolean = false;
+  uid: string = "presetsUid";
+
+  showPresetPanel = new formattingSettings.ToggleSwitch({
+    name: "showPresetPanel",
+    displayName: "Show preset panel",
+    value: defaultSettings.layout.presetSettings.showPresetPanel,
+  } as unknown as formattingSettings.ToggleSwitch);
+
+  showYesterday = new formattingSettings.ToggleSwitch({
+    name: "showYesterday",
+    displayName: "Yesterday",
+    value: defaultSettings.layout.presetSettings.showYesterday,
+  } as unknown as formattingSettings.ToggleSwitch);
+
+  showToday = new formattingSettings.ToggleSwitch({
+    name: "showToday",
+    displayName: "Today",
+    value: defaultSettings.layout.presetSettings.showToday,
+  } as unknown as formattingSettings.ToggleSwitch);
+
+  showMinDate = new formattingSettings.ToggleSwitch({
+    name: "showMinDate",
+    displayName: "Min Date (full scope)",
+    value: defaultSettings.layout.presetSettings.showMinDate,
+  } as unknown as formattingSettings.ToggleSwitch);
+
+  showThisWeek = new formattingSettings.ToggleSwitch({
+    name: "showThisWeek",
+    displayName: "This Week",
+    value: defaultSettings.layout.presetSettings.showThisWeek,
+  } as unknown as formattingSettings.ToggleSwitch);
+
+  showLastWeek = new formattingSettings.ToggleSwitch({
+    name: "showLastWeek",
+    displayName: "Last Week",
+    value: defaultSettings.layout.presetSettings.showLastWeek,
+  } as unknown as formattingSettings.ToggleSwitch);
+
+  showThisMonth = new formattingSettings.ToggleSwitch({
+    name: "showThisMonth",
+    displayName: "This Month",
+    value: defaultSettings.layout.presetSettings.showThisMonth,
+  } as unknown as formattingSettings.ToggleSwitch);
+
+  showLastMonth = new formattingSettings.ToggleSwitch({
+    name: "showLastMonth",
+    displayName: "Last Month",
+    value: defaultSettings.layout.presetSettings.showLastMonth,
+  } as unknown as formattingSettings.ToggleSwitch);
+
+  showLast3Months = new formattingSettings.ToggleSwitch({
+    name: "showLast3Months",
+    displayName: "Last 3 Months",
+    value: defaultSettings.layout.presetSettings.showLast3Months,
+  } as unknown as formattingSettings.ToggleSwitch);
+
+  showLast6Months = new formattingSettings.ToggleSwitch({
+    name: "showLast6Months",
+    displayName: "Last 6 Months",
+    value: defaultSettings.layout.presetSettings.showLast6Months,
+  } as unknown as formattingSettings.ToggleSwitch);
+
+  daysUpToToday = new formattingSettings.NumUpDown({
+    name: "daysUpToToday",
+    displayName: "Days up to today (0 = hide)",
+    value: defaultSettings.layout.presetSettings.daysUpToToday,
+    options: {
+      minValue: { type: powerbi.visuals.ValidatorType.Min, value: 0 },
+      maxValue: { type: powerbi.visuals.ValidatorType.Max, value: 3650 },
+    },
+  } as unknown as formattingSettings.NumUpDown);
+
+  daysStartingToday = new formattingSettings.NumUpDown({
+    name: "daysStartingToday",
+    displayName: "Days starting today (0 = hide)",
+    value: defaultSettings.layout.presetSettings.daysStartingToday,
+    options: {
+      minValue: { type: powerbi.visuals.ValidatorType.Min, value: 0 },
+      maxValue: { type: powerbi.visuals.ValidatorType.Max, value: 3650 },
+    },
+  } as unknown as formattingSettings.NumUpDown);
+
+  topLevelSlice: formattingSettings.SimpleSlice = this.showPresetPanel;
+  slices: Array<FormattingSettingsSlice> = [
+    this.showYesterday,
+    this.showToday,
+    this.showMinDate,
+    this.showThisWeek,
+    this.showLastWeek,
+    this.showThisMonth,
+    this.showLastMonth,
+    this.showLast3Months,
+    this.showLast6Months,
+    this.daysUpToToday,
+    this.daysStartingToday,
+  ];
+}
+
 class LayoutSettings extends FormattingSettingsCompositeCard {
   name: string = "layout";
   displayNameKey = "layout_displayName";
@@ -336,12 +439,14 @@ class LayoutSettings extends FormattingSettingsCompositeCard {
   layoutMove = new MoveSettings({ name: "move" });
   layoutCurrent = new CurrentSettings({ name: "current" });
   layoutHelp = new HelpSettings({ name: "tooltip" });
+  layoutPresets = new PresetGroup({ name: "presets" });
 
   groups: Array<FormattingSettingsGroup> = [
     this.layoutCurrent,
     this.layoutMove,
     this.layoutTimeline,
     this.layoutHelp,
+    this.layoutPresets,
   ];
 }
 

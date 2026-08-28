@@ -65,6 +65,7 @@ export const settingProps = (
     layoutMove: move,
     layoutTimeline: timeline,
     layoutHelp: help,
+    layoutPresets: presets,
   } = layout;
 
   const stepInit = String(calendar.stepInit.value);
@@ -150,6 +151,20 @@ export const settingProps = (
     fontSize: nonNeg(style.fontSize.value),
     fontBold: style.bold.value,
     fontItalic: style.italic.value,
+
+    // Preset panel settings
+    showPresetPanel: presets.showPresetPanel.value,
+    showYesterday: presets.showYesterday.value,
+    showToday: presets.showToday.value,
+    showMinDate: presets.showMinDate.value,
+    showThisWeek: presets.showThisWeek.value,
+    showLastWeek: presets.showLastWeek.value,
+    showThisMonth: presets.showThisMonth.value,
+    showLastMonth: presets.showLastMonth.value,
+    showLast3Months: presets.showLast3Months.value,
+    showLast6Months: presets.showLast6Months.value,
+    daysUpToToday: presets.daysUpToToday.value,
+    daysStartingToday: presets.daysStartingToday.value,
   };
 };
 

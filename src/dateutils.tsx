@@ -351,6 +351,8 @@ export const getInitRange = (
     lastMonthOfScope: month(0, rangeScope.end, endOfDay(rangeScope.end)),
     monthFromScopeEnd: day(0, subMonths(rangeScope.end, 12), rangeScope.end),
     days30FromScopeEnd: day(0, subDays(rangeScope.end, 29), rangeScope.end),
+    last3Months: { start: startOfMonth(subMonths(startOfToday(), 3)), end: endOfMonth(subMonths(startOfToday(), 1)) },
+    last6Months: { start: startOfMonth(subMonths(startOfToday(), 6)), end: endOfMonth(subMonths(startOfToday(), 1)) },
   };
   return rtn !== ""
     ? _rnge

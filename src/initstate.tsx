@@ -49,6 +49,20 @@ export const defaultSettings = {
       showTooltip: true,
       showExtendedTooltip: false,
     },
+    presetSettings: {
+      showPresetPanel: false,
+      showYesterday: true,
+      showToday: true,
+      showMinDate: true,
+      showThisWeek: true,
+      showLastWeek: true,
+      showThisMonth: true,
+      showLastMonth: true,
+      showLast3Months: true,
+      showLast6Months: true,
+      daysUpToToday: 0,
+      daysStartingToday: 0,
+    },
   },
   period: {
     daySettings: {
