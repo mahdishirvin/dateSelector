@@ -403,6 +403,26 @@
                     "type": {
                         "bool": true
                     }
+                },
+                "showAsPopup": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "showGoToToday": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "allowSessionDismiss": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "calendarMonths": {
+                    "type": {
+                        "numeric": true
+                    }
                 }
             }
         },

@@ -23,6 +23,7 @@ import {
 } from "../dateutils";
 import { HelpProvider } from "./helpprovider";
 import LandingPage from "./landingpage";
+import DatePickerDialog from "./datepickerdialog";
 import { compareAsc, format } from "date-fns";
 import { useLocalization } from "../localeutils";
 import Menu from "@mui/material/Menu";
@@ -88,6 +89,9 @@ export default function DateRangeCard(props: dateCardProps) {
   const pendingPreviewRef = useRef<dateRange | null>(null);
   const suppressPropSyncRef = useRef(false);
   const propSyncTimeoutRef = useRef<number | null>(null);
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [sessionDismissed, setSessionDismissed] = useState(false);
 
   // State for the context menu: tracks the mouse coordinates when open
   const [contextMenu, setContextMenu] = useState<{
@@ -219,6 +223,20 @@ export default function DateRangeCard(props: dateCardProps) {
   // Use useCallback to memoize the toggle functions
   const toggleSlider = useCallback(() => setOpenSlider((prev) => !prev), []);
   const toggleStepOpen = useCallback(() => setStepOpen((prev) => !prev), []);
+
+  const openDialog = useCallback(() => setIsDialogOpen(true), []);
+  const closeDialog = useCallback(() => setIsDialogOpen(false), []);
+  const handleDialogConfirm = useCallback(
+    (range: dateRange) => {
+      handleDateChange([range.start, range.end]);
+      setIsDialogOpen(false);
+    },
+    [handleDateChange],
+  );
+  const handleSessionDismiss = useCallback(() => setSessionDismissed(true), []);
+
+  const popupClickHandler =
+    props.showAsPopup && !sessionDismissed ? openDialog : undefined;
 
   // Handler for opening the context menu
   const handleContextMenu = (event: React.MouseEvent) => {
@@ -395,6 +413,7 @@ export default function DateRangeCard(props: dateCardProps) {
                 setStepValue={setStepValue}
                 setStepOpen={setStepOpen}
                 current={current}
+                onClickInput={popupClickHandler}
               />
               <Zoom in={openSlider}>
                 <Grid container spacing={0} size={12}>
@@ -416,6 +435,21 @@ export default function DateRangeCard(props: dateCardProps) {
           </>
         )}
       </HelpProvider>
+
+      {props.showAsPopup && (
+        <DatePickerDialog
+          open={isDialogOpen}
+          dates={currentDates}
+          rangeScope={safeRangeScope}
+          themeColor={props.themeColor}
+          calendarMonths={props.calendarMonths}
+          showGoToToday={props.showGoToToday}
+          allowSessionDismiss={props.allowSessionDismiss}
+          onConfirm={handleDialogConfirm}
+          onDismiss={closeDialog}
+          onSessionDismiss={handleSessionDismiss}
+        />
+      )}
 
       <Menu
         open={contextMenu !== null}

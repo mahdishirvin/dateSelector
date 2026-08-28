@@ -31,6 +31,7 @@
     "powerbi-visuals-utils-interactivityutils": "^6.0.4",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
+    "react-date-range": "^1.4.0",
     "react-hotkeys-hook": "^5.3.2",
     "tinycolor2": "^1.6.0"
   },

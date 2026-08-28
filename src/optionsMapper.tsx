@@ -65,6 +65,7 @@ export const settingProps = (
     layoutMove: move,
     layoutTimeline: timeline,
     layoutHelp: help,
+    layoutPopup: popup,
   } = layout;
 
   const stepInit = String(calendar.stepInit.value);
@@ -150,6 +151,11 @@ export const settingProps = (
     fontSize: nonNeg(style.fontSize.value),
     fontBold: style.bold.value,
     fontItalic: style.italic.value,
+
+    showAsPopup: popup.showAsPopup.value,
+    showGoToToday: popup.showGoToToday.value,
+    allowSessionDismiss: popup.allowSessionDismiss.value,
+    calendarMonths: nonNeg(popup.calendarMonths.value) || 2,
   };
 };
 

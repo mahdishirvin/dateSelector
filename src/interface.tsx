@@ -228,6 +228,12 @@ export interface dateCardProps {
   // boolean value indicating whether to show timeline toggle button
   enableSlider?: boolean;
 
+  showAsPopup?: boolean;
+  showGoToToday?: boolean;
+  allowSessionDismiss?: boolean;
+  calendarMonths?: number;
+  onClickInput?: () => void;
+
   stepOpen?: boolean;
   stepValue?: string;
   current?: any;

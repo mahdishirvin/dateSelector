@@ -324,6 +324,59 @@ class HelpSettings extends FormattingSettingsGroup {
   ];
 }
 
+class PopupGroup extends FormattingSettingsGroup {
+  name: string = "popup";
+  displayNameKey = "popup_displayName";
+  descriptionKey = "popup_description";
+  analyticsPane: boolean = false;
+  uid: string = "popupUid";
+
+  showAsPopup = new formattingSettings.ToggleSwitch({
+    name: "showAsPopup",
+    displayNameKey: "popup_showAsPopup_displayName",
+    descriptionKey: "popup_showAsPopup_description",
+    value: false,
+  } as unknown as formattingSettings.ToggleSwitch);
+
+  showGoToToday = new formattingSettings.ToggleSwitch({
+    name: "showGoToToday",
+    displayNameKey: "popup_showGoToToday_displayName",
+    descriptionKey: "popup_showGoToToday_description",
+    value: true,
+  } as unknown as formattingSettings.ToggleSwitch);
+
+  allowSessionDismiss = new formattingSettings.ToggleSwitch({
+    name: "allowSessionDismiss",
+    displayNameKey: "popup_allowSessionDismiss_displayName",
+    descriptionKey: "popup_allowSessionDismiss_description",
+    value: false,
+  } as unknown as formattingSettings.ToggleSwitch);
+
+  calendarMonths = new formattingSettings.NumUpDown({
+    name: "calendarMonths",
+    displayNameKey: "popup_calendarMonths_displayName",
+    descriptionKey: "popup_calendarMonths_description",
+    value: 2,
+    options: {
+      minValue: {
+        type: powerbi.visuals.ValidatorType.Min,
+        value: 1,
+      },
+      maxValue: {
+        type: powerbi.visuals.ValidatorType.Max,
+        value: 2,
+      },
+    },
+  } as unknown as formattingSettings.NumUpDown);
+
+  topLevelSlice: formattingSettings.SimpleSlice = this.showAsPopup;
+  slices: Array<FormattingSettingsSlice> = [
+    this.showGoToToday,
+    this.allowSessionDismiss,
+    this.calendarMonths,
+  ];
+}
+
 class LayoutSettings extends FormattingSettingsCompositeCard {
   name: string = "layout";
   displayNameKey = "layout_displayName";
@@ -336,12 +389,14 @@ class LayoutSettings extends FormattingSettingsCompositeCard {
   layoutMove = new MoveSettings({ name: "move" });
   layoutCurrent = new CurrentSettings({ name: "current" });
   layoutHelp = new HelpSettings({ name: "tooltip" });
+  layoutPopup = new PopupGroup({ name: "popup" });
 
   groups: Array<FormattingSettingsGroup> = [
     this.layoutCurrent,
     this.layoutMove,
     this.layoutTimeline,
     this.layoutHelp,
+    this.layoutPopup,
   ];
 }
 

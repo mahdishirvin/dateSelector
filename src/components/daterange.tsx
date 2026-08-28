@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
+import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -31,7 +32,18 @@ const DateRange = (props: dateCardProps) => {
     startupFilter,
     startRange,
     localization,
+    onClickInput,
   } = props;
+
+  // In popup mode, wrap inputs in a clickable overlay that blocks direct editing.
+  const wrapForPopup = (node: React.ReactNode): React.ReactNode => {
+    if (!onClickInput) return node;
+    return (
+      <Box sx={{ position: "relative", cursor: "pointer" }} onClick={onClickInput}>
+        <Box sx={{ pointerEvents: "none" }}>{node}</Box>
+      </Box>
+    );
+  };
   const fallbackLocalization = useLocalization();
   const i18n = localization ?? fallbackLocalization;
   const safeDates = dates ??
@@ -143,30 +155,32 @@ const DateRange = (props: dateCardProps) => {
   return (
     <Grid container spacing={0.5} sx={{ paddingLeft: 0.3 }}>
       <Grid size="grow">
-        <RngeTooltip
-          topRow={topRow}
-          detailRow={dateSpan.string}
-          infoRow={dateSpan.info}
-          placement="bottom-start"
-        >
-          <DateField
-            id="start"
-            value={startText}
-            min={scopeMinDate}
-            max={
-              singleDay
-                ? scopeMaxDate
-                : endText < scopeMaxDate
-                  ? endText
-                  : scopeMaxDate
-            }
-            error={!dateSpan.toValid}
-            onBlur={handleBlur}
-            doUpdate={doUpdate}
-            onChange={handleInput}
-            {...props}
-          />
-        </RngeTooltip>
+        {wrapForPopup(
+          <RngeTooltip
+            topRow={topRow}
+            detailRow={dateSpan.string}
+            infoRow={dateSpan.info}
+            placement="bottom-start"
+          >
+            <DateField
+              id="start"
+              value={startText}
+              min={scopeMinDate}
+              max={
+                singleDay
+                  ? scopeMaxDate
+                  : endText < scopeMaxDate
+                    ? endText
+                    : scopeMaxDate
+              }
+              error={!dateSpan.toValid}
+              onBlur={handleBlur}
+              doUpdate={doUpdate}
+              onChange={handleInput}
+              {...props}
+            />
+          </RngeTooltip>
+        )}
       </Grid>
 
       {!singleDay && (
@@ -245,24 +259,26 @@ const DateRange = (props: dateCardProps) => {
           </RngeTooltip>
 
           <Grid size="grow">
-            <RngeTooltip
-              topRow={topRow}
-              detailRow={dateSpan.string}
-              infoRow={dateSpan.info}
-              placement="bottom-start"
-            >
-              <DateField
-                id="end"
-                value={endText}
-                min={startText > scopeMinDate ? startText : scopeMinDate}
-                max={scopeMaxDate}
-                error={!dateSpan.toValid}
-                onBlur={handleBlur}
-                doUpdate={doUpdate}
-                onChange={handleInput}
-                {...props}
-              />
-            </RngeTooltip>
+            {wrapForPopup(
+              <RngeTooltip
+                topRow={topRow}
+                detailRow={dateSpan.string}
+                infoRow={dateSpan.info}
+                placement="bottom-start"
+              >
+                <DateField
+                  id="end"
+                  value={endText}
+                  min={startText > scopeMinDate ? startText : scopeMinDate}
+                  max={scopeMaxDate}
+                  error={!dateSpan.toValid}
+                  onBlur={handleBlur}
+                  doUpdate={doUpdate}
+                  onChange={handleInput}
+                  {...props}
+                />
+              </RngeTooltip>
+            )}
           </Grid>
         </>
       )}
